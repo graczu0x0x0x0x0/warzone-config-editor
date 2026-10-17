@@ -1,0 +1,33 @@
+{
+  "group": "interface",
+  "settings": {
+    "HUDHorizBound@0": {
+      "subgroup": "hud",
+      "label": {"en": "HUD width", "pl": "Szerokość HUD"},
+      "desc": {
+        "en": "How far towards the screen edges the HUD extends horizontally. Lower it on ultrawide monitors so the minimap stays in view.",
+        "pl": "Jak daleko w stronę krawędzi ekranu sięga HUD w poziomie. Zmniejsz na monitorach ultrapanoramicznych, aby minimapa była w zasięgu wzroku."
+      },
+      "widget": "percent"
+    },
+    "HUDVertBound@0": {
+      "subgroup": "hud",
+      "label": {"en": "HUD height", "pl": "Wysokość HUD"},
+      "desc": {"en": "How far towards the top/bottom edges the HUD extends.", "pl": "Jak daleko w stronę górnej/dolnej krawędzi sięga HUD."},
+      "widget": "percent"
+    },
+    "TextChat background opacity@0": {
+      "subgroup": "accessibility",
+      "label": {"en": "Text chat background opacity", "pl": "Krycie tła czatu tekstowego"},
+      "desc": {"en": "Opacity of the box behind the text chat.", "pl": "Krycie tła za czatem tekstowym."},
+      "widget": "percent"
+    },
+    "ADSTimingSensitivityTouch@0": {
+      "subgroup": "accessibility",
+      "label": {"en": "ADS sensitivity transition (touch)", "pl": "Moment zmiany czułości ADS (dotyk)"},
+      "desc": {"en": "Touch-screen version of the ADS sensitivity transition timing.", "pl": "Wersja dla ekranów dotykowych ustawienia momentu zmiany czułości ADS."},
+      "options": {"immediately": {"pl": "natychmiast"}, "interpolated": {"pl": "płynnie"}, "delayed": {"pl": "z opóźnieniem"}},
+      "flags": ["advanced"]
+    }
+  }
+}

@@ -15,6 +15,7 @@ from wzce.core import (
     diff_values,
     discover,
 )
+from wzce.core.discovery import classify_stem
 
 
 def test_discover_finds_machine_and_account_files(players_dir: Path) -> None:
@@ -22,13 +23,15 @@ def test_discover_finds_machine_and_account_files(players_dir: Path) -> None:
     summary = [(loc.title_code, loc.scope, loc.kind, loc.account_id) for loc in found]
     assert summary == [
         ("cod26", Scope.MACHINE, FileKind.SETTINGS, None),
+        ("cod26", Scope.ACCOUNT, FileKind.PROFILE, "76561190000000000"),
+        ("cod26", Scope.ACCOUNT, FileKind.PROFILE_PM, "76561190000000000"),
         ("cod25", Scope.MACHINE, FileKind.SETTINGS, None),
         ("cod25", Scope.ACCOUNT, FileKind.PROFILE, "76561190000000000"),
         ("cod25", Scope.ACCOUNT, FileKind.PROFILE_PM, "76561190000000000"),
     ]
-    assert found[1].title_name == "Black Ops 7 / Warzone"
+    assert found[3].title_name == "Black Ops 7 / Warzone"
     assert found[0].title_name == "cod26"  # unknown titles still listed
-    assert found[1].fileset.is_ab and not found[0].fileset.is_ab
+    assert found[3].fileset.is_ab and not found[0].fileset.is_ab
 
 
 def test_discover_ignores_manual_copies_and_steamcloud(players_dir: Path) -> None:
@@ -41,7 +44,10 @@ def test_discover_ignores_manual_copies_and_steamcloud(players_dir: Path) -> Non
     shutil.copy2(COD25_TXT0, players_dir / "76561190000000000" / "s.1.0.cod25.txt0")
 
     stems = [loc.fileset.stem for loc in discover([players_dir])]
-    assert stems == ["s.1.0.cod26", "s.1.0.cod25", "g.cod25.1.0.l", "g.cod25.pm.1.0.l"]
+    assert stems == [
+        "s.1.0.cod26", "g.cod26.1.0.l", "g.cod26.pm.1.0.l",
+        "s.1.0.cod25", "g.cod25.1.0.l", "g.cod25.pm.1.0.l",
+    ]  # fmt: skip
 
 
 def test_discover_tolerates_missing_dirs(tmp_path: Path) -> None:
@@ -67,3 +73,10 @@ def test_diff_values_added_and_removed() -> None:
         ("New@0", ChangeKind.ADDED),
         ("Gone@0", ChangeKind.REMOVED),
     ]
+
+
+def test_classify_stem() -> None:
+    assert classify_stem("s.1.0.cod25") == (Scope.MACHINE, FileKind.SETTINGS, "cod25")
+    assert classify_stem("g.cod26.1.0.l") == (Scope.ACCOUNT, FileKind.PROFILE, "cod26")
+    assert classify_stem("g.cod25.pm.1.0.l") == (Scope.ACCOUNT, FileKind.PROFILE_PM, "cod25")
+    assert classify_stem("s.1.0.cod25_bu") is None

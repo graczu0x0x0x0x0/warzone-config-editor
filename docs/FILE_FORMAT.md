@@ -20,10 +20,35 @@ Root: `%LOCALAPPDATA%\Activision\Call of Duty\players\`
 | `<platformId>\SteamCloud\...` | mixed | account | Steam Cloud mirror |
 | `s.1.0.cod26.txt` (single file, no A/B) | text | machine | Next title (`cod26`), same grammar, 163 settings |
 
-**Account-file caveat:** every `g.cod25.1.0.l.txtN` is written together with a binary
-`g.cod25.1.0.l.bN` (127 bytes) in the same A/B slot. It may be a checksum/signature of the
-text file — if so, the game could reject a hand-edited account text file. Must be tested
-before account editing ships (PLAN stage 7). Machine files `s.1.0.*` have no such companion.
+### Account files and their `.l.b` companions (analysed 2026-10-17)
+
+Every `g.cod25.1.0.l.txtN` is written together with a binary `g.cod25.1.0.l.bN` (127 bytes)
+in the same A/B slot, sharing the marker `g.cod25.1.0.l.m`. Findings:
+
+- **`.l.b` is not a checksum of the text.** At 12:30/12:34 the game changed `HDRMinLum`
+  (0.06 -> 0.09), so `l.txt0` and `l.txt1` differ - while `l.b0` and `l.b1` are byte-identical.
+  A hash of the text would have changed too.
+- `.l.b` is a tiny binary key/value store of *other* values: records look like
+  `4-byte hash | flags | type | size | value` (e.g. floats 0.7, 1.0, 1.4, ints 0/1).
+  The `pm` variant (112 bytes) holds 0 and 0.3 values. Neither contains the text values.
+- **Text values (FOV 120, sensitivity 7.0, ADS 0.55, monitor coefficient 1.333) occur in
+  no binary file** (`.b0/.b1`, `.l.b`, `pm` files) -> the text file is the only local copy.
+- Some values do appear in the big binary profile `g.cod25.1.0.b0/.b1` (e.g. 0.75, 100.0, 0.2),
+  but those floats are common and the matches are not specific.
+
+Conclusion: nothing local binds the text to a checksum, so editing it is consistent with how
+the game writes it. **Still unverified:** whether the game overwrites it from the account's
+cloud profile at login. The editor marks account files as experimental and explains a
+one-value test (change FOV by 1, launch, compare); a revert by the game would show up as a
+GAME_CHANGE in History. Record the outcome here once tested.
+
+Other account-file facts:
+- `g.codNN.pm.1.0.l` holds a **second, independent FOV** (`Fov@0`, e.g. 90/95) next to the main
+  `Fov@1` (120) in `g.codNN.1.0.l`. Which modes use which is not documented.
+- Volume ids (`Volume@0`, `EffectsVolume@0`, ...) exist in both the machine and the account
+  file, with different TypeIds; it is unknown which one wins.
+- cod26 account files are single `.txt` files (no A/B), like the cod26 machine file.
+- Machine files `s.1.0.*` have no binary companion at all.
 
 `<platformId>` is e.g. a SteamID64 (`7656119...`). Older title BO6 (`cod24`) lives in
 `%USERPROFILE%\Documents\Call of Duty\players\` with the same naming scheme.

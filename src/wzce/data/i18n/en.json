@@ -3,6 +3,11 @@
 
   "about.disclaimer": "This tool only edits text settings files and never touches the game or its process. Not affiliated with Activision.",
 
+  "account.experimental": "Account file (sensitivity, FOV, audio mix): editing it is experimental - the game might replace it with your profile from the cloud. Check after the first game launch.",
+  "account.how_to_test": "How to check",
+  "account.test_title": "Checking account file edits",
+  "account.test_text": "1. Close the game.\n2. Change one easy-to-see value here (e.g. FOV by 1) and save.\n3. Start the game and look at that value in the game's settings.\n4. Close the game and open this file again in the editor.\n\nIf the game kept your value, edits work. If it put the old value back, the editor shows a 'changed by the game' notice and History has the details - your change is not lost.",
+
   "app.title": "Warzone Config Editor",
   "app.subtitle": "Settings editor for Call of Duty: Black Ops 7 / Warzone",
 
@@ -70,6 +75,7 @@
   "file.read_only": "Files are read-only",
   "file.open_dialog_title": "Open settings file",
   "file.open_filter": "Call of Duty settings (*.txt0 *.txt1 *.txt)",
+  "file.account_pm": "Account FOV {account}",
 
   "filter.simple_mode": "Simple",
   "filter.advanced_mode": "Advanced",

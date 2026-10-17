@@ -67,6 +67,15 @@ class ConfigLocation:
         return int(self.title_code.removeprefix("cod"))
 
 
+def classify_stem(stem: str) -> tuple[Scope, FileKind, str] | None:
+    """``(scope, kind, title code)`` for a file stem such as ``g.cod25.1.0.l``; None if unknown."""
+    for pattern, scope, kind in _STEM_PATTERNS:
+        match = pattern.match(stem)
+        if match is not None:
+            return scope, kind, match.group(1)
+    return None
+
+
 def discover(players_dirs: list[Path] | None = None) -> list[ConfigLocation]:
     """All settings file sets, newest title first, machine scope before account scope."""
     dirs = game_players_dirs() if players_dirs is None else players_dirs

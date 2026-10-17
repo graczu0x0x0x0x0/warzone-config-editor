@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import COD25_TXT0, COD26_SINGLE
+from conftest import COD25_TXT0, COD26_SINGLE, SNAPSHOT
 from wzce.core import ConfigDocument, ValidationError, ValueType
 from wzce.core.knowledge import (
     SUPPORTED_LANGUAGES,
@@ -25,9 +25,15 @@ from wzce.core.knowledge import (
 )
 from wzce.core.model import format_value
 
+PROFILE = SNAPSHOT / "profile"
 TITLE_DOCS = {
     "cod25": ConfigDocument.from_bytes(COD25_TXT0.read_bytes()),
     "cod26": ConfigDocument.from_bytes(COD26_SINGLE.read_bytes()),
+    # Account-level files (sensitivity, FOV, audio mix, HDR...).
+    "cod25-account": ConfigDocument.from_bytes((PROFILE / "g.cod25.1.0.l.txt0").read_bytes()),
+    "cod25-pm": ConfigDocument.from_bytes((PROFILE / "g.cod25.pm.1.0.l.txt0").read_bytes()),
+    "cod26-account": ConfigDocument.from_bytes((PROFILE / "g.cod26.1.0.l.txt").read_bytes()),
+    "cod26-pm": ConfigDocument.from_bytes((PROFILE / "g.cod26.pm.1.0.l.txt").read_bytes()),
 }
 
 # Recommendations that are valid for one title but not another. Listed explicitly
@@ -47,7 +53,7 @@ def kb() -> KnowledgeBase:
 
 def test_groups_and_presets(kb: KnowledgeBase) -> None:
     assert [g.id for g in kb.groups] == [
-        "display", "performance", "upscaling", "quality", "gameplay",
+        "display", "performance", "upscaling", "quality", "aim", "gameplay",
         "audio", "interface", "controls", "power", "system",
     ]  # fmt: skip
     assert [p.id for p in kb.presets] == ["competitive", "balanced", "quality", "low_end"]

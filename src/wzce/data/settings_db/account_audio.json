@@ -1,0 +1,134 @@
+{
+  "group": "audio",
+  "settings": {
+    "AudioMixPreset@0": {
+      "subgroup": "mix",
+      "label": {"en": "Audio mix", "pl": "Miks dźwięku"},
+      "desc": {
+        "en": "Audio mix preset (internal name), e.g. 'theatrical_cer', 'headphones_cer' or 'headphones_bass_cut_cer'. Headphone mixes make footsteps and direction clearer; the bass-cut variant is popular in competitive play. Pick it in game if unsure - the exact names are not listed in the file.",
+        "pl": "Preset miksu dźwięku (nazwa wewnętrzna), np. „theatrical_cer”, „headphones_cer” lub „headphones_bass_cut_cer”. Miksy słuchawkowe wyraźniej oddają kroki i kierunek; wariant z obciętym basem jest popularny w grze rankingowej. W razie wątpliwości wybierz w grze — plik nie podaje listy nazw."
+      },
+      "widget": "text",
+      "impact": {"visibility": 2},
+      "tip": {
+        "en": "Community favourite on headphones: headphones_bass_cut_cer.",
+        "pl": "Ulubiony wybór społeczności na słuchawkach: headphones_bass_cut_cer."
+      }
+    },
+    "MonoSound@0": {
+      "subgroup": "mix",
+      "label": {"en": "Mono audio", "pl": "Dźwięk mono"},
+      "desc": {
+        "en": "Mixes stereo into mono (accessibility, single earbud). Removes left/right direction cues - keep off for competitive play.",
+        "pl": "Miesza stereo do mono (dostępność, jedna słuchawka). Usuwa informację o kierunku lewo/prawo — w grze rankingowej wyłącz."
+      },
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": false, "balanced": false},
+      "related": ["MonoSoundAmount@0"]
+    },
+    "MonoSoundAmount@0": {
+      "subgroup": "mix",
+      "label": {"en": "Mono amount", "pl": "Udział mono"},
+      "desc": {"en": "How much of the mix is mono when Mono audio is on.", "pl": "Jaka część miksu jest mono, gdy dźwięk mono jest włączony."},
+      "unit": "%",
+      "flags": ["advanced"],
+      "related": ["MonoSound@0"]
+    },
+    "ImmerseSpatialAudio@0": {
+      "subgroup": "mix",
+      "label": {"en": "Embody Immerse spatial audio", "pl": "Dźwięk przestrzenny Embody Immerse"},
+      "desc": {
+        "en": "Headphone spatial audio technology (HRTF) that places sounds around you in 3D. Some players hear direction better with it, others prefer the plain headphone mix - try both.",
+        "pl": "Technologia dźwięku przestrzennego na słuchawki (HRTF), która rozmieszcza dźwięki wokół w 3D. Część graczy lepiej słyszy z nią kierunek, inni wolą zwykły miks słuchawkowy — wypróbuj oba."
+      },
+      "impact": {"visibility": 1},
+      "related": ["ImmersePersonalization@0"]
+    },
+    "ImmersePersonalization@0": {
+      "subgroup": "mix",
+      "label": {"en": "Immerse personalized HRTF", "pl": "Spersonalizowany profil Immerse"},
+      "desc": {"en": "Uses a personalized HRTF profile with Embody Immerse (set up in game).", "pl": "Używa spersonalizowanego profilu HRTF dla Embody Immerse (konfigurowanego w grze)."},
+      "flags": ["advanced"]
+    },
+    "ThxLssEnabled@0": {
+      "subgroup": "mix",
+      "label": {"en": "THX Spatial Audio (speakers)", "pl": "THX Spatial Audio (głośniki)"},
+      "desc": {"en": "THX loudspeaker spatial processing (cod26 files). For speaker setups, not headphones.", "pl": "Przestrzenne przetwarzanie THX dla głośników (pliki cod26). Dla zestawów głośnikowych, nie słuchawek."}
+    },
+    "AltShellShock@0": {
+      "subgroup": "mix",
+      "label": {"en": "Mute tinnitus sound", "pl": "Wycisz piszczenie w uszach"},
+      "desc": {
+        "en": "Replaces the loud tinnitus ring after explosions/stuns with a quieter effect, so you can keep hearing footsteps.",
+        "pl": "Zastępuje głośne piszczenie w uszach po wybuchach i ogłuszeniu cichszym efektem, dzięki czemu nadal słychać kroki."
+      },
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": true, "balanced": true}
+    },
+    "MuteLicensedMusic@0": {
+      "subgroup": "volume",
+      "label": {"en": "Mute licensed music", "pl": "Wycisz muzykę licencjonowaną"},
+      "desc": {"en": "Mutes licensed songs (useful for streaming to avoid copyright claims).", "pl": "Wycisza licencjonowane utwory (przydatne przy streamowaniu, by uniknąć roszczeń praw autorskich)."},
+      "recommend": {"competitive": true}
+    },
+    "MuteAudioWhileOutOfFocus@0": {
+      "subgroup": "volume",
+      "label": {"en": "Mute when in background", "pl": "Wycisz w tle"},
+      "desc": {"en": "Mutes the game while its window is not focused (Alt+Tab).", "pl": "Wycisza grę, gdy jej okno nie jest aktywne (Alt+Tab)."}
+    },
+    "VoiceChat@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Voice chat", "pl": "Czat głosowy"},
+      "desc": {"en": "Enables in-game voice chat.", "pl": "Włącza czat głosowy w grze."}
+    },
+    "VoiceChatVolume@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Voice chat volume", "pl": "Głośność czatu głosowego"},
+      "desc": {"en": "Volume of other players' voices (up to 4x boost).", "pl": "Głośność głosów innych graczy (do 4x wzmocnienia)."},
+      "unit": "x"
+    },
+    "MicrophoneVolume@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Microphone volume", "pl": "Głośność mikrofonu"},
+      "desc": {"en": "Your microphone level sent to others (up to 4x boost).", "pl": "Poziom Twojego mikrofonu wysyłany do innych (do 4x wzmocnienia)."},
+      "unit": "x"
+    },
+    "VoiceInputDevice@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Voice chat microphone", "pl": "Mikrofon czatu głosowego"},
+      "desc": {"en": "Which Windows default microphone voice chat uses: the default communication device or the default system device.", "pl": "Który domyślny mikrofon Windows używa czat głosowy: domyślne urządzenie komunikacyjne czy domyślne urządzenie systemowe."},
+      "options": {"Default Communication Device": {"pl": "Domyślne urządzenie komunikacyjne"}, "Default System Device": {"pl": "Domyślne urządzenie systemowe"}}
+    },
+    "VoiceInputVolume@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Microphone input volume", "pl": "Głośność wejścia mikrofonu"},
+      "desc": {"en": "Microphone input level (cod26 files).", "pl": "Poziom wejścia mikrofonu (pliki cod26)."},
+      "widget": "percent",
+      "related": ["VoiceInputVolumeBoost@0"]
+    },
+    "VoiceInputVolumeBoost@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Microphone boost", "pl": "Wzmocnienie mikrofonu"},
+      "desc": {"en": "Extra boost for a quiet microphone (cod26 files).", "pl": "Dodatkowe wzmocnienie cichego mikrofonu (pliki cod26)."},
+      "unit": "x"
+    },
+    "VoiceOutputVolume@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Voice chat output volume", "pl": "Głośność odtwarzania czatu"},
+      "desc": {"en": "Volume of voice chat playback (cod26 files).", "pl": "Głośność odtwarzania czatu głosowego (pliki cod26)."},
+      "widget": "percent",
+      "related": ["VoiceOutputVolumeBoost@0"]
+    },
+    "VoiceOutputVolumeBoost@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Voice chat boost", "pl": "Wzmocnienie czatu głosowego"},
+      "desc": {"en": "Extra boost for quiet teammates (cod26 files).", "pl": "Dodatkowe wzmocnienie cichych członków drużyny (pliki cod26)."},
+      "unit": "x"
+    },
+    "AudioWheelActive@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Audio wheel", "pl": "Koło komunikatów głosowych"},
+      "desc": {"en": "Enables the audio (voice line / communication) wheel.", "pl": "Włącza koło komunikatów głosowych (szybkie kwestie postaci)."}
+    }
+  }
+}

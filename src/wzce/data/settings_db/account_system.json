@@ -1,0 +1,22 @@
+{
+  "group": "system",
+  "settings": {
+    "HTTPStreamUsageLimit@0": {
+      "subgroup": "streaming",
+      "label": {"en": "Limit on-demand texture streaming", "pl": "Ogranicz strumieniowanie tekstur"},
+      "desc": {
+        "en": "Caps how much data the game may download for on-demand texture streaming (high-res textures fetched from the internet). Useful on metered connections.",
+        "pl": "Ogranicza, ile danych gra może pobrać przy strumieniowaniu tekstur na żądanie (tekstury wysokiej rozdzielczości pobierane z internetu). Przydatne przy łączu z limitem danych."
+      },
+      "related": ["HTTPStreamLimitMBytes@0"]
+    },
+    "HTTPStreamLimitMBytes@0": {
+      "subgroup": "streaming",
+      "label": {"en": "Streaming data limit", "pl": "Limit danych strumieniowania"},
+      "desc": {"en": "Data limit for on-demand texture streaming, in MB, when the limit is enabled.", "pl": "Limit danych dla strumieniowania tekstur w MB, gdy ograniczenie jest włączone."},
+      "unit": "MB",
+      "widget": "text",
+      "flags": ["advanced"]
+    }
+  }
+}

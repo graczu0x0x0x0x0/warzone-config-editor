@@ -1,0 +1,61 @@
+{
+  "group": "display",
+  "settings": {
+    "Brightness@0": {
+      "subgroup": "brightness",
+      "label": {"en": "Brightness", "pl": "Jasność"},
+      "desc": {
+        "en": "In-game brightness offset (-0.5 to 0.5, 0 = neutral). A small positive value helps spot enemies in dark interiors; too much washes the image out.",
+        "pl": "Przesunięcie jasności w grze (od -0,5 do 0,5, 0 = neutralnie). Niewielka dodatnia wartość pomaga dostrzec wrogów w ciemnych wnętrzach; za dużo sprawia, że obraz staje się wyblakły."
+      },
+      "impact": {"visibility": 2}
+    },
+    "Display Gamma@0": {
+      "subgroup": "brightness",
+      "label": {"en": "SDR gamma", "pl": "Gamma SDR"},
+      "desc": {
+        "en": "Gamma curve for SDR output. Increase until the checkerboard swatch in the game's calibration screen matches the reference grey.",
+        "pl": "Krzywa gamma dla obrazu SDR. Zwiększaj, aż szachownica na ekranie kalibracji w grze zrówna się z szarym wzorcem."
+      },
+      "impact": {"visibility": 2}
+    },
+    "TargetRefreshRate@0": {
+      "subgroup": "mode",
+      "label": {"en": "Target refresh rate", "pl": "Docelowe odświeżanie"},
+      "desc": {
+        "en": "Target refresh rate stored in the account profile (60 or 120 Hz) - most likely for consoles and handhelds. The PC refresh rate is set in the machine settings file.",
+        "pl": "Docelowe odświeżanie zapisane w profilu konta (60 lub 120 Hz) — najpewniej dla konsol i urządzeń przenośnych. Odświeżanie na PC ustawia plik ustawień komputera."
+      },
+      "flags": ["advanced"],
+      "related": ["TargetRefreshRate@1"]
+    },
+    "TargetRefreshRate@1": {
+      "subgroup": "mode",
+      "label": {"en": "Target refresh rate (variant 2)", "pl": "Docelowe odświeżanie (wariant 2)"},
+      "desc": {"en": "Second variant of the target refresh rate (cod26 files).", "pl": "Drugi wariant docelowego odświeżania (pliki cod26)."},
+      "flags": ["advanced"]
+    },
+    "HDRGamma@0": {
+      "subgroup": "color",
+      "label": {"en": "HDR gamma", "pl": "Gamma HDR"},
+      "desc": {"en": "Gamma adjustment applied in HDR mode.", "pl": "Korekta gammy w trybie HDR."},
+      "impact": {"visibility": 1}
+    },
+    "HDRMaxLum@0": {
+      "subgroup": "color",
+      "label": {"en": "HDR peak brightness", "pl": "Maksymalna jasność HDR"},
+      "desc": {"en": "Peak luminance target for HDR - set it with the in-game HDR calibration to match your display.", "pl": "Docelowa maksymalna jasność HDR — ustaw ją kalibracją HDR w grze pod swój monitor."}
+    },
+    "HDRMinLum@0": {
+      "subgroup": "color",
+      "label": {"en": "HDR black level", "pl": "Poziom czerni HDR"},
+      "desc": {"en": "Minimum luminance (black level) for HDR. Too high lifts blacks, too low crushes shadow detail.", "pl": "Minimalna jasność (poziom czerni) w HDR. Za wysoko rozjaśnia czerń, za nisko zlewa szczegóły w cieniach."},
+      "impact": {"visibility": 1}
+    },
+    "HDRUseWindowsDisplayMapping@0": {
+      "subgroup": "color",
+      "label": {"en": "Use Windows HDR calibration", "pl": "Użyj kalibracji HDR z Windows"},
+      "desc": {"en": "Uses the Windows 11 HDR Calibration values instead of the game's own min/max luminance.", "pl": "Używa wartości z aplikacji Kalibracja HDR w Windows 11 zamiast własnych ustawień jasności gry."}
+    }
+  }
+}

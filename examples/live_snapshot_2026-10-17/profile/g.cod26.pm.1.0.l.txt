@@ -1,0 +1,15 @@
+1
+
+
+//
+// Gameplay
+
+// 1st Person Field of View
+Fov@0;24892;9411 = 95.000000 // 60.000000 to 120.000000
+
+// 3rd Person Field of View
+ThirdPersonFov@0;20915;9411 = 90.000000 // 70.000000 to 90.000000
+
+// 1st Person Field of View (Handheld)
+Handheld Fov@0;24892;41457 = 70.000000 // 60.000000 to 120.000000
+

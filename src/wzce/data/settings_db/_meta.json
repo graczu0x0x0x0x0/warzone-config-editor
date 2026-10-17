@@ -46,7 +46,8 @@
         {"id": "mode", "label": {"en": "Mode & resolution", "pl": "Tryb i rozdzielczość"}},
         {"id": "sync_latency", "label": {"en": "Sync & latency", "pl": "Synchronizacja i opóźnienie"}},
         {"id": "color", "label": {"en": "HDR & color", "pl": "HDR i kolory"}},
-        {"id": "window", "label": {"en": "Window", "pl": "Okno"}}
+        {"id": "window", "label": {"en": "Window", "pl": "Okno"}},
+        {"id": "brightness", "label": {"en": "Brightness & gamma", "pl": "Jasność i gamma"}}
       ]
     },
     {
@@ -83,6 +84,18 @@
       ]
     },
     {
+      "id": "aim", "icon": "target",
+      "label": {"en": "Aim & field of view", "pl": "Celowanie i FOV"},
+      "subgroups": [
+        {"id": "fov", "label": {"en": "Field of view", "pl": "Pole widzenia (FOV)"}},
+        {"id": "sensitivity", "label": {"en": "Mouse sensitivity", "pl": "Czułość myszy"}},
+        {"id": "ads", "label": {"en": "Aiming down sights", "pl": "Celowanie przez przyrządy (ADS)"}},
+        {"id": "vehicles", "label": {"en": "Vehicles", "pl": "Pojazdy"}},
+        {"id": "mouse_advanced", "label": {"en": "Mouse processing", "pl": "Przetwarzanie ruchu myszy"}},
+        {"id": "input_device", "label": {"en": "Aiming device", "pl": "Urządzenie do celowania"}}
+      ]
+    },
+    {
       "id": "gameplay", "icon": "crosshair",
       "label": {"en": "Gameplay", "pl": "Rozgrywka"},
       "subgroups": [
@@ -97,7 +110,8 @@
       "subgroups": [
         {"id": "volume", "label": {"en": "Volume", "pl": "Głośność"}},
         {"id": "devices", "label": {"en": "Devices & channels", "pl": "Urządzenia i kanały"}},
-        {"id": "voice_chat", "label": {"en": "Voice chat", "pl": "Czat głosowy"}}
+        {"id": "voice_chat", "label": {"en": "Voice chat", "pl": "Czat głosowy"}},
+        {"id": "mix", "label": {"en": "Mix & spatial audio", "pl": "Miks i dźwięk przestrzenny"}}
       ]
     },
     {
@@ -105,7 +119,8 @@
       "label": {"en": "Interface", "pl": "Interfejs"},
       "subgroups": [
         {"id": "hud", "label": {"en": "HUD & cursor", "pl": "HUD i kursor"}},
-        {"id": "videos", "label": {"en": "Intro & videos", "pl": "Intro i filmy"}}
+        {"id": "videos", "label": {"en": "Intro & videos", "pl": "Intro i filmy"}},
+        {"id": "accessibility", "label": {"en": "Accessibility & touch", "pl": "Dostępność i dotyk"}}
       ]
     },
     {
@@ -114,7 +129,8 @@
       "subgroups": [
         {"id": "mouse", "label": {"en": "Mouse", "pl": "Mysz"}},
         {"id": "gamepad", "label": {"en": "Gamepad", "pl": "Pad"}},
-        {"id": "menu", "label": {"en": "Menu navigation", "pl": "Nawigacja w menu"}}
+        {"id": "menu", "label": {"en": "Menu navigation", "pl": "Nawigacja w menu"}},
+        {"id": "movement", "label": {"en": "Movement assists", "pl": "Wspomaganie ruchu"}}
       ]
     },
     {
@@ -131,7 +147,8 @@
       "subgroups": [
         {"id": "behaviour", "label": {"en": "Sync & detection", "pl": "Synchronizacja i wykrywanie"}},
         {"id": "hardware_info", "label": {"en": "Detected hardware", "pl": "Wykryty sprzęt"}},
-        {"id": "unknown", "label": {"en": "Other / new", "pl": "Inne / nowe"}}
+        {"id": "unknown", "label": {"en": "Other / new", "pl": "Inne / nowe"}},
+        {"id": "streaming", "label": {"en": "Data streaming", "pl": "Strumieniowanie danych"}}
       ]
     }
   ],

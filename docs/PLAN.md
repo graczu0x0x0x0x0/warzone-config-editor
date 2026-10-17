@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–6 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–7 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -123,10 +123,18 @@ tests/             # pytest, fixtures z examples/
 - [x] Testy: 25 rdzenia (parsowanie CPU, wybór karty, reguły) + 8 GUI
 
 ### Etap 7 — Plik konta (czułość, FOV)
-- [ ] Obsługa `players\<ID>\g.cod25.1.0.l.txt0/1` i `g.cod25.pm.1.0.l.txt0/1` (ten sam parser)
-- [ ] Wybór konta, gdy jest kilka folderów
-- [ ] Sprawdzenie, czy gra respektuje edycję tekstu, czy nadpisuje z binarnego `.b0/.b1` / chmury
-      (uwaga: każdy `g.cod25.1.0.l.txtN` ma binarny towarzysz `.l.bN` — możliwa suma kontrolna)
+- [x] Analiza `.l.b`: to NIE jest suma kontrolna tekstu (sloty tekstu się różnią, `.l.b` identyczne),
+      a wartości z tekstu (FOV, czułość) nie występują w żadnym pliku binarnym — szczegóły w
+      [`FILE_FORMAT.md`](FILE_FORMAT.md)
+- [x] Obsługa `players\<ID>\g.codNN.1.0.l` i `g.codNN.pm.1.0.l` (A/B i pojedyncze pliki cod26),
+      te same zasady zapisu co dla pliku komputera (oba sloty, znacznik `.m` i `.l.b` bez zmian)
+- [x] Wybór konta: każdy plik konta na liście plików z końcówką identyfikatora (np. „Profil konta …0575”)
+- [x] Baza wiedzy: 67 ustawień konta PL/EN, nowa kategoria „Celowanie i FOV” (FOV, czułość, ADS,
+      pojazdy, akceleracja/wygładzanie), miks dźwięku, czat głosowy, jasność/HDR, HUD, auto-sprint
+- [x] Baner „edycja pliku konta jest eksperymentalna” + instrukcja testu w grze
+- [x] Testy: pokrycie bazy dla plików konta cod25/cod26 + 4 GUI (zapis FOV i czułości do obu slotów)
+- [ ] **Test w grze (Ty):** zmiana FOV o 1 → uruchomienie gry → czy wartość została (wynik dopisać
+      do `FILE_FORMAT.md`; jeśli gra nadpisuje z chmury — zablokować zapis plików konta)
 
 ### Etap 8 — Dystrybucja
 - [ ] Ikona, nazwa, wersjonowanie

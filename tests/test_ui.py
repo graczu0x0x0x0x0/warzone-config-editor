@@ -646,3 +646,63 @@ def test_read_only_lock_needs_confirmation(window: MainWindow) -> None:
     window.set_files_read_only(True)
     assert not window.session.fileset.is_read_only()
     assert not window.read_only_action.isChecked()
+
+
+# --------------------------------------------------- stage 7: account files
+
+
+def _open_by_stem(window: MainWindow, stem: str) -> None:
+    for index in range(window.file_combo.count()):
+        data = window.file_combo.itemData(index)
+        if isinstance(data, SettingsFileSet) and data.stem == stem:
+            window._on_file_activated(index)
+            return
+    raise AssertionError(f"{stem} not in the file list")
+
+
+def test_account_files_are_listed_with_labels(window: MainWindow) -> None:
+    labels = [window.file_combo.itemText(i) for i in range(window.file_combo.count())]
+    assert "Black Ops 7 / Warzone · Account profile …0000" in labels
+    assert "Black Ops 7 / Warzone · Account FOV …0000" in labels
+    assert window.account_notice.isHidden()  # machine file open
+
+
+def test_edit_and_save_account_sensitivity_and_fov(window: MainWindow, players_dir: Path) -> None:
+    _open_by_stem(window, "g.cod25.1.0.l")
+    assert window.is_account_file()
+    assert not window.account_notice.isHidden()
+    nav = [window.nav.item(i).text() for i in range(window.nav.count())]
+    assert any(text.startswith("Aim & field of view") for text in nav)
+
+    account = players_dir / "76561190000000000"
+    marker_before = (account / "g.cod25.1.0.l.m").read_bytes()
+    _edit(window, "Fov@1", 105)
+    _edit(window, "MouseHorizontalSensibility@0", 6.5)
+    card = window.cards["MouseHorizontalSensibility@0"]
+    assert card.entry.label["en"] == "Mouse sensitivity"
+    assert window.save() is True
+
+    for slot in ("txt0", "txt1"):
+        doc = ConfigDocument.from_bytes((account / f"g.cod25.1.0.l.{slot}").read_bytes())
+        assert doc.get("Fov@1").raw_value == "105.000000"
+        assert doc.get("MouseHorizontalSensibility@0").raw_value == "6.500000"
+    assert (account / "g.cod25.1.0.l.m").read_bytes() == marker_before
+
+
+def test_account_notice_explains_how_to_check(window: MainWindow) -> None:
+    _open_by_stem(window, "g.cod25.pm.1.0.l")
+    window.account_notice_help.click()
+    level, text = window.messages[-1]
+    assert level == "info" and "FOV" in text
+    _open_by_stem(window, "s.1.0.cod25")
+    assert window.account_notice.isHidden()
+
+
+def test_template_from_account_file_keeps_aim_settings(window: MainWindow) -> None:
+    from wzce.core.templates import template_from_document
+
+    _open_by_stem(window, "g.cod25.1.0.l")
+    template = template_from_document(
+        window.session.document, window.knowledge, "My aim", groups=["aim"]
+    )
+    assert {"Fov@1", "MouseHorizontalSensibility@0", "ADSSensitivity@1"} <= set(template.values)

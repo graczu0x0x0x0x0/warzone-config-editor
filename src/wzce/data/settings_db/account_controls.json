@@ -1,0 +1,26 @@
+{
+  "group": "controls",
+  "settings": {
+    "Sprint Assist Delay KBM@1": {
+      "subgroup": "movement",
+      "label": {"en": "Auto-sprint delay (keyboard)", "pl": "Opóźnienie auto-sprintu (klawiatura)"},
+      "desc": {
+        "en": "With automatic sprint enabled: how long you must move before sprint starts by itself, in milliseconds. 0 = instantly.",
+        "pl": "Przy włączonym automatycznym sprincie: jak długo trzeba się poruszać, zanim sprint włączy się sam, w milisekundach. 0 = od razu."
+      },
+      "unit": "ms",
+      "widget": "spin"
+    },
+    "Sprint Assist Delay Gamepad@1": {
+      "subgroup": "movement",
+      "label": {"en": "Auto-sprint delay (gamepad)", "pl": "Opóźnienie auto-sprintu (pad)"},
+      "desc": {
+        "en": "Time at full stick deflection before sprint starts automatically, in milliseconds.",
+        "pl": "Czas przy maksymalnym wychyleniu gałki, po którym sprint włącza się automatycznie, w milisekundach."
+      },
+      "unit": "ms",
+      "widget": "spin",
+      "flags": ["advanced"]
+    }
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "group": "aim",
+  "settings": {
+    "Fov@1": {
+      "subgroup": "fov",
+      "label": {"en": "Field of view (FOV)", "pl": "Pole widzenia (FOV)"},
+      "desc": {
+        "en": "First-person field of view in degrees, stored in the account profile. Wider FOV shows more of the battlefield at the edges (more enemies in view) but makes distant targets smaller and costs a little performance. 100-110 is a common competitive choice; 120 adds a fisheye look.",
+        "pl": "Pole widzenia z perspektywy pierwszej osoby w stopniach, zapisane w profilu konta. Szersze FOV pokazuje więcej pola walki na brzegach ekranu (więcej wrogów w zasięgu wzroku), ale odległe cele są mniejsze, a wydajność odrobinę spada. 100–110 to popularny wybór w grze rankingowej; 120 daje efekt „rybiego oka”."
+      },
+      "unit": "°",
+      "impact": {"visibility": 3, "fps": 1},
+      "recommend": {"competitive": 110, "balanced": 105, "quality": 100, "low_end": 100},
+      "tip": {
+        "en": "Warzone players often go 110-120 for peripheral vision; multiplayer 100-110 keeps targets larger.",
+        "pl": "W Warzone gracze często wybierają 110–120 dla widzenia peryferyjnego; w multiplayerze 100–110 zostawia cele większe."
+      },
+      "related": ["Fov@0", "ADSFovScaling@0"]
+    },
+    "Fov@0": {
+      "subgroup": "fov",
+      "label": {"en": "Field of view (second value)", "pl": "Pole widzenia (druga wartość)"},
+      "desc": {
+        "en": "A second first-person FOV value. It lives in the small 'pm' account file and can differ from the main FOV (e.g. 90 vs 120). Which modes use it is not documented - keep it equal to the main FOV if you are unsure.",
+        "pl": "Druga wartość FOV z perspektywy pierwszej osoby. Znajduje się w małym pliku konta „pm” i może różnić się od głównego FOV (np. 90 i 120). Nie wiadomo dokładnie, które tryby jej używają — w razie wątpliwości ustaw tak samo jak główne FOV."
+      },
+      "unit": "°",
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": 110, "balanced": 105, "quality": 100, "low_end": 100},
+      "related": ["Fov@1"]
+    },
+    "ThirdPersonFov@1": {
+      "subgroup": "fov",
+      "label": {"en": "Third-person field of view", "pl": "Pole widzenia z trzeciej osoby"},
+      "desc": {
+        "en": "Field of view in third-person modes and views. Higher shows more around your character.",
+        "pl": "Pole widzenia w trybach i widokach z trzeciej osoby. Wyższe pokazuje więcej wokół postaci."
+      },
+      "unit": "°",
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": 90, "balanced": 90},
+      "related": ["ThirdPersonFov@0"]
+    },
+    "ThirdPersonFov@0": {
+      "subgroup": "fov",
+      "label": {"en": "Third-person FOV (second value)", "pl": "FOV z trzeciej osoby (druga wartość)"},
+      "desc": {
+        "en": "Second third-person FOV value (seen in cod26 and 'pm' files); purpose not documented.",
+        "pl": "Druga wartość FOV z trzeciej osoby (pliki cod26 i „pm”); przeznaczenie nieudokumentowane."
+      },
+      "unit": "°",
+      "flags": ["advanced"],
+      "related": ["ThirdPersonFov@1"]
+    },
+    "Handheld Fov@0": {
+      "subgroup": "fov",
+      "label": {"en": "Field of view (handheld)", "pl": "Pole widzenia (urządzenia przenośne)"},
+      "desc": {
+        "en": "FOV used on handheld PCs (Steam Deck, ROG Ally style devices). Irrelevant on a desktop.",
+        "pl": "FOV używane na przenośnych PC (Steam Deck, ROG Ally itp.). Na komputerze stacjonarnym bez znaczenia."
+      },
+      "unit": "°",
+      "flags": ["advanced"]
+    },
+    "ADSFovScaling@0": {
+      "subgroup": "fov",
+      "label": {"en": "Scale ADS with FOV", "pl": "Skaluj ADS z FOV"},
+      "desc": {
+        "en": "When on ('Affected'), the zoom while aiming down sights scales with your FOV, so optics feel consistent whatever FOV you use. Off ('Independent') keeps the same zoom regardless of FOV.",
+        "pl": "Gdy włączone („Affected”), przybliżenie przy celowaniu skaluje się z Twoim FOV, więc celowniki zachowują się spójnie niezależnie od FOV. Wyłączone („Independent”) daje stałe przybliżenie niezależnie od FOV."
+      },
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": true, "balanced": true}
+    },
+    "MouseHorizontalSensibility@0": {
+      "subgroup": "sensitivity",
+      "label": {"en": "Mouse sensitivity", "pl": "Czułość myszy"},
+      "desc": {
+        "en": "Base mouse sensitivity for both axes. Purely personal - pick a value that lets you turn 180° comfortably and still make small corrections. Change it in small steps and keep mouse DPI fixed.",
+        "pl": "Podstawowa czułość myszy dla obu osi. Kwestia osobista — wybierz wartość, przy której wygodnie obrócisz się o 180° i nadal zrobisz drobne poprawki. Zmieniaj ją małymi krokami przy stałym DPI myszy."
+      },
+      "widget": "spin"
+    },
+    "MouseVerticalSensibility@1": {
+      "subgroup": "sensitivity",
+      "label": {"en": "Vertical sensitivity multiplier", "pl": "Mnożnik czułości w pionie"},
+      "desc": {
+        "en": "Multiplies sensitivity on the vertical axis only. 1.0 = same as horizontal; slightly lower values make recoil control steadier for some players.",
+        "pl": "Mnoży czułość tylko w osi pionowej. 1,0 = tak samo jak w poziomie; nieco niższe wartości u części graczy ułatwiają kontrolę odrzutu."
+      },
+      "unit": "x"
+    },
+    "MouseMonitorDistanceCoeff@1": {
+      "subgroup": "sensitivity",
+      "label": {"en": "Monitor distance coefficient", "pl": "Współczynnik odległości od monitora"},
+      "desc": {
+        "en": "Coefficient for 'monitor distance' scaling of ADS sensitivity: decides at what point of the screen the hip-fire and ADS sensitivities feel equal. 1.33 is the game's default. Only change it if you match sensitivity between scopes deliberately.",
+        "pl": "Współczynnik skalowania czułości ADS „według odległości na monitorze”: określa, w którym miejscu ekranu czułość z biodra i przy celowaniu będą odczuwalne jednakowo. 1,33 to wartość domyślna gry. Zmieniaj tylko, jeśli świadomie dopasowujesz czułość między celownikami."
+      },
+      "flags": ["advanced"]
+    },
+    "MouseInGameTabletSensitivity@1": {
+      "subgroup": "sensitivity",
+      "label": {"en": "Map tablet sensitivity", "pl": "Czułość na tablecie mapy"},
+      "desc": {
+        "en": "Multiplies mouse sensitivity when picking a target on the map tablet (killstreaks).",
+        "pl": "Mnoży czułość myszy przy wybieraniu celu na tablecie z mapą (serie zabójstw)."
+      },
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "ADSSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "ADS sensitivity multiplier", "pl": "Mnożnik czułości ADS"},
+      "desc": {
+        "en": "Multiplies mouse sensitivity while aiming down sights with any optic. Lower values give finer control at range; many players use 0.8-1.0 with 'Scale ADS with FOV' on.",
+        "pl": "Mnoży czułość myszy podczas celowania przez dowolny celownik. Niższe wartości dają precyzyjniejszą kontrolę na dystansie; wielu graczy używa 0,8–1,0 przy włączonym „Skaluj ADS z FOV”."
+      },
+      "unit": "x",
+      "related": ["ADSLowZoomSensitivity@1", "ADSHighZoomSensitivity@1"]
+    },
+    "ADSLowZoomSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "Low zoom ADS multiplier", "pl": "Mnożnik ADS — małe przybliżenie"},
+      "desc": {"en": "Extra multiplier for low-zoom optics (iron sights, red dots).", "pl": "Dodatkowy mnożnik dla celowników o małym przybliżeniu (przyrządy mechaniczne, kolimatory)."},
+      "unit": "x"
+    },
+    "ADSHighZoomSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "High zoom ADS multiplier", "pl": "Mnożnik ADS — duże przybliżenie"},
+      "desc": {"en": "Extra multiplier for high-zoom optics (sniper scopes).", "pl": "Dodatkowy mnożnik dla celowników o dużym przybliżeniu (lunety snajperskie)."},
+      "unit": "x"
+    },
+    "ADS2xZoomSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "2x scope multiplier", "pl": "Mnożnik lunety 2x"},
+      "desc": {"en": "Sensitivity multiplier when aiming with 2x optics.", "pl": "Mnożnik czułości przy celowaniu przez celownik 2x."},
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "ADS4xZoomSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "4x scope multiplier", "pl": "Mnożnik lunety 4x"},
+      "desc": {"en": "Sensitivity multiplier when aiming with 4x optics.", "pl": "Mnożnik czułości przy celowaniu przez celownik 4x."},
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "ADS6xZoomSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "6x scope multiplier", "pl": "Mnożnik lunety 6x"},
+      "desc": {"en": "Sensitivity multiplier when aiming with 6x optics.", "pl": "Mnożnik czułości przy celowaniu przez celownik 6x."},
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "ADS8xZoomSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "8x scope multiplier", "pl": "Mnożnik lunety 8x"},
+      "desc": {"en": "Sensitivity multiplier when aiming with 8x optics.", "pl": "Mnożnik czułości przy celowaniu przez celownik 8x."},
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "ADSHoldBreathSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "Hold breath multiplier", "pl": "Mnożnik przy wstrzymanym oddechu"},
+      "desc": {"en": "Sensitivity multiplier while holding breath on a scope.", "pl": "Mnożnik czułości podczas wstrzymywania oddechu na lunecie."},
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "TacticalAdsMouseSensitivityMultiplier@1": {
+      "subgroup": "ads",
+      "label": {"en": "Tactical ADS multiplier", "pl": "Mnożnik taktycznego ADS"},
+      "desc": {"en": "Sensitivity multiplier for tactical (canted / sideways) aiming.", "pl": "Mnożnik czułości dla taktycznego celowania (przechylona broń / boczny celownik)."},
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "ADSTimingSensitivity@1": {
+      "subgroup": "ads",
+      "label": {"en": "ADS sensitivity transition", "pl": "Moment zmiany czułości ADS"},
+      "desc": {
+        "en": "When the ADS multipliers kick in: immediately when you press aim, interpolated during the aim animation, or delayed until fully aimed. 'Interpolated' feels the smoothest.",
+        "pl": "Kiedy zaczynają działać mnożniki ADS: natychmiast po wciśnięciu celowania, płynnie w trakcie animacji („interpolated”) albo dopiero po pełnym wycelowaniu. „Interpolated” jest najbardziej płynne."
+      },
+      "options": {"immediately": {"pl": "natychmiast"}, "interpolated": {"pl": "płynnie"}, "delayed": {"pl": "z opóźnieniem"}}
+    },
+    "MouseAirSensitivityMultiplier@1": {
+      "subgroup": "vehicles",
+      "label": {"en": "Air vehicle multiplier", "pl": "Mnożnik — pojazdy powietrzne"},
+      "desc": {"en": "Mouse sensitivity multiplier when piloting aircraft.", "pl": "Mnożnik czułości myszy podczas pilotowania statków powietrznych."},
+      "unit": "x"
+    },
+    "MouseFlightHorizontalSensibility@0": {
+      "subgroup": "vehicles",
+      "label": {"en": "Flight sensitivity", "pl": "Czułość w locie"},
+      "desc": {"en": "Mouse sensitivity in air vehicles for both axes.", "pl": "Czułość myszy w pojazdach powietrznych dla obu osi."},
+      "widget": "spin"
+    },
+    "MouseFlightVerticalSensibility@0": {
+      "subgroup": "vehicles",
+      "label": {"en": "Flight vertical multiplier", "pl": "Mnożnik pionowy w locie"},
+      "desc": {"en": "Multiplier for the vertical axis only while flying.", "pl": "Mnożnik tylko dla osi pionowej podczas lotu."},
+      "unit": "x"
+    },
+    "MouseLandSensitivityMultiplier@1": {
+      "subgroup": "vehicles",
+      "label": {"en": "Land vehicle multiplier", "pl": "Mnożnik — pojazdy lądowe"},
+      "desc": {"en": "Mouse sensitivity multiplier when driving land vehicles.", "pl": "Mnożnik czułości myszy podczas jazdy pojazdami lądowymi."},
+      "unit": "x"
+    },
+    "MouseFlyingVehicleInvertPitch@1": {
+      "subgroup": "vehicles",
+      "label": {"en": "Invert pitch in aircraft", "pl": "Odwróć pion w powietrzu"},
+      "desc": {"en": "Inverts vertical mouse aim while in an air vehicle (flight-sim style).", "pl": "Odwraca pionowy ruch myszy w pojazdach powietrznych (jak w symulatorach lotu)."}
+    },
+    "MouseGroundVehicleInvertPitch@1": {
+      "subgroup": "vehicles",
+      "label": {"en": "Invert pitch in land vehicles", "pl": "Odwróć pion w pojazdach lądowych"},
+      "desc": {"en": "Inverts vertical mouse aim while in a land vehicle.", "pl": "Odwraca pionowy ruch myszy w pojazdach lądowych."}
+    },
+    "MouseAcceleration@1": {
+      "subgroup": "mouse_advanced",
+      "label": {"en": "Mouse acceleration", "pl": "Akceleracja myszy"},
+      "desc": {
+        "en": "Makes fast mouse movements turn further than slow ones. Breaks muscle memory - 0 is recommended for aiming.",
+        "pl": "Sprawia, że szybkie ruchy myszy obracają dalej niż wolne. Psuje pamięć mięśniową — do celowania zalecane 0."
+      },
+      "impact": {"latency": 1},
+      "recommend": {"competitive": 0.0, "balanced": 0.0, "quality": 0.0, "low_end": 0.0}
+    },
+    "MouseFilter@1": {
+      "subgroup": "mouse_advanced",
+      "label": {"en": "Mouse filtering", "pl": "Filtrowanie myszy"},
+      "desc": {
+        "en": "Averages mouse input over several frames. Smoother but laggy - keep at 0.",
+        "pl": "Uśrednia ruch myszy z kilku klatek. Gładsze, ale z opóźnieniem — zostaw 0."
+      },
+      "impact": {"latency": 2},
+      "recommend": {"competitive": 0.0, "balanced": 0.0, "quality": 0.0, "low_end": 0.0}
+    },
+    "MouseSmoothing@1": {
+      "subgroup": "mouse_advanced",
+      "label": {"en": "Mouse smoothing", "pl": "Wygładzanie myszy"},
+      "desc": {
+        "en": "Smooths mouse movement at the cost of added input latency. Off for responsive aim.",
+        "pl": "Wygładza ruch myszy kosztem dodatkowego opóźnienia. Wyłącz dla responsywnego celowania."
+      },
+      "impact": {"latency": 2},
+      "recommend": {"competitive": false, "balanced": false, "quality": false, "low_end": false}
+    },
+    "MouseInvertPitch@0": {
+      "subgroup": "mouse_advanced",
+      "label": {"en": "Invert vertical aim", "pl": "Odwróć oś pionową"},
+      "desc": {"en": "Inverts vertical mouse aim on foot (mouse forward = look down).", "pl": "Odwraca pionowy ruch myszy pieszo (mysz do przodu = patrzenie w dół)."}
+    },
+    "FreeLook@0": {
+      "subgroup": "mouse_advanced",
+      "label": {"en": "Free look", "pl": "Swobodne rozglądanie"},
+      "desc": {"en": "Allows looking around freely in situations that support it (e.g. vehicles, parachuting).", "pl": "Pozwala swobodnie się rozglądać tam, gdzie gra to obsługuje (np. pojazdy, spadochron)."}
+    },
+    "EnableGamepad@0": {
+      "subgroup": "input_device",
+      "label": {"en": "Aim with gamepad stick", "pl": "Celowanie gałką pada"},
+      "desc": {
+        "en": "Restricts the device used for aiming: on = gamepad stick, off = mouse. Usually set automatically by the game when you switch input.",
+        "pl": "Wybiera urządzenie do celowania: włączone = gałka pada, wyłączone = mysz. Zwykle gra ustawia to sama przy zmianie urządzenia."
+      },
+      "flags": ["advanced"]
+    },
+    "EnableGamepadHandheld@0": {
+      "subgroup": "input_device",
+      "label": {"en": "Aim with gamepad stick (handheld)", "pl": "Celowanie gałką pada (przenośne)"},
+      "desc": {"en": "Same as above, for handheld PCs.", "pl": "Jak wyżej, dla przenośnych PC."},
+      "flags": ["advanced"]
+    }
+  }
+}

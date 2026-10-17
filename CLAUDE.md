@@ -68,7 +68,9 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   a real modal `exec()` hangs the headless test run.
 - Any change to the working copy must end in `_after_changes(ids)` (cards, nav, panel, buttons).
 - History restores pass through `_user_values()`, which drops read-only and `game_managed` settings.
-- MVP edits machine-scope files only (`s.1.0.codNN`); account files come in stage 7.
+- Account files (`g.codNN.1.0.l`, `g.codNN.pm.1.0.l`) are editable since stage 7 but flagged
+  experimental in the UI (`account_notice`); see FILE_FORMAT.md for the `.l.b` analysis.
+  `discovery.classify_stem()` tells machine vs account files apart.
 
 ## Hard rules for touching game files
 1. Never write while `cod.exe` is running.
@@ -76,7 +78,7 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
 3. Write identical content to **both** `.txt0` and `.txt1`, atomically (temp + `os.replace`). Never edit `.m`.
 4. Round-trip guarantee: untouched lines stay byte-identical. LF line endings, no BOM, trailing newline.
 5. Never change the numbers after `@` (`Variant;TypeId;DefaultId`). Setting identity = `Key@Variant`.
-6. Never touch binary files (`*.b0`, `*.b1`, `*.kb`, `*.cdb`) or the SteamCloud folder.
+6. Never touch binary files (`*.b0`, `*.b1`, `*.l.b0/1`, `*.kb`, `*.cdb`) or the SteamCloud folder.
 7. Do not hard-code `cod25` — discover `s.1.0.cod*.txt*`. Unknown keys must still render (from inline constraint).
 8. Tests and manual experiments use copies in `examples/` or a temp dir — never the live folder,
    unless the user explicitly asks.

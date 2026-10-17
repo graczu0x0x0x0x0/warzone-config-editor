@@ -44,7 +44,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..core.backup import BackupManager
-from ..core.discovery import ConfigLocation, FileKind, Scope, discover
+from ..core.discovery import ConfigLocation, FileKind, Scope, classify_stem, discover
 from ..core.document import ConfigDocument
 from ..core.errors import GameRunningError, ValidationError, WzceError
 from ..core.hardware import HardwareInfo, detect_hardware
@@ -102,13 +102,9 @@ class MainWindow(QMainWindow):
         self._nav_key = "display"
         self._disk_warning_shown = False
 
-        # Only machine-level settings are editable in the MVP (account files: stage 7).
-        all_locations = discover() if locations is None else locations
-        self._locations = [
-            loc
-            for loc in all_locations
-            if loc.scope is Scope.MACHINE and loc.kind is FileKind.SETTINGS
-        ]
+        # Machine settings first, then account files (sensitivity, FOV...) - discover()
+        # already sorts them that way per title.
+        self._locations = discover() if locations is None else list(locations)
         self._extra_files: list[SettingsFileSet] = []
         self._entry_order = {sid: i for i, sid in enumerate(knowledge.entries)}
 
@@ -135,6 +131,7 @@ class MainWindow(QMainWindow):
         root.setSpacing(0)
         root.addWidget(self._build_header())
         root.addWidget(self._build_notice())
+        root.addWidget(self._build_account_notice())
 
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setChildrenCollapsible(False)
@@ -320,6 +317,8 @@ class MainWindow(QMainWindow):
         self.notice_show.setText(tr("notice.show"))
         self.notice_undo.setText(tr("notice.undo_game"))
         self.notice_dismiss.setToolTip(tr("notice.dismiss"))
+        self.account_notice_text.setText(tr("account.experimental"))
+        self.account_notice_help.setText(tr("account.how_to_test"))
 
         self.preset_combo.clear()
         self.preset_combo.addItem(tr("toolbar.preset_none"), "")
@@ -352,11 +351,27 @@ class MainWindow(QMainWindow):
         items = []
         for loc in self._locations:
             fs = loc.fileset
-            label = f"{loc.title_name} · {self.tr('file.machine')}"
-            items.append((label, fs, str(fs.directory / fs.stem)))
+            items.append((self._file_label(loc), fs, str(fs.directory / fs.stem)))
         for fs in self._extra_files:
             items.append((fs.stem, fs, str(fs.directory / fs.stem)))
         return items
+
+    def _file_label(self, loc: ConfigLocation) -> str:
+        if loc.scope is Scope.MACHINE:
+            kind = self.tr("file.machine")
+        else:
+            # Steam/Battle.net ids are long; the last digits are enough to tell accounts apart.
+            account = f"…{loc.account_id[-4:]}" if loc.account_id else ""
+            key = "file.account_pm" if loc.kind is FileKind.PROFILE_PM else "file.account"
+            kind = self.tr(key, account=account)
+        return f"{loc.title_name} · {kind}"
+
+    def is_account_file(self) -> bool:
+        """True when the open file is an account profile (sensitivity, FOV...)."""
+        if self.session is None:
+            return False
+        info = classify_stem(self.session.fileset.stem)
+        return info is not None and info[0] is Scope.ACCOUNT
 
     def _populate_file_combo(self) -> None:
         self.file_combo.blockSignals(True)
@@ -568,6 +583,7 @@ class MainWindow(QMainWindow):
 
     def _render_all(self) -> None:
         self._update_notice()
+        self.account_notice.setVisible(self.is_account_file())
         self._refresh_nav()
         self._render_page()
         self.changes_panel.refresh(self.session)
@@ -872,6 +888,25 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.notice_dismiss)
         self.notice.hide()
         return self.notice
+
+    def _build_account_notice(self) -> QWidget:
+        """Permanent hint while an account file is open: editing it is experimental."""
+        self.account_notice = QFrame()
+        self.account_notice.setObjectName("accountNotice")
+        layout = QHBoxLayout(self.account_notice)
+        layout.setContentsMargins(16, 6, 12, 6)
+        self.account_notice_text = QLabel()
+        self.account_notice_text.setWordWrap(True)
+        layout.addWidget(self.account_notice_text, 1)
+        self.account_notice_help = QPushButton()
+        self.account_notice_help.clicked.connect(
+            lambda: self._show_message(
+                "info", self.tr("account.test_title"), self.tr("account.test_text")
+            )
+        )
+        layout.addWidget(self.account_notice_help)
+        self.account_notice.hide()
+        return self.account_notice
 
     def _notice_entry(self) -> HistoryEntry | None:
         return self.session.external_change if self.session is not None else None
