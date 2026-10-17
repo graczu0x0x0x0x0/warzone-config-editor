@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–4 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–5 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -20,7 +20,7 @@ src/wzce/
     paths.py       # %APPDATA%/WarzoneConfigEditor, game players folders         [done]
     undo.py        # undo stack with merging of quick edits                    [done]
     history.py     # persistent history: saves + game changes, snapshots     [done]
-    templates.py   # szablony: zapis/odczyt/nakładanie częściowe, import/export
+    templates.py   # templates, built-in presets, preview plan, store, import/export [done]
     knowledge.py   # knowledge base loader + unknown-key fallback                [done]
     i18n.py        # UI translations with EN fallback, language listeners        [done]
     session.py     # EditorSession: original vs working copy, revert, save, disk change [done]
@@ -32,7 +32,8 @@ src/wzce/
     app.py, app_settings.py, theme.py                                         [done]
     main_window.py, setting_card.py, editors.py, changes_panel.py             [done]
     history_dialog.py                                                          [done]
-    templates_dialog.py, optimizer_wizard.py                                   (stages 5-6)
+    templates_dialog.py                                                        [done]
+    optimizer_wizard.py                                                        (stage 6)
 tests/             # pytest, fixtures z examples/
 ```
 
@@ -93,11 +94,16 @@ tests/             # pytest, fixtures z examples/
 - [x] Testy: 17 rdzenia (stos, historia, zmiany gry) + 11 GUI
 
 ### Etap 5 — Szablony i presety
-- [ ] Zapis szablonu: całość lub wybrane kategorie; pomijanie danych sprzętowych
-- [ ] Nakładanie szablonu z podglądem różnic (wybór, które zmiany przyjąć)
-- [ ] Wbudowane presety (zalecenia już są w bazie wiedzy): Competitive, Zbalansowany, Jakość, Słaby PC
-- [ ] Presety pomijają ustawienia innych producentów GPU i zgłaszają różnice między tytułami
-- [ ] Eksport/import `.json`; import wybranych kategorii z cudzego pliku `.txt0`
+- [x] Zapis szablonu z obecnych ustawień (także niezapisanych): nazwa, opis, wybór kategorii;
+      wartości sprzętowe i zarządzane przez grę nigdy nie trafiają do szablonu
+- [x] Nakładanie z podglądem: tabela „obecnie → z szablonu” z checkboxami, podsumowanie
+      (zmieni się / bez zmian / pominięte z powodem), zastosowanie jako jeden krok Cofnij
+- [x] Wbudowane presety z bazy wiedzy: Competitive, Zbalansowany, Jakość, Słaby PC / laptop
+- [x] Pomijanie z podaniem powodu: brak w pliku (inny tytuł), zależne od sprzętu, zarządzane przez grę,
+      inny producent GPU, wartość nieakceptowana (np. DLAA w cod26)
+- [x] Eksport do `.json` (także presetów), import `.json` oraz utworzenie szablonu z cudzego pliku
+      `.txt0/.txt1/.txt` (wybrane kategorie, bez danych sprzętowych); usuwanie własnych szablonów
+- [x] Szablony w `%APPDATA%\WarzoneConfigEditor\templates`; testy: 22 rdzenia + 5 GUI
 
 ### Etap 6 — Optymalizator
 - [ ] Odczyt sprzętu (rdzenie fizyczne/P-cores, VRAM, producent GPU, odświeżanie)

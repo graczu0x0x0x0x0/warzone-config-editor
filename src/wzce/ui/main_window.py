@@ -50,10 +50,13 @@ from ..core.model import Setting
 from ..core.process import GameRunningCheck, is_game_running
 from ..core.session import EditorSession
 from ..core.storage import SettingsFileSet
+from ..core.templates import TemplateStore
+from ..core.undo import CommandKind
 from .app_settings import AppSettings
 from .changes_panel import ChangesPanel
 from .history_dialog import HistoryDialog
 from .setting_card import SettingCard
+from .templates_dialog import TemplatesDialog
 from .theme import repolish
 
 NAV_ALL = "__all__"
@@ -73,6 +76,7 @@ class MainWindow(QMainWindow):
         locations: list[ConfigLocation] | None = None,
         backup_manager: BackupManager | None = None,
         game_running: GameRunningCheck = is_game_running,
+        template_store: TemplateStore | None = None,
         poll: bool = True,
     ) -> None:
         super().__init__()
@@ -80,6 +84,7 @@ class MainWindow(QMainWindow):
         self.tr = tr
         self.settings = settings
         self._backup_manager = backup_manager
+        self.template_store = template_store if template_store is not None else TemplateStore()
         self._game_running_check = game_running
         self._game_running = False
         self.session: EditorSession | None = None
@@ -235,6 +240,9 @@ class MainWindow(QMainWindow):
         self.redo_button.clicked.connect(self.redo)
         row2.addWidget(self.undo_button)
         row2.addWidget(self.redo_button)
+        self.templates_button = QPushButton()
+        self.templates_button.clicked.connect(self.open_templates)
+        row2.addWidget(self.templates_button)
         self.history_button = QPushButton()
         self.history_button.clicked.connect(lambda: self.open_history())
         row2.addWidget(self.history_button)
@@ -265,6 +273,7 @@ class MainWindow(QMainWindow):
         self.reload_button.setText(tr("toolbar.reload"))
         self.discard_button.setText(tr("toolbar.discard"))
         self.history_button.setText(tr("toolbar.history"))
+        self.templates_button.setText(tr("toolbar.templates"))
         self.undo_button.setText(tr("toolbar.undo"))
         self.redo_button.setText(tr("toolbar.redo"))
         self.notice_show.setText(tr("notice.show"))
@@ -713,6 +722,25 @@ class MainWindow(QMainWindow):
         if self._exec_dialog(dialog) and dialog.result_values:
             self._apply_restored_values(dialog.result_values)
 
+    # ========================================================== templates
+    def open_templates(self) -> None:
+        if self.session is None:
+            return
+        dialog = TemplatesDialog(
+            self.session, self.knowledge, self.tr, self.template_store, parent=self
+        )
+        if not self._exec_dialog(dialog) or not dialog.result_values:
+            return
+        # Values come from plan_template(): already validated for this file and free
+        # of hardware/managed settings, so they can go straight into the session.
+        touched = self.session.apply_raw_values(dialog.result_values, kind=CommandKind.BULK)
+        if touched:
+            self._after_changes(touched)
+        self.statusBar().showMessage(
+            self.tr("templates.applied", count=len(touched), name=dialog.result_name),
+            STATUS_TIMEOUT_MS,
+        )
+
     # ===================================================== game-change notice
     def _build_notice(self) -> QWidget:
         self.notice = QFrame()
@@ -932,6 +960,7 @@ class MainWindow(QMainWindow):
         self.discard_button.setEnabled(count > 0)
         self.reload_button.setEnabled(session is not None)
         self.history_button.setEnabled(session is not None)
+        self.templates_button.setEnabled(session is not None)
         stack = session.undo_stack if session else None
         undo_cmd = stack.peek_undo() if stack else None
         redo_cmd = stack.peek_redo() if stack else None

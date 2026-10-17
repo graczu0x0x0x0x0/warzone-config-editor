@@ -35,6 +35,11 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
 - `EditorSession` (`core/session.py`): `set_value/revert/discard_all/apply_raw_values/restore_snapshot`
   all push onto `session.undo_stack` (`core/undo.py`); `undo()/redo()` return touched ids.
   `reload()` clears undo unless `keep_undo=True` (used by `save`).
+- Templates (`core/templates.py`): `template_from_document(doc, kb, name, groups=...)`,
+  `builtin_templates(kb, doc, lang)`, `plan_template(doc, kb, values, gpu_vendor=...)` -> `TemplatePlan`
+  (changes/unchanged/skipped+reason); apply with `session.apply_raw_values(plan.values(...), kind=BULK)`.
+  `exclusion_reason()` is THE rule for what may never be copied (hardware_specific, game_managed, read-only).
+  `TemplateStore` keeps user templates as JSON (`format: wzce-template`).
 - `HistoryStore` (`core/history.py`): SAVE / GAME_CHANGE entries with diff + snapshot after;
   `last_seen.snapshot` drives `check_external_change`; `session.external_change` holds the latest
   GAME_CHANGE until the UI calls `acknowledge_external_change()`.

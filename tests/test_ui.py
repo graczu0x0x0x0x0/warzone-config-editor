@@ -418,3 +418,90 @@ def test_saving_over_game_changes_asks_and_keeps_them_in_history(window: MainWin
     assert window.save() is True
     kinds = [e.kind.value for e in window.session.history.list(window.session.fileset)]
     assert kinds == ["save", "game_change"]  # the overwritten game change is recoverable
+
+
+# ------------------------------------------------------- stage 5: templates
+
+
+def _templates_dialog(window: MainWindow):
+    from wzce.ui.templates_dialog import TemplatesDialog
+
+    dialog = TemplatesDialog(
+        window.session, window.knowledge, window.tr, window.template_store, parent=window
+    )
+    dialog.errors = []
+    dialog._show_error = dialog.errors.append
+    dialog._ask = lambda *_a: True
+    return dialog
+
+
+def test_templates_dialog_previews_builtin_preset(window: MainWindow) -> None:
+    dialog = _templates_dialog(window)
+    names = [t.name for t in dialog.templates]
+    assert names[:4] == ["Competitive", "Balanced", "Quality", "Low-end PC / laptop"]
+    assert dialog.current_template.builtin_id == "competitive"
+    plan = dialog.plan
+    assert plan.changes and dialog.table.rowCount() == len(plan.changes)
+    assert dialog.apply_button.text() == f"Apply selected ({len(plan.changes)})"
+    assert not dialog.delete_button.isEnabled()  # built-ins cannot be deleted
+    dialog._set_all_checked(False)
+    assert not dialog.apply_button.isEnabled()
+
+
+def test_apply_template_with_unchecked_rows(window: MainWindow) -> None:
+    planned = {}
+
+    def run(dialog) -> bool:
+        dialog.table.item(0, 0).setCheckState(Qt.CheckState.Unchecked)
+        planned["kept"] = set(dialog.checked_ids())
+        planned["dropped"] = dialog.table.item(0, 0).data(Qt.ItemDataRole.UserRole)
+        dialog.apply_selected()
+        return dialog.result() == dialog.DialogCode.Accepted
+
+    window._exec_dialog = run
+    window.open_templates()
+    assert window.session.changed_ids() == planned["kept"]
+    assert planned["dropped"] not in window.session.changed_ids()
+    assert "Competitive" in window.statusBar().currentMessage()
+    window.undo()  # the whole template is one step
+    assert not window.session.is_dirty
+
+
+def test_create_template_from_current_settings(window: MainWindow) -> None:
+    dialog = _templates_dialog(window)
+    dialog._edit_template_info = lambda default, groups: ("Moje FPS", "opis", ["quality"])
+    template = dialog.create_from_current()
+    assert template.path.exists()
+    assert dialog.current_template.path == template.path
+    assert {window.knowledge.entries[sid].group for sid in template.values} == {"quality"}
+    assert dialog.delete_button.isEnabled()  # user templates can be deleted
+    assert dialog.plan.changes == []  # identical to current settings
+    assert "already match" in dialog.summary_label.text()
+
+
+def test_import_game_file_export_and_delete(window: MainWindow, tmp_path: Path) -> None:
+    from conftest import COD26_SINGLE
+
+    dialog = _templates_dialog(window)
+    dialog._edit_template_info = lambda default, groups: (default, "", groups)
+    imported = dialog.import_path(COD26_SINGLE)
+    assert imported.name == "s.1.0.cod26"
+    assert imported.title_code == "cod26"
+    assert "GPUName@0" not in imported.values  # hardware data stripped
+
+    exported = dialog.export_to(tmp_path / "shared")
+    assert exported.suffix == ".json" and exported.exists()
+    again = dialog.import_path(exported)
+    assert again.values == imported.values
+    assert len(window.template_store.list()) == 2
+
+    dialog.delete_selected()
+    assert len(window.template_store.list()) == 1
+
+
+def test_import_invalid_file_shows_error(window: MainWindow, tmp_path: Path) -> None:
+    bad = tmp_path / "bad.json"
+    bad.write_text('{"hello": true}', encoding="utf-8")
+    dialog = _templates_dialog(window)
+    assert dialog.import_path(bad) is None
+    assert dialog.errors and "not a Warzone Config Editor template" in dialog.errors[0]

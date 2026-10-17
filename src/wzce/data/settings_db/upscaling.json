@@ -232,6 +232,7 @@
         "en": "Internal resolution of the old FSR 1 spatial upscaler. Ultra Quality ≈ 77%, Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%.",
         "pl": "Rozdzielczość wewnętrzna starego, przestrzennego FSR 1. Ultra Quality ≈ 77%, Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%."
       },
+      "options": {"Maximum Performance": {"pl": "Wydajność"}, "Balanced": {"pl": "Zbalansowany"}, "Maximum Quality": {"pl": "Jakość"}, "Ultra Quality": {"pl": "Ultra jakość"}},
       "impact": {"fps": 2, "visibility": 2},
       "flags": ["advanced"],
       "recommend": {"low_end": "Balanced"}
@@ -243,7 +244,7 @@
         "en": "Internal resolution of the FSR 2/3 temporal upscaler (used with 'FSR AA' / FSR 3). Native Resolution = FSR as anti-aliasing only (like DLAA). Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%, Ultra Performance ≈ 33%.",
         "pl": "Rozdzielczość wewnętrzna czasowego upscalera FSR 2/3 (przy „FSR AA” / FSR 3). Native Resolution = FSR tylko jako wygładzanie (jak DLAA). Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%, Ultra Performance ≈ 33%."
       },
-      "options": {"Native Resolution": {"pl": "Rozdzielczość natywna"}},
+      "options": {"Ultra Performance": {"pl": "Ultra wydajność"}, "Maximum Performance": {"pl": "Wydajność"}, "Balanced": {"pl": "Zbalansowany"}, "Maximum Quality": {"pl": "Jakość"}, "Native Resolution": {"pl": "Rozdzielczość natywna"}},
       "impact": {"fps": 3, "visibility": 2},
       "recommend": {"competitive": "Maximum Quality", "balanced": "Maximum Quality", "quality": "Native Resolution", "low_end": "Balanced"}
     },
@@ -254,7 +255,7 @@
         "en": "Internal resolution of Intel XeSS upscaling. Native Resolution = anti-aliasing only. Works on most GPUs, best on Intel Arc.",
         "pl": "Rozdzielczość wewnętrzna upscalingu Intel XeSS. Native Resolution = samo wygładzanie. Działa na większości kart, najlepiej na Intel Arc."
       },
-      "options": {"Native Resolution": {"pl": "Rozdzielczość natywna"}},
+      "options": {"Ultra Performance": {"pl": "Ultra wydajność"}, "Maximum Performance": {"pl": "Wydajność"}, "Balanced": {"pl": "Zbalansowany"}, "Maximum Quality": {"pl": "Jakość"}, "Ultra Quality": {"pl": "Ultra jakość"}, "Ultra Quality Plus": {"pl": "Ultra jakość plus"}, "Native Resolution": {"pl": "Rozdzielczość natywna"}},
       "impact": {"fps": 3, "visibility": 2},
       "recommend": {"competitive": "Maximum Quality", "balanced": "Maximum Quality", "quality": "Ultra Quality Plus", "low_end": "Balanced"}
     },
@@ -277,6 +278,7 @@
         "en": "Internal resolution used by NVIDIA Image Scaling.",
         "pl": "Rozdzielczość wewnętrzna używana przez NVIDIA Image Scaling."
       },
+      "options": {"Maximum Performance": {"pl": "Wydajność"}, "Balanced": {"pl": "Zbalansowany"}, "Maximum Quality": {"pl": "Jakość"}, "Ultra Quality": {"pl": "Ultra jakość"}, "Native Resolution": {"pl": "Rozdzielczość natywna"}},
       "vendor": "nvidia",
       "flags": ["advanced"],
       "related": ["NVIDIAImageScalingMP@0"]

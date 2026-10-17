@@ -246,6 +246,11 @@ def stylesheet() -> str:
         gridline-color: {c["border"]}; alternate-background-color: {c["surface_alt"]};
     }}
     QTableWidget::item {{ padding: 4px 8px; }}
+    QTableView::indicator {{
+        width: 15px; height: 15px; border-radius: 4px;
+        border: 1px solid {c["border_strong"]}; background: {c["surface_alt"]};
+    }}
+    QTableView::indicator:checked {{ background: {c["accent"]}; border-color: {c["accent"]}; image: url("{check}"); }}
     QHeaderView::section {{
         background: {c["surface_alt"]}; color: {c["text_muted"]}; border: none;
         border-bottom: 1px solid {c["border"]}; padding: 6px 8px; font-weight: 600;
