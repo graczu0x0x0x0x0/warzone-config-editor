@@ -49,6 +49,9 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   never raises) -> `SystemInfo`; `evaluate_checks(info, hardware, machine_doc)` -> `CheckResult`s
   (texts: i18n `checks.<id>.title/problem[_variant]/fix/ok`). UI runs the probe in `SystemProbe`
   (daemon thread); tests pass `system_info_provider=None` or a fixture (`tests/fixtures/system_cim.json`).
+- Display & sharing: `core/display.display_value(raw, setting, entry, tr)` renders values for every
+  view (cards, panels, exports). `core/share_export.build_share(...)` -> `to_markdown/to_json`;
+  it reuses `exclusion_reason()` and skips other GPU vendors - keep exports free of identifying data.
 - `HistoryStore` (`core/history.py`): SAVE / GAME_CHANGE entries with diff + snapshot after;
   `last_seen.snapshot` drives `check_external_change`; `session.external_change` holds the latest
   GAME_CHANGE until the UI calls `acknowledge_external_change()`.

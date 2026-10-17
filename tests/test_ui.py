@@ -920,3 +920,70 @@ def test_card_title_shows_original_file_name(window: MainWindow) -> None:
     # The key is shown once, next to the title - not repeated in the footer.
     keys = [w for w in card.findChildren(QLabel) if w.objectName() == "cardKey"]
     assert keys == [card.key_label]
+
+
+# ------------------------------------------------------- share export (1.2.0)
+
+
+def _share_dialog(window: MainWindow):
+    captured = {}
+
+    def run(dialog) -> bool:
+        captured["dialog"] = dialog
+        return True
+
+    window._exec_dialog = run
+    window.open_share_dialog()
+    return captured["dialog"]
+
+
+def test_share_dialog_markdown_and_json(window: MainWindow, tmp_path: Path) -> None:
+    import json
+
+    from PySide6.QtGui import QGuiApplication
+
+    dialog = _share_dialog(window)
+    checked = [gid for gid, c in dialog.group_checks.items() if c.isChecked()]
+    assert checked == ["display", "performance", "upscaling", "quality"]
+    text = dialog.preview.toPlainText()
+    assert text.startswith("# Call of Duty settings — Black Ops 7 / Warzone")
+    assert "## Display" in text and "`VSync@0`" in text
+    assert "AmdAntilag2@0" not in text  # sample file reports an NVIDIA GPU
+
+    dialog.copy()
+    assert QGuiApplication.clipboard().text() == text
+
+    dialog.json_radio.setChecked(True)
+    data = json.loads(dialog.preview.toPlainText())
+    assert data["title_code"] == "cod25"
+    saved = dialog.save_to(tmp_path / "my-settings")
+    assert saved.suffix == ".json" and json.loads(saved.read_text(encoding="utf-8")) == data
+
+    for check in dialog.group_checks.values():
+        check.setChecked(False)
+    assert not dialog.copy_button.isEnabled()
+
+
+def test_share_dialog_mentions_unsaved_changes(window: MainWindow) -> None:
+    _edit(window, "ShaderQuality@0", "Medium")
+    dialog = _share_dialog(window)
+    assert "Shader quality:** Medium" in dialog.preview.toPlainText()
+    labels = [w.text() for w in dialog.findChildren(QLabel)]
+    assert "The export includes your unsaved changes." in labels
+
+
+def test_share_dialog_for_account_file_preselects_its_groups(window: MainWindow) -> None:
+    _open_by_stem(window, "g.cod25.1.0.l")
+    dialog = _share_dialog(window)
+    assert all(c.isChecked() for c in dialog.group_checks.values())
+    assert "Field of view (FOV):** 120 °" in dialog.preview.toPlainText()
+
+
+def test_share_dialog_includes_hardware_when_known(window: MainWindow) -> None:
+    _with_system(window)
+    dialog = _share_dialog(window)
+    assert dialog.include_hardware.isChecked()
+    text = dialog.preview.toPlainText()
+    assert "## Hardware" in text and "EXPO/XMP off" in text
+    dialog.include_hardware.setChecked(False)
+    assert "## Hardware" not in dialog.preview.toPlainText()

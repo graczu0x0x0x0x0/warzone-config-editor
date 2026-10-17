@@ -4,6 +4,26 @@ Format oparty na [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/), wersj
 [Semantic Versioning](https://semver.org/lang/pl/). Wersja programu jest zdefiniowana w jednym
 miejscu: `src/wzce/__init__.py`.
 
+## [1.2.0] — 2026-10-17
+
+### Dodano
+
+- **Udostępnij ustawienia (Markdown / JSON)** — w menu *Narzędzia*. Eksport czytelnego
+  podsumowania aktualnych ustawień: domyślnie Wyświetlanie, Wydajność, Upscaling i AA oraz
+  Jakość grafiki (dowolne kategorie do wyboru; dla pliku konta — celowanie, FOV, dźwięk).
+  - Polskie lub angielskie nazwy i wartości („Pełny ekran”, „75 %”) wraz z oryginalnym kluczem z pliku.
+  - Opcjonalnie krótki opis sprzętu (procesor, karta z VRAM, RAM z prędkością i EXPO/XMP, monitor).
+  - Markdown w formie list (czytelny na Discordzie, Reddicie, GitHubie) lub JSON z surowymi
+    wartościami dla narzędzi; podgląd na żywo, „Kopiuj do schowka”, „Zapisz do pliku…”.
+  - Tylko podstawowe ustawienia (opcjonalnie także zaawansowane); pomijane są opcje kart innych
+    producentów.
+  - Prywatność: bez identyfikatorów urządzeń audio, pozycji okna, wykrytego sprzętu, wersji
+    sterowników, ścieżek plików i identyfikatorów konta. Nic nie jest wysyłane.
+
+### Zmieniono
+
+- Wartości liczbowe są wyświetlane bez szumu zaokrągleń gry (np. 0.750001 → 0.75).
+
 ## [1.1.2] — 2026-10-17
 
 ### Zmieniono

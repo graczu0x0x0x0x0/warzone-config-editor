@@ -169,6 +169,12 @@ def stylesheet() -> str:
         width: 16px; height: 16px; border-radius: 4px;
         border: 1px solid {c["border_strong"]}; background: {c["surface_alt"]};
     }}
+    QRadioButton {{ spacing: 6px; }}
+    QRadioButton::indicator {{
+        width: 14px; height: 14px; border-radius: 8px;
+        border: 1px solid {c["border_strong"]}; background: {c["surface_alt"]};
+    }}
+    QRadioButton::indicator:checked {{ background: {c["accent"]}; border: 3px solid {c["surface_alt"]}; outline: none; }}
     QCheckBox::indicator:checked {{ background: {c["accent"]}; border-color: {c["accent"]}; image: url("{check}"); }}
 
     QSlider::groove:horizontal {{ height: 4px; background: {c["border"]}; border-radius: 2px; }}

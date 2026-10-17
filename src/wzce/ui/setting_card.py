@@ -12,12 +12,13 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 from ..core.diff import same_value
+from ..core.display import display_value
 from ..core.errors import ValidationError
 from ..core.i18n import Translator
 from ..core.knowledge import IMPACT_DIMENSIONS, IMPACT_MAX, KnowledgeEntry, localized
 from ..core.model import Setting
 from ..core.session import EditorSession
-from .editors import ValueEditor, create_editor, display_value
+from .editors import ValueEditor, create_editor
 from .theme import repolish
 
 

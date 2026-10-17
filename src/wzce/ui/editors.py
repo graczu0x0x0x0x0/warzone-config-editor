@@ -12,6 +12,8 @@ Widget choice (``create_editor``):
   int/float, sane range     -> slider + spin box;  huge range or widget "spin" -> spin box only
   float with widget percent -> values shown as 0-100 %
   string                    -> line edit (monospace for device ids)
+
+Read-only rendering of values (changes panel, exports) lives in ``core/display.py``.
 """
 
 from __future__ import annotations
@@ -432,23 +434,3 @@ def create_editor(setting: Setting, entry: KnowledgeEntry, tr: Translator) -> Va
             editor = TextEditor(monospace=entry.widget == "device")
     editor.set_raw(setting.raw_value)
     return editor
-
-
-def display_value(raw: str, setting: Setting, entry: KnowledgeEntry, tr: Translator) -> str:
-    """Human-readable form of a raw value (changes panel, recommendation line)."""
-    if raw == "":
-        return tr("value.empty")
-    match setting.value_type:
-        case ValueType.BOOL:
-            return tr("value.true" if raw == "true" else "value.false")
-        case ValueType.ENUM:
-            return entry.option_label(raw, tr.language)
-        case ValueType.FLOAT:
-            value = parse_raw_value(raw, ValueType.FLOAT)
-            if isinstance(value, float):
-                if entry.widget == "percent":
-                    return f"{value * 100:g} %"
-                return f"{value:g}" + (f" {entry.unit}" if entry.unit else "")
-        case ValueType.INT:
-            return raw + (f" {entry.unit}" if entry.unit else "")
-    return raw

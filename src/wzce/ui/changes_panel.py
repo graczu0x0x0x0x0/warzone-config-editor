@@ -13,10 +13,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from ..core.display import display_value
 from ..core.i18n import Translator
 from ..core.knowledge import KnowledgeBase, localized
 from ..core.session import EditorSession
-from .editors import display_value
 
 
 class ChangesPanel(QFrame):

@@ -45,6 +45,8 @@ pilnuje poprawności wartości i bezpiecznie je zapisuje — z kopią zapasową 
   wyłączone EXPO/XMP, pamięć jednokanałowa, gra na HDD, monitor na niższym odświeżaniu, stary
   sterownik, złe złącze PCIe, wyłączony Resizable BAR, plan zasilania i inne.
   „Kopiuj specyfikację” przygotowuje tekst na Discord lub forum.
+- **Udostępnianie ustawień** — czytelne podsumowanie (Markdown na Discord/Reddit albo JSON)
+  wybranych kategorii, opcjonalnie z krótkim opisem sprzętu; bez danych identyfikujących.
 - Ciemny motyw, przełączanie **PL / EN** w locie.
 
 | | |
@@ -52,10 +54,11 @@ pilnuje poprawności wartości i bezpiecznie je zapisuje — z kopią zapasową 
 | ![Optymalizator](docs/img/optimizer.png) | ![Szablony](docs/img/templates.png) |
 | ![Zmiany gry](docs/img/game-change.png) | ![Plik konta](docs/img/account.png) |
 | ![Twój sprzęt](docs/img/hardware-bar.png) | ![Kontrola systemu](docs/img/system-check.png) |
+| ![Udostępnianie ustawień](docs/img/share.png) | ![Historia](docs/img/history.png) |
 
 ### Pobranie i uruchomienie
 
-1. Pobierz `WarzoneConfigEditor-1.1.2.exe` (jeden plik, bez instalacji).
+1. Pobierz `WarzoneConfigEditor-1.2.0.exe` (jeden plik, bez instalacji).
 2. Uruchom. Przy pierwszym uruchomieniu Windows SmartScreen może pokazać ostrzeżenie
    („Nieznany wydawca”) — plik nie jest podpisany certyfikatem. Wybierz *Więcej informacji →
    Uruchom mimo to*. Sumę kontrolną SHA-256 znajdziesz w pliku `.sha256` obok.
@@ -110,7 +113,7 @@ zrobionych w jej własnym menu.
 
 ```
 uv sync
-uv run pytest                       # ~320 testów (rdzeń + GUI offscreen)
+uv run pytest                       # ~340 testów (rdzeń + GUI offscreen)
 uv run ruff check . && uv run ruff format .
 uv run wzce --report                # raport z wykrytych plików (tylko odczyt)
 uv run python scripts/build_exe.py  # budowa .exe + samotest (--onedir: wersja folderowa)
@@ -151,11 +154,13 @@ validates every value and saves safely — with backups and a change history.
   state, GPU, monitor, game drive) and 15 checks with fixes: EXPO/XMP off, single-channel RAM,
   game on HDD, monitor below its refresh rate, outdated driver, wrong PCIe slot, Resizable BAR off,
   power plan and more. "Copy specification" prepares text for Discord or forums.
+- **Share settings** — a readable summary (Markdown for Discord/Reddit, or JSON) of the chosen
+  categories, optionally with a short hardware summary; no identifying data.
 - Dark theme, live **EN / PL** language switch.
 
 ### Download & run
 
-Download `WarzoneConfigEditor-1.1.2.exe` (single file, no installation) and run it. Windows
+Download `WarzoneConfigEditor-1.2.0.exe` (single file, no installation) and run it. Windows
 SmartScreen may warn about an unknown publisher because the file is not code-signed — choose
 *More info → Run anyway*. The SHA-256 checksum is in the `.sha256` file next to it.
 

@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–9 ukończone — wersja 1.1.0** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–9 ukończone, wersja 1.2.0** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -164,6 +164,12 @@ Propozycja i analiza: [`RAPORT_SPRZET.md`](RAPORT_SPRZET.md).
 - [x] 9d Optymalizator: ostrzeżenia systemowe w kreatorze, ReBAR wyłączony → GPU Upload Heaps off
 - [x] Testy: 29 rdzenia (parsowanie, EXPO, sprawdzenia „mój PC” i „PC z problemami”) + 9 GUI
 - [ ] Później: HDR Windows (DisplayConfig), szczegóły PCIe/ReBAR dla AMD/Intel, więcej marek RAM
+
+### Poprawki i dodatki po 1.1.0
+- [x] 1.1.1 — lista ustawień zachowuje pozycję przewinięcia po zapisie / cofnięciu / przeładowaniu
+- [x] 1.1.2 — oryginalna nazwa z pliku (np. `DLSSModeMP@0`) w nawiasie przy nazwie ustawienia
+- [x] 1.2.0 — „Udostępnij ustawienia” (Markdown / JSON): `core/share_export.py` + `ui/share_dialog.py`;
+      formatowanie wartości przeniesione do `core/display.py` (wspólne dla UI i eksportu)
 
 ## Otwarte pytania / ryzyka
 - Czy gra czyta slot z `.m`, czy zawsze oba? (zapis obu identycznie omija problem)

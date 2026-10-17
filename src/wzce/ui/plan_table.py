@@ -20,12 +20,12 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from ..core.display import display_value
 from ..core.document import ConfigDocument
 from ..core.i18n import Translator
 from ..core.knowledge import KnowledgeBase, localized
 from ..core.model import Setting
 from ..core.templates import SkipReason, TemplatePlan
-from .editors import display_value
 
 
 class PlanTable(QWidget):

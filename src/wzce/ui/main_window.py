@@ -46,7 +46,14 @@ from PySide6.QtWidgets import (
 
 from .. import __version__
 from ..core.backup import BackupManager
-from ..core.discovery import ConfigLocation, FileKind, Scope, classify_stem, discover
+from ..core.discovery import (
+    TITLE_NAMES,
+    ConfigLocation,
+    FileKind,
+    Scope,
+    classify_stem,
+    discover,
+)
 from ..core.document import ConfigDocument
 from ..core.errors import GameRunningError, ValidationError, WzceError
 from ..core.hardware import HardwareInfo, detect_hardware
@@ -68,6 +75,7 @@ from .changes_panel import ChangesPanel
 from .history_dialog import HistoryDialog
 from .optimizer_dialog import OptimizerDialog
 from .setting_card import SettingCard
+from .share_dialog import ShareDialog
 from .system_panel import HardwareBar, SystemDialog, SystemProbe, bar_items, check_title
 from .templates_dialog import TemplatesDialog
 from .theme import repolish
@@ -301,6 +309,10 @@ class MainWindow(QMainWindow):
         self.open_folder_action.triggered.connect(self._open_game_folder)
         self.open_backups_action = QAction(self)
         self.open_backups_action.triggered.connect(self._open_backup_folder)
+        self.share_action = QAction(self)
+        self.share_action.triggered.connect(self.open_share_dialog)
+        self.tools_menu.addAction(self.share_action)
+        self.tools_menu.addSeparator()
         self.tools_menu.addAction(self.reload_action)
         self.tools_menu.addSeparator()
         self.tools_menu.addAction(self.game_reset_action)
@@ -331,6 +343,7 @@ class MainWindow(QMainWindow):
         self.tools_button.setText(tr("toolbar.tools"))
         self.optimize_button.setText(tr("toolbar.optimize"))
         self.reload_action.setText(tr("toolbar.reload"))
+        self.share_action.setText(tr("tools.share"))
         self.game_reset_action.setText(tr("tools.game_reset"))
         self.read_only_action.setText(tr("readonly.toggle"))
         self.read_only_action.setToolTip(tr("readonly.explain"))
@@ -936,6 +949,32 @@ class MainWindow(QMainWindow):
         """Open a Windows settings page (ms-settings:...) or a web page."""
         QDesktopServices.openUrl(QUrl(target))
 
+    # ============================================================== share
+    def open_share_dialog(self) -> None:
+        """Readable summary of the current settings (Markdown/JSON) for sharing."""
+        session = self.session
+        if session is None:
+            return
+        code = session.fileset.title_code
+        dialog = ShareDialog(
+            session.document,
+            self.knowledge,
+            self.tr,
+            game=TITLE_NAMES.get(code or "", code or session.fileset.stem),
+            title_code=code,
+            system_info=self.system_info,
+            hardware=self.hardware,
+            has_unsaved_changes=session.is_dirty,
+            # Account files (sensitivity, FOV, audio) are shared as a whole.
+            default_groups=[g.id for g in self.knowledge.groups]
+            if self.is_account_file()
+            else None,
+            # Leave out other vendors' options (e.g. AMD Anti-Lag on an NVIDIA PC).
+            gpu_vendor=session.gpu_vendor or self.hardware.gpu_vendor,
+            parent=self,
+        )
+        self._exec_dialog(dialog)
+
     # ============================================================== tools
     def request_game_reset(self) -> None:
         """Set RecommendedSet=false: the game re-applies its own recommendations on start."""
@@ -1225,6 +1264,7 @@ class MainWindow(QMainWindow):
         self.save_button.setToolTip(tr("save.game_running_text") if self._game_running else "")
         self.discard_button.setEnabled(count > 0)
         for action in (
+            self.share_action,
             self.reload_action,
             self.game_reset_action,
             self.read_only_action,
