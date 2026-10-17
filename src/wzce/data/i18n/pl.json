@@ -3,11 +3,6 @@
 
   "about.disclaimer": "Narzędzie edytuje wyłącznie tekstowe pliki ustawień i nigdy nie dotyka gry ani jej procesu. Nie jest powiązane z Activision.",
 
-  "account.experimental": "Plik konta (czułość, FOV, miks dźwięku): jego edycja jest eksperymentalna — gra może zastąpić go profilem z chmury. Sprawdź po pierwszym uruchomieniu gry.",
-  "account.how_to_test": "Jak sprawdzić",
-  "account.test_title": "Sprawdzenie edycji pliku konta",
-  "account.test_text": "1. Zamknij grę.\n2. Zmień tu jedną łatwą do sprawdzenia wartość (np. FOV o 1) i zapisz.\n3. Uruchom grę i sprawdź tę wartość w ustawieniach gry.\n4. Zamknij grę i ponownie otwórz ten plik w edytorze.\n\nJeśli gra zachowała Twoją wartość — edycja działa. Jeśli przywróciła starą, edytor pokaże komunikat „gra zmieniła ustawienia”, a szczegóły będą w Historii — Twoja zmiana nie przepadnie.",
-
   "app.title": "Warzone Config Editor",
   "app.subtitle": "Edytor ustawień Call of Duty: Black Ops 7 / Warzone",
 

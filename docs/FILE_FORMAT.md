@@ -47,7 +47,11 @@ the game writes it.
   That is 119.9 after a float32 round-trip: the game loaded *our* value and saved it back. A cloud
   value would have come back as `120.000000`.
 - => **The game reads the account text file and does not replace it from the cloud** (at least for
-  FOV, on this account). A visible whole-degree change (e.g. 120 -> 115) would confirm it fully.
+  FOV, on this account).
+
+**In-game test #2 (2026-10-17):** editor saved `Fov@1 = 119.000000` (13:29:33); the game showed
+**119** in its menu and on exit wrote `119.000000` into the other slot (13:31:21, marker -> 01).
+No GAME_CHANGE entry was produced. **Confirmed: account-file edits take effect in game.**
 
 Consequence for diffs: the game re-serializes floats through float32, so `0.750000` may come
 back as `0.750001`. `diff.same_value()` treats decimal values equal within 1e-6 relative /

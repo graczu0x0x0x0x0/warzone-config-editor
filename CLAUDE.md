@@ -68,8 +68,9 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   a real modal `exec()` hangs the headless test run.
 - Any change to the working copy must end in `_after_changes(ids)` (cards, nav, panel, buttons).
 - History restores pass through `_user_values()`, which drops read-only and `game_managed` settings.
-- Account files (`g.codNN.1.0.l`, `g.codNN.pm.1.0.l`) are editable since stage 7 but flagged
-  experimental in the UI (`account_notice`); see FILE_FORMAT.md for the `.l.b` analysis.
+- Account files (`g.codNN.1.0.l`, `g.codNN.pm.1.0.l`) are editable since stage 7; edits were
+  confirmed in game (FILE_FORMAT.md: `.l.b` analysis + in-game tests #1/#2). The game writes floats
+  back via float32 (119.9 -> 119.900002), hence `diff.same_value()` tolerance.
   `discovery.classify_stem()` tells machine vs account files apart.
 
 ## Hard rules for touching game files

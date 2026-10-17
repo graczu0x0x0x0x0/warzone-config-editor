@@ -131,7 +131,6 @@ class MainWindow(QMainWindow):
         root.setSpacing(0)
         root.addWidget(self._build_header())
         root.addWidget(self._build_notice())
-        root.addWidget(self._build_account_notice())
 
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setChildrenCollapsible(False)
@@ -317,8 +316,6 @@ class MainWindow(QMainWindow):
         self.notice_show.setText(tr("notice.show"))
         self.notice_undo.setText(tr("notice.undo_game"))
         self.notice_dismiss.setToolTip(tr("notice.dismiss"))
-        self.account_notice_text.setText(tr("account.experimental"))
-        self.account_notice_help.setText(tr("account.how_to_test"))
 
         self.preset_combo.clear()
         self.preset_combo.addItem(tr("toolbar.preset_none"), "")
@@ -583,7 +580,6 @@ class MainWindow(QMainWindow):
 
     def _render_all(self) -> None:
         self._update_notice()
-        self.account_notice.setVisible(self.is_account_file())
         self._refresh_nav()
         self._render_page()
         self.changes_panel.refresh(self.session)
@@ -888,25 +884,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.notice_dismiss)
         self.notice.hide()
         return self.notice
-
-    def _build_account_notice(self) -> QWidget:
-        """Permanent hint while an account file is open: editing it is experimental."""
-        self.account_notice = QFrame()
-        self.account_notice.setObjectName("accountNotice")
-        layout = QHBoxLayout(self.account_notice)
-        layout.setContentsMargins(16, 6, 12, 6)
-        self.account_notice_text = QLabel()
-        self.account_notice_text.setWordWrap(True)
-        layout.addWidget(self.account_notice_text, 1)
-        self.account_notice_help = QPushButton()
-        self.account_notice_help.clicked.connect(
-            lambda: self._show_message(
-                "info", self.tr("account.test_title"), self.tr("account.test_text")
-            )
-        )
-        layout.addWidget(self.account_notice_help)
-        self.account_notice.hide()
-        return self.account_notice
 
     def _notice_entry(self) -> HistoryEntry | None:
         return self.session.external_change if self.session is not None else None

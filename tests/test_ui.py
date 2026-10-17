@@ -664,13 +664,11 @@ def test_account_files_are_listed_with_labels(window: MainWindow) -> None:
     labels = [window.file_combo.itemText(i) for i in range(window.file_combo.count())]
     assert "Black Ops 7 / Warzone · Account profile …0000" in labels
     assert "Black Ops 7 / Warzone · Account FOV …0000" in labels
-    assert window.account_notice.isHidden()  # machine file open
 
 
 def test_edit_and_save_account_sensitivity_and_fov(window: MainWindow, players_dir: Path) -> None:
     _open_by_stem(window, "g.cod25.1.0.l")
     assert window.is_account_file()
-    assert not window.account_notice.isHidden()
     nav = [window.nav.item(i).text() for i in range(window.nav.count())]
     assert any(text.startswith("Aim & field of view") for text in nav)
 
@@ -689,13 +687,11 @@ def test_edit_and_save_account_sensitivity_and_fov(window: MainWindow, players_d
     assert (account / "g.cod25.1.0.l.m").read_bytes() == marker_before
 
 
-def test_account_notice_explains_how_to_check(window: MainWindow) -> None:
+def test_switching_between_account_and_machine_files(window: MainWindow) -> None:
     _open_by_stem(window, "g.cod25.pm.1.0.l")
-    window.account_notice_help.click()
-    level, text = window.messages[-1]
-    assert level == "info" and "FOV" in text
+    assert window.is_account_file()
     _open_by_stem(window, "s.1.0.cod25")
-    assert window.account_notice.isHidden()
+    assert not window.is_account_file()
 
 
 def test_template_from_account_file_keeps_aim_settings(window: MainWindow) -> None:

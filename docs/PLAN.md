@@ -131,14 +131,14 @@ tests/             # pytest, fixtures z examples/
 - [x] Wybór konta: każdy plik konta na liście plików z końcówką identyfikatora (np. „Profil konta …0575”)
 - [x] Baza wiedzy: 67 ustawień konta PL/EN, nowa kategoria „Celowanie i FOV” (FOV, czułość, ADS,
       pojazdy, akceleracja/wygładzanie), miks dźwięku, czat głosowy, jasność/HDR, HUD, auto-sprint
-- [x] Baner „edycja pliku konta jest eksperymentalna” + instrukcja testu w grze
+- [x] ~~Baner „edycja pliku konta jest eksperymentalna”~~ — usunięty po potwierdzeniu w grze (test #2)
 - [x] Testy: pokrycie bazy dla plików konta cod25/cod26 + 4 GUI (zapis FOV i czułości do obu slotów)
 - [x] Test w grze #1: gra wczytała wartość z pliku tekstowego (zapisała ją z powrotem jako 119.900002),
       nie nadpisała jej z chmury; menu gry zaokrągla FOV do liczby całkowitej
 - [x] Poprawki po teście: FOV zmienia się o pełne stopnie (pole `step` w bazie wiedzy); różnice
       zaokrągleń float32 (119.900000 vs 119.900002) nie są już zgłaszane jako zmiana gry
-- [ ] Test w grze #2 (opcjonalny): wyraźna zmiana FOV (np. 120 → 115) → potwierdzenie w menu gry;
-      potem można zdjąć oznaczenie „eksperymentalne” z plików konta
+- [x] Test w grze #2: FOV 119 ustawione w edytorze → gra pokazuje 119 i zapisuje 119.000000;
+      edycja plików konta potwierdzona
 
 ### Etap 8 — Dystrybucja
 - [ ] Ikona, nazwa, wersjonowanie

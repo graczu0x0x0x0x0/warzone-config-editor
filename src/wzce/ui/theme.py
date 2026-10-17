@@ -240,9 +240,6 @@ def stylesheet() -> str:
     #notice {{ background: #2a2216; border-bottom: 1px solid #4a3b22; }}
     #notice QLabel {{ color: {c["accent_hover"]}; }}
 
-    #accountNotice {{ background: #13283d; border-bottom: 1px solid #1e4466; }}
-    #accountNotice QLabel {{ color: {c["info"]}; }}
-
     /* ---------- tables (history) ---------- */
     QTableWidget {{
         background: {c["surface"]}; border: 1px solid {c["border"]}; border-radius: 6px;
