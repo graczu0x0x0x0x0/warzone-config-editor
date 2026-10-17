@@ -119,9 +119,10 @@ uv run wzce --report                # raport z wykrytych plików (tylko odczyt)
 uv run python scripts/build_exe.py  # budowa .exe + samotest (--onedir: wersja folderowa)
 ```
 
-Dokumentacja: [raport z researchu](docs/RAPORT.md) · [plan](docs/PLAN.md) ·
+Dokumentacja: [architektura i rozwój](docs/ARCHITECTURE.md) · [plan](docs/PLAN.md) ·
 [format plików](docs/FILE_FORMAT.md) · [baza wiedzy](docs/KNOWLEDGE_BASE.md) ·
-[zmiany](CHANGELOG.md). Kod: Python 3.12 + PySide6; `src/wzce/core` (bez Qt) i `src/wzce/ui`.
+[raport z researchu](docs/RAPORT.md) · [raport: sprzęt](docs/RAPORT_SPRZET.md) ·
+[zmiany](CHANGELOG.md). Wytyczne dla asystenta AI i twarde zasady zapisu: [CLAUDE.md](CLAUDE.md). Kod: Python 3.12 + PySide6; `src/wzce/core` (bez Qt) i `src/wzce/ui`.
 
 ---
 
@@ -187,6 +188,8 @@ history entry can be restored. Not affiliated with or endorsed by Activision; us
 
 ### Development
 
-See the Polish section above for commands (`uv run pytest`, `uv run python scripts/build_exe.py`)
-and the design documents in [`docs/`](docs/). Code: Python 3.12 + PySide6, Qt-free core in
+See the Polish section above for commands (`uv run pytest`, `uv run python scripts/build_exe.py`).
+Start with [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (module map, data flows, testing,
+release checklist), then [`docs/FILE_FORMAT.md`](docs/FILE_FORMAT.md) and the rules in
+[`CLAUDE.md`](CLAUDE.md). Code: Python 3.12 + PySide6, Qt-free core in
 `src/wzce/core`, UI in `src/wzce/ui`.

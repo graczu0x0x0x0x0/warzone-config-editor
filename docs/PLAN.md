@@ -26,17 +26,27 @@ src/wzce/
     session.py     # EditorSession: original vs working copy, revert, save, disk change [done]
     hardware.py    # CPU cores/P-cores, VRAM, GPU, refresh rate, RAM (Win32)   [done]
     optimizer.py   # goal + bottleneck + hardware -> values with reasons      [done]
+    system_info.py # PC spec: CIM/WMI via PowerShell, registry, nvidia-smi    [done]
+    system_checks.py # 15 system checks (EXPO, HDD, ReBAR, power plan...)    [done]
+    display.py     # human-readable values shared by UI and exports           [done]
+    share_export.py # "Share settings" -> Markdown / JSON                     [done]
   data/
-    settings_db/       # baza wiedzy: _meta.json (grupy, presety) + plik na grupę  [done]
+    settings_db/       # baza wiedzy: _meta.json + <grupa>.json + account_<grupa>.json [done]
     i18n/en.json, pl.json                                                      [done]
+    icons/             # ikony SVG interfejsu + app.svg/png/ico                [done]
   ui/              # PySide6
     app.py, app_settings.py, theme.py                                         [done]
     main_window.py, setting_card.py, editors.py, changes_panel.py             [done]
     history_dialog.py                                                          [done]
     templates_dialog.py                                                        [done]
     optimizer_dialog.py, plan_table.py (shared preview table)                  [done]
-tests/             # pytest, fixtures z examples/
+    system_panel.py (HardwareBar, SystemDialog, SystemProbe)                   [done]
+    share_dialog.py                                                            [done]
+scripts/           # build_exe.py, build_icon.py, launcher.py                  [done]
+tests/             # pytest, fixtures z examples/ i tests/fixtures/
 ```
+
+Szczegółowa mapa modułów i przepływów danych (EN): [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Etapy
 
@@ -66,7 +76,7 @@ tests/             # pytest, fixtures z examples/
 - [x] Fallback dla nieznanych kluczy: kategoria z sekcji pliku, nazwa z klucza, opis z komentarza, flaga „new”
 - [x] `i18n/en.json`, `pl.json` (~120 tekstów UI) + `Translator` z powiadamianiem o zmianie języka
 - [x] Testy spójności: pokrycie wszystkich kluczy, poprawność zaleceń względem plików gry, kompletność tłumaczeń
-- [ ] Baza wiedzy dla pliku konta (czułość, FOV — 67 ustawień) → razem z etapem 7
+- [x] Baza wiedzy dla pliku konta (czułość, FOV — 67 ustawień) → zrobione w etapie 7 (`account_*.json`)
 
 ### Etap 3 — Interfejs MVP
 - [x] Okno główne: nagłówek (plik, filtry, akcje), nawigacja kategorii z licznikami zmian, karty, pasek statusu
@@ -172,7 +182,12 @@ Propozycja i analiza: [`RAPORT_SPRZET.md`](RAPORT_SPRZET.md).
       formatowanie wartości przeniesione do `core/display.py` (wspólne dla UI i eksportu)
 
 ## Otwarte pytania / ryzyka
-- Czy gra czyta slot z `.m`, czy zawsze oba? (zapis obu identycznie omija problem)
-- Czy chmura (`ConfigCloudStorageEnabled`, SteamCloud) nadpisuje edycję? — test w etapie 1/7
+- ~~Czy gra czyta slot z `.m`, czy zawsze oba?~~ — nieistotne: zapisujemy oba sloty identycznie,
+  `.m` zostaje bez zmian (potwierdzone, że gra wczytuje nasze wartości).
+- ~~Czy chmura nadpisuje edycję?~~ — testy w grze #1/#2 (etap 7, `FILE_FORMAT.md`): gra wczytała
+  wartości z pliku konta i nie zastąpiła ich chmurą (Steam, to konto). Inne platformy niesprawdzone.
 - Znaczenie liczb `TypeId;DefaultId` — rozszyfrowanie dałoby „reset do domyślnej” dla każdej opcji
-- Czy Battle.net ma inną strukturę folderu konta niż Steam
+- Czy Battle.net / Xbox app mają inną strukturę folderu konta niż Steam (discovery szuka ogólnie,
+  ale brak próbek)
+- Który z dwóch FOV (`Fov@1` w pliku konta, `Fov@0` w pliku `pm`) obowiązuje w których trybach
+- Które `Volume@0` wygrywa: z pliku komputera czy konta

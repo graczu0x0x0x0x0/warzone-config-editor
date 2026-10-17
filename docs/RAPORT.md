@@ -1,5 +1,11 @@
 # Raport: pliki konfiguracyjne Warzone / Black Ops 7 i propozycja edytora
 
+> **Status (wersja 1.2.0):** to raport z researchu przed rozpoczęciem prac — opisuje stan
+> wiedzy i propozycje z 2026-10-17. Wszystkie etapy są wdrożone (patrz [`PLAN.md`](PLAN.md)
+> i [`CHANGELOG.md`](../CHANGELOG.md)). Różnice względem propozycji: plik konta został
+> obsłużony w etapie 7 (nie 2), preset „Streaming” nie powstał (są 4: Competitive,
+> Zbalansowany, Jakość, Słaby PC), a aktualny opis formatu jest w [`FILE_FORMAT.md`](FILE_FORMAT.md).
+
 *Data: 2026-10-17 · Źródła: analiza plików z `examples/`, Twój folder `players`, research w sieci (lista na końcu).*
 
 ---

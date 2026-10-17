@@ -9,10 +9,13 @@ already says. Loader: `wzce.core.knowledge.KnowledgeBase.load()`. Validation is 
 | File | Contents |
 |---|---|
 | `_meta.json` | presets, groups + subgroups (editor navigation order), section fallback map |
-| `<group>.json` | `{"group": "<group id>", "settings": {"Key@Variant": {...}}}` — one file per group |
+| `<group>.json` | `{"group": "<group id>", "settings": {"Key@Variant": {...}}}` — machine-file (`s.1.0.codNN`) settings of one group |
+| `account_<group>.json` | same schema — account-file (`g.codNN.1.0.l`, `g.codNN.pm.1.0.l`) settings of one group |
 
 One file per group keeps edits small and reviewable. The group of an entry is the file's
-`group`; it is not repeated in each entry.
+`group`; it is not repeated in each entry. File names are free (the loader reads every
+`*.json`), so machine and account entries of the same group (`audio`, `display`, ...) live in
+separate files. An id must be unique across all files.
 
 ## Entry fields
 
@@ -46,8 +49,9 @@ One file per group keeps edits small and reviewable. The group of an entry is th
 - Constraints differ between titles (cod26 removed `DLAA` from `DLSSModeMP@0`). Such cases
   are listed in `KNOWN_TITLE_DIFFERENCES` in `tests/test_knowledge.py`; applying a preset
   reports them via `ConfigDocument.apply_values` errors instead of failing.
-- `vendor` marks settings that only do something on that GPU vendor. Presets should skip
-  them for other vendors (stage 5/6). FSR, XeSS upscaling and CAS work on all GPUs → no vendor.
+- `vendor` marks settings that only do something on that GPU vendor. `plan_template` skips
+  them for other vendors (reason `vendor`), the share export leaves them out and the UI can hide
+  them. FSR, XeSS upscaling and CAS work on all GPUs → no vendor.
 
 ### Flags
 
@@ -60,8 +64,9 @@ One file per group keeps edits small and reviewable. The group of an entry is th
 
 ## Groups (editor categories)
 
-`display`, `performance`, `upscaling`, `quality`, `gameplay`, `audio`, `interface`, `controls`,
-`power`, `system`. They intentionally differ from the game's 7 file sections — e.g. the
+`display`, `performance`, `upscaling`, `quality`, `aim`, `gameplay`, `audio`, `interface`,
+`controls`, `power`, `system` (order = `_meta.json`; `aim` holds sensitivity/ADS/FOV from the
+account file). They intentionally differ from the game's 7 file sections — e.g. the
 64-setting "Graphics" section is split into performance / upscaling / quality, and HDR moves
 to display. The reserved subgroup `system/unknown` collects synthesized entries.
 

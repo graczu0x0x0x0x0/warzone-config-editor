@@ -7,7 +7,9 @@ GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
 - `docs/FILE_FORMAT.md` — file grammar, A/B slot mechanism, special keys. **Source of truth for parsing.**
 - `docs/PLAN.md` — phased plan with checkboxes. Update checkboxes when finishing work.
 - `docs/KNOWLEDGE_BASE.md` — schema/conventions of the settings knowledge base (labels, descriptions, presets).
+- `docs/ARCHITECTURE.md` — module map, data flows, app data folders, testing and release checklist.
 - `docs/RAPORT.md` — research report for the user (Polish), optimization recommendations + sources.
+- `docs/RAPORT_SPRZET.md` — hardware/system detection report (Polish), basis of stage 9.
 
 ## Communication
 - The user writes in **Polish** → answer in Polish. User-facing docs (`RAPORT.md`, `PLAN.md`, README) in Polish.
@@ -16,9 +18,9 @@ GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
   describing its responsibility.
 
 ## Stack (approved 2026-10-17)
-Python 3.12 (pinned in `.python-version`) + PySide6-Essentials, psutil, pytest, ruff, uv,
-PyInstaller later. Package `src/wzce/`. `core/` must never import Qt (keeps it unit-testable).
-UI will live in `ui/`. Use PySide6-**Essentials**, not `PySide6` (avoids WebEngine bloat;
+Python 3.12 (pinned in `.python-version`) + PySide6-Essentials, psutil, pytest, pytest-qt, ruff, uv,
+PyInstaller (`scripts/build_exe.py`). Package `src/wzce/`. `core/` must never import Qt (keeps it
+unit-testable); the UI lives in `ui/`. Use PySide6-**Essentials**, not `PySide6` (avoids WebEngine bloat;
 switching between them breaks the install - fix with `uv sync --reinstall-package pyside6-essentials --reinstall-package shiboken6`).
 
 Environment quirk: this machine intercepts TLS, so uv needs system certs - already set via
@@ -93,12 +95,20 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
 
 ## Layout
 ```
-docs/        design docs (see above)
-examples/    sample files from the user's machine (fixtures for tests)
+docs/            design docs (see above); docs/img/ = README screenshots
+examples/        sample files from the user's machine (fixtures for tests)
   live_snapshot_2026-10-17/   .m marker, cod26 file, account-level profile files
-src/wzce/    application package (core/, data/, ui/)
-tests/       pytest
+scripts/         build_exe.py (PyInstaller), build_icon.py (svg -> png/ico), launcher.py (exe entry)
+src/wzce/
+  __init__.py    __version__ (single source of the version)
+  __main__.py    CLI: GUI (default), --report, --smoke-test, --version
+  core/          Qt-free logic: parsing, storage, session, history, templates, hardware, exports
+  data/          settings_db/ (knowledge base), i18n/{en,pl}.json, icons/
+  ui/            PySide6 widgets and dialogs
+tests/           pytest (+ fixtures/system_cim.json)
+build/, dist/    PyInstaller output (git-ignored)
 ```
+Module-by-module map: `docs/ARCHITECTURE.md`.
 
 ## Commands
 ```
@@ -119,7 +129,7 @@ also set `QT_QPA_FONTDIR=C:/Windows/Fonts`, otherwise text renders as boxes.
 ## i18n and knowledge base
 - UI strings: `src/wzce/data/i18n/{en,pl}.json` (flat keys, `{placeholder}` format). Every new key goes
   into **both** files with the same placeholders - `tests/test_i18n.py` enforces it.
-- Setting labels/descriptions/recommendations: `src/wzce/data/settings_db/<group>.json`
-  (one file per editor category + `_meta.json`). Polish must be a real translation, enum values in
+- Setting labels/descriptions/recommendations: `src/wzce/data/settings_db/<group>.json` for the
+  machine file and `account_<group>.json` for account files (+ `_meta.json`). Polish must be a real translation, enum values in
   `recommend` must use the game's exact spelling - `tests/test_knowledge.py` enforces it.
 - New game setting -> add a sample file to `examples/`, run the knowledge tests, they list missing ids.
