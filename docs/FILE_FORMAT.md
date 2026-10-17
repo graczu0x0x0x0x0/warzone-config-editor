@@ -20,6 +20,11 @@ Root: `%LOCALAPPDATA%\Activision\Call of Duty\players\`
 | `<platformId>\SteamCloud\...` | mixed | account | Steam Cloud mirror |
 | `s.1.0.cod26.txt` (single file, no A/B) | text | machine | Next title (`cod26`), same grammar, 163 settings |
 
+**Account-file caveat:** every `g.cod25.1.0.l.txtN` is written together with a binary
+`g.cod25.1.0.l.bN` (127 bytes) in the same A/B slot. It may be a checksum/signature of the
+text file — if so, the game could reject a hand-edited account text file. Must be tested
+before account editing ships (PLAN stage 7). Machine files `s.1.0.*` have no such companion.
+
 `<platformId>` is e.g. a SteamID64 (`7656119...`). Older title BO6 (`cod24`) lives in
 `%USERPROFILE%\Documents\Call of Duty\players\` with the same naming scheme.
 
@@ -93,7 +98,11 @@ Evidence from the live folder (2026-10-17):
 - `.m` is 2 bytes: `00 00` or `01 01`. In every case where timestamps differ, the slot named
   by `.m` is the newer file (`g.cod25.1.0.m = 01 01` → `b1` newer; `g.cod25.1.0.l.m = 00 00` → `l.txt0` newer).
 
-**Conclusion (high confidence):** A/B ("ping-pong") double buffering for crash-safe saving.
+- **Observed live flip (2026-10-17):** at 11:34 the game wrote `g.cod25.1.0.l.txt0` and the
+  marker was `00 00`; at 11:50 it wrote `...l.txt1` and the marker became `01 01`.
+  Same for `g.cod25.pm.1.0.l.*` and `s.1.0.cod25.m`.
+
+**Conclusion (confirmed by observation):** A/B ("ping-pong") double buffering for crash-safe saving.
 The game writes the inactive slot, then flips `.m`. If a write is interrupted, the other slot is
 still valid. On load it reads the slot from `.m` and falls back to the other one.
 The two bytes are probably the slot index written twice for integrity.

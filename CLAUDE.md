@@ -14,9 +14,24 @@ GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
 - Comments: explain *why* and game-file quirks, not the obvious. Every module starts with a docstring
   describing its responsibility.
 
-## Stack (proposed, pending user approval)
-Python 3.12 + PySide6, pytest, ruff, uv, PyInstaller. Package `src/wzce/`.
-`core/` must never import Qt (keeps it unit-testable). UI lives in `ui/`.
+## Stack (approved 2026-10-17)
+Python 3.12 (pinned in `.python-version`) + PySide6-Essentials, psutil, pytest, ruff, uv,
+PyInstaller later. Package `src/wzce/`. `core/` must never import Qt (keeps it unit-testable).
+UI will live in `ui/`. Use PySide6-**Essentials**, not `PySide6` (avoids WebEngine bloat;
+switching between them breaks the install - fix with `uv sync --reinstall-package pyside6-essentials --reinstall-package shiboken6`).
+
+Environment quirk: this machine intercepts TLS, so uv needs system certs - already set via
+`[tool.uv] native-tls = true` in `pyproject.toml`.
+
+## Core API cheat sheet (`from wzce.core import ...`)
+- `discover()` -> `list[ConfigLocation]` (`.fileset`, `.scope`, `.kind`, `.title_code`, `.account_id`)
+- `SettingsFileSet.from_path(p)`; `.load()` -> `LoadedConfig(document, source, slot_differences)`;
+  `.save(doc, backup_manager=..., game_running=...)` (refuses if game runs, backs up, writes both slots, rolls back on failure)
+- `ConfigDocument`: `.get(id)`, iteration, `.sections`, `.values()`, `.set_value(id, v)` -> `ValueChange`,
+  `.apply_values(mapping)` -> `(applied, errors)`, `.copy()`, `.to_bytes()`
+- `Setting`: `.id` (`Key@Variant`), `.value_type`, `.value`, `.constraint`, `.description`, `.section`, `.read_only`
+- `BackupManager().create/list/restore/prune`; `diff_documents(a, b)`
+- Inject `game_running=lambda: False` in tests; `WZCE_DATA_DIR` redirects app data (autouse fixture does it).
 
 ## Hard rules for touching game files
 1. Never write while `cod.exe` is running.
@@ -38,13 +53,14 @@ src/wzce/    application package (core/, data/, ui/)
 tests/       pytest
 ```
 
-## Commands (once scaffolded)
+## Commands
 ```
 uv sync
 uv run pytest
 uv run ruff check . && uv run ruff format .
-uv run python -m wzce
+uv run python -m wzce        # read-only report of real files (GUI comes in stage 3)
 ```
+Run pytest + ruff before every commit. Tests import helpers with `from conftest import ...`.
 
 ## i18n
 UI strings: `src/wzce/data/i18n/{en,pl}.json`. Setting labels/descriptions: `src/wzce/data/settings_db.json`

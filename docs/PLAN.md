@@ -1,7 +1,7 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: **propozycja do akceptacji** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
-> Stos (proponowany): Python 3.12 + PySide6, pytest, ruff, uv, PyInstaller.
+> Status: stos zaakceptowany; **etapy 0–1 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
 ## Architektura (warstwy)
@@ -9,12 +9,15 @@
 ```
 src/wzce/
   core/            # czysty Python, zero importów Qt — w pełni testowalny
-    parser.py      # tekst → ConfigDocument (linie + Setting), round-trip bajt w bajt
-    model.py       # Setting, ValueType, Constraint, ConfigDocument
-    writer.py      # ConfigDocument → tekst; zapis atomowy obu slotów A/B
-    discovery.py   # wyszukiwanie plików cod24/25/26 i folderów kont
-    process.py     # wykrywanie działającego cod.exe
-    backup.py      # kopie zapasowe przed zapisem, przywracanie
+    errors.py      # exception hierarchy (WzceError and subclasses)              [done]
+    model.py       # Setting, Constraint, ValueType, value validation/formatting [done]
+    document.py    # text -> ConfigDocument, byte-exact round-trip, set_value    [done]
+    diff.py        # setting-level diff of documents / snapshots                 [done]
+    storage.py     # SettingsFileSet: A/B slots, atomic save, read-only, rollback [done]
+    backup.py      # timestamped backups with sha256 manifest, restore, prune    [done]
+    discovery.py   # finds s.1.0.codNN and account g.codNN files                [done]
+    process.py     # cod.exe detection                                           [done]
+    paths.py       # %APPDATA%/WarzoneConfigEditor, game players folders         [done]
     history.py     # trwała historia zapisów (snapshoty + diff)
     templates.py   # szablony: zapis/odczyt/nakładanie częściowe, import/export
     knowledge.py   # ładowanie bazy wiedzy (opisy PL/EN, grupy, wpływ, zalecenia)
@@ -33,20 +36,21 @@ tests/             # pytest, fixtures z examples/
 ## Etapy
 
 ### Etap 0 — Fundamenty
-- [ ] Repozytorium Git, `.gitignore`, `CLAUDE.md`, dokumentacja w `docs/`
-- [ ] `pyproject.toml` (uv, Python 3.12), ruff, pytest, struktura katalogów
-- [ ] Sprawdzenie, że PySide6 instaluje się na wybranej wersji Pythona
+- [x] Repozytorium Git, `.gitignore`, `CLAUDE.md`, dokumentacja w `docs/`
+- [x] `pyproject.toml` (uv, Python 3.12), ruff, pytest, struktura katalogów
+- [x] Sprawdzenie, że PySide6 instaluje się na wybranej wersji Pythona
 
 ### Etap 1 — Rdzeń: odczyt i zapis (bez UI)
-- [ ] Parser: nagłówek, sekcje, opisy, ustawienia `Key@Variant;Type;Default = Value // Constraint`
-- [ ] Rozpoznawanie typów: bool / int / float / enum / string; zakresy „bez limitu”
-- [ ] Writer z gwarancją round-trip (test: parse → write == oryginał, bajt w bajt, dla wszystkich próbek)
-- [ ] Walidacja wartości (zakres, opcje enum, format float 6 miejsc)
-- [ ] Zapis do obu slotów (txt0 + txt1), atomowo; `.m` bez zmian
-- [ ] Wykrywanie `cod.exe` i blokada zapisu
-- [ ] Kopia zapasowa przed zapisem + przywracanie
-- [ ] Discovery: `%LOCALAPPDATA%` i `Dokumenty`, wszystkie `codNN`
-- [ ] Testy jednostkowe na plikach z `examples/`
+- [x] Parser: nagłówek, sekcje, opisy, ustawienia `Key@Variant;Type;Default = Value // Constraint`
+- [x] Rozpoznawanie typów: bool / int / float / enum / string; zakresy „bez limitu”
+- [x] Writer z gwarancją round-trip (test: parse → write == oryginał, bajt w bajt, dla wszystkich próbek)
+- [x] Walidacja wartości (zakres, opcje enum, format float 6 miejsc)
+- [x] Zapis do obu slotów (txt0 + txt1), atomowo; `.m` bez zmian
+- [x] Wykrywanie `cod.exe` i blokada zapisu
+- [x] Kopia zapasowa przed zapisem + przywracanie
+- [x] Discovery: `%LOCALAPPDATA%` i `Dokumenty`, wszystkie `codNN`
+- [x] Testy jednostkowe na plikach z `examples/`
+- [x] Tymczasowy raport CLI: `uv run python -m wzce` (tylko odczyt, do czasu GUI)
 
 ### Etap 2 — Baza wiedzy i tłumaczenia
 - [ ] `settings_db.json`: dla każdego z 147 (+ cod26) ustawień: grupa, podgrupa, nazwa PL/EN,
@@ -84,6 +88,7 @@ tests/             # pytest, fixtures z examples/
 - [ ] Obsługa `players\<ID>\g.cod25.1.0.l.txt0/1` i `g.cod25.pm.1.0.l.txt0/1` (ten sam parser)
 - [ ] Wybór konta, gdy jest kilka folderów
 - [ ] Sprawdzenie, czy gra respektuje edycję tekstu, czy nadpisuje z binarnego `.b0/.b1` / chmury
+      (uwaga: każdy `g.cod25.1.0.l.txtN` ma binarny towarzysz `.l.bN` — możliwa suma kontrolna)
 
 ### Etap 8 — Dystrybucja
 - [ ] Ikona, nazwa, wersjonowanie
