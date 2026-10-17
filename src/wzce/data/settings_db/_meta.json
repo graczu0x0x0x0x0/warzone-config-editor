@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "impact_scale": {
+    "comment": "Impact values are 0 (none) to 3 (high). They are estimates compiled from community guides (see docs/RAPORT.md), not measurements.",
+    "dimensions": ["fps", "latency", "visibility", "vram"]
+  },
+  "presets": [
+    {
+      "id": "competitive",
+      "label": {"en": "Competitive", "pl": "Competitive"},
+      "desc": {
+        "en": "Maximum FPS, lowest input latency and best enemy visibility. Eye candy is sacrificed.",
+        "pl": "Maksymalne FPS, najniższe opóźnienie i najlepsza widoczność przeciwników kosztem efektów wizualnych."
+      }
+    },
+    {
+      "id": "balanced",
+      "label": {"en": "Balanced", "pl": "Zbalansowany"},
+      "desc": {
+        "en": "Good visibility and high FPS while keeping the game pleasant to look at.",
+        "pl": "Dobra widoczność i wysokie FPS przy zachowaniu przyzwoitej oprawy graficznej."
+      }
+    },
+    {
+      "id": "quality",
+      "label": {"en": "Quality", "pl": "Jakość"},
+      "desc": {
+        "en": "Best image quality for strong PCs, campaign, Zombies or recording. Competitive advantage is not the goal.",
+        "pl": "Najlepsza jakość obrazu dla mocnych PC, kampanii, Zombies lub nagrywania. Przewaga w grze nie jest celem."
+      }
+    },
+    {
+      "id": "low_end",
+      "label": {"en": "Low-end PC / laptop", "pl": "Słaby PC / laptop"},
+      "desc": {
+        "en": "Lowest load on CPU, GPU and VRAM to reach a playable, stable frame rate.",
+        "pl": "Najmniejsze obciążenie CPU, GPU i VRAM, aby uzyskać grywalną, stabilną liczbę klatek."
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "display", "icon": "monitor",
+      "label": {"en": "Display", "pl": "Wyświetlanie"},
+      "subgroups": [
+        {"id": "mode", "label": {"en": "Mode & resolution", "pl": "Tryb i rozdzielczość"}},
+        {"id": "sync_latency", "label": {"en": "Sync & latency", "pl": "Synchronizacja i opóźnienie"}},
+        {"id": "color", "label": {"en": "HDR & color", "pl": "HDR i kolory"}},
+        {"id": "window", "label": {"en": "Window", "pl": "Okno"}}
+      ]
+    },
+    {
+      "id": "performance", "icon": "gauge",
+      "label": {"en": "Performance", "pl": "Wydajność"},
+      "subgroups": [
+        {"id": "fps_limits", "label": {"en": "Frame rate limits", "pl": "Limity klatek"}},
+        {"id": "render_resolution", "label": {"en": "Render resolution", "pl": "Rozdzielczość renderowania"}},
+        {"id": "cpu_memory", "label": {"en": "CPU, memory & shaders", "pl": "CPU, pamięć i shadery"}}
+      ]
+    },
+    {
+      "id": "upscaling", "icon": "sparkles",
+      "label": {"en": "Upscaling & AA", "pl": "Upscaling i AA"},
+      "subgroups": [
+        {"id": "antialiasing", "label": {"en": "Anti-aliasing", "pl": "Wygładzanie krawędzi"}},
+        {"id": "dlss", "label": {"en": "NVIDIA DLSS", "pl": "NVIDIA DLSS"}},
+        {"id": "frame_generation", "label": {"en": "Frame generation", "pl": "Generowanie klatek"}},
+        {"id": "amd", "label": {"en": "AMD FidelityFX", "pl": "AMD FidelityFX"}},
+        {"id": "other_scalers", "label": {"en": "Intel XeSS & NVIDIA NIS", "pl": "Intel XeSS i NVIDIA NIS"}}
+      ]
+    },
+    {
+      "id": "quality", "icon": "image",
+      "label": {"en": "Graphics quality", "pl": "Jakość grafiki"},
+      "subgroups": [
+        {"id": "preset", "label": {"en": "Preset", "pl": "Preset"}},
+        {"id": "textures_geometry", "label": {"en": "Textures & geometry", "pl": "Tekstury i geometria"}},
+        {"id": "shadows", "label": {"en": "Shadows", "pl": "Cienie"}},
+        {"id": "lighting", "label": {"en": "Lighting & reflections", "pl": "Oświetlenie i odbicia"}},
+        {"id": "raytracing", "label": {"en": "Ray tracing", "pl": "Ray tracing"}},
+        {"id": "effects", "label": {"en": "Effects & world", "pl": "Efekty i świat"}},
+        {"id": "post_processing", "label": {"en": "Blur & depth of field", "pl": "Rozmycie i głębia ostrości"}}
+      ]
+    },
+    {
+      "id": "gameplay", "icon": "crosshair",
+      "label": {"en": "Gameplay", "pl": "Rozgrywka"},
+      "subgroups": [
+        {"id": "gore", "label": {"en": "Blood & battlefield", "pl": "Krew i pole bitwy"}},
+        {"id": "map_cursor", "label": {"en": "Map cursor", "pl": "Kursor mapy"}},
+        {"id": "hints", "label": {"en": "Hints", "pl": "Podpowiedzi"}}
+      ]
+    },
+    {
+      "id": "audio", "icon": "volume",
+      "label": {"en": "Audio", "pl": "Dźwięk"},
+      "subgroups": [
+        {"id": "volume", "label": {"en": "Volume", "pl": "Głośność"}},
+        {"id": "devices", "label": {"en": "Devices & channels", "pl": "Urządzenia i kanały"}},
+        {"id": "voice_chat", "label": {"en": "Voice chat", "pl": "Czat głosowy"}}
+      ]
+    },
+    {
+      "id": "interface", "icon": "layout",
+      "label": {"en": "Interface", "pl": "Interfejs"},
+      "subgroups": [
+        {"id": "hud", "label": {"en": "HUD & cursor", "pl": "HUD i kursor"}},
+        {"id": "videos", "label": {"en": "Intro & videos", "pl": "Intro i filmy"}}
+      ]
+    },
+    {
+      "id": "controls", "icon": "gamepad",
+      "label": {"en": "Controls", "pl": "Sterowanie"},
+      "subgroups": [
+        {"id": "mouse", "label": {"en": "Mouse", "pl": "Mysz"}},
+        {"id": "gamepad", "label": {"en": "Gamepad", "pl": "Pad"}},
+        {"id": "menu", "label": {"en": "Menu navigation", "pl": "Nawigacja w menu"}}
+      ]
+    },
+    {
+      "id": "power", "icon": "leaf",
+      "label": {"en": "Power saving", "pl": "Oszczędzanie energii"},
+      "subgroups": [
+        {"id": "sustainability", "label": {"en": "Idle & menus", "pl": "Bezczynność i menu"}},
+        {"id": "battery", "label": {"en": "Battery", "pl": "Bateria"}}
+      ]
+    },
+    {
+      "id": "system", "icon": "cpu",
+      "label": {"en": "System (advanced)", "pl": "System (zaawansowane)"},
+      "subgroups": [
+        {"id": "behaviour", "label": {"en": "Sync & detection", "pl": "Synchronizacja i wykrywanie"}},
+        {"id": "hardware_info", "label": {"en": "Detected hardware", "pl": "Wykryty sprzęt"}},
+        {"id": "unknown", "label": {"en": "Other / new", "pl": "Inne / nowe"}}
+      ]
+    }
+  ],
+  "section_fallback": {
+    "comment": "Group used for settings missing from the knowledge base, keyed by the file's own section name.",
+    "Audio": "audio",
+    "Display": "display",
+    "Gameplay": "gameplay",
+    "Graphics": "quality",
+    "Interface": "interface",
+    "Mouse and Gamepad": "controls",
+    "System": "system",
+    "": "system"
+  }
+}

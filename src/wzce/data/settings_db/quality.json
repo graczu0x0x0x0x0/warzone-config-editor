@@ -1,0 +1,472 @@
+{
+  "group": "quality",
+  "settings": {
+    "GraphicsQuality@0": {
+      "subgroup": "preset",
+      "label": {"en": "Graphics quality preset", "pl": "Preset jakości grafiki"},
+      "desc": {
+        "en": "The game's overall quality preset (Minimum ... Extreme). Choosing a preset in the game menu overwrites all individual quality settings; the individual values in this file are what is actually used. Changing only this line here does not re-apply the preset.",
+        "pl": "Ogólny preset jakości gry (Minimum ... Extreme). Wybranie presetu w menu gry nadpisuje wszystkie pojedyncze ustawienia jakości; faktycznie używane są pojedyncze wartości z tego pliku. Zmiana samej tej linii tutaj nie nakłada presetu ponownie."
+      },
+      "options": {"Minimum": {"pl": "Minimalny"}, "Basic": {"pl": "Podstawowy"}, "Balanced": {"pl": "Zbalansowany"}, "Ultra": {"pl": "Ultra"}, "Extreme": {"pl": "Ekstremalny"}},
+      "flags": ["advanced"]
+    },
+    "TextureQuality@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "Texture resolution", "pl": "Rozdzielczość tekstur"},
+      "desc": {
+        "en": "Texture detail level. Note the inverted scale: 0 = highest resolution, 3 = lowest. Mostly costs VRAM, not FPS - if your card has enough memory, high textures are almost free. Too high for your VRAM causes stutter.",
+        "pl": "Poziom szczegółowości tekstur. Uwaga na odwróconą skalę: 0 = najwyższa rozdzielczość, 3 = najniższa. Kosztuje głównie VRAM, a nie FPS — przy wystarczającej ilości pamięci wysokie tekstury są prawie darmowe. Za wysokie jak na Twój VRAM powodują przycięcia."
+      },
+      "impact": {"vram": 3, "fps": 1},
+      "recommend": {"competitive": 1, "balanced": 1, "quality": 0, "low_end": 2}
+    },
+    "TextureFilter@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "Texture filtering", "pl": "Filtrowanie tekstur"},
+      "desc": {
+        "en": "Anisotropic filtering keeps textures sharp at oblique angles (floors, roads, walls far away). 16x costs almost nothing on modern GPUs; 2x makes the ground blurry a few metres in front of you.",
+        "pl": "Filtrowanie anizotropowe utrzymuje ostrość tekstur pod kątem (podłogi, drogi, dalekie ściany). 16x prawie nic nie kosztuje na współczesnych kartach; 2x rozmywa podłoże już kilka metrów przed postacią."
+      },
+      "impact": {"fps": 1, "visibility": 1},
+      "recommend": {"competitive": "aniso 16x", "balanced": "aniso 16x", "quality": "aniso 16x", "low_end": "aniso 4x"}
+    },
+    "ModelQuality@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "Model quality", "pl": "Jakość modeli"},
+      "desc": {
+        "en": "Level of detail of 3D models (characters, vehicles, props) and how far detailed models are kept. Higher costs CPU and GPU in busy areas like Warzone cities.",
+        "pl": "Poziom szczegółowości modeli 3D (postacie, pojazdy, obiekty) i odległość, na jaką zachowywane są szczegółowe modele. Wyższy kosztuje CPU i GPU w gęstych miejscach, np. miastach w Warzone."
+      },
+      "options": {"Low Quality": {"pl": "Niska"}, "Medium Quality": {"pl": "Średnia"}, "High Quality": {"pl": "Wysoka"}},
+      "impact": {"fps": 2, "vram": 1},
+      "recommend": {"competitive": "Medium Quality", "balanced": "Medium Quality", "quality": "High Quality", "low_end": "Low Quality"}
+    },
+    "STLodSkip@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "Vegetation LOD skip", "pl": "Pomijanie LOD roślinności"},
+      "desc": {
+        "en": "Number of 'ST' detail levels to skip - most likely SpeedTree vegetation (trees, bushes). Higher values use simpler vegetation models: more FPS, less detail. Effect on how well foliage hides players is not verified.",
+        "pl": "Liczba pomijanych poziomów szczegółowości „ST” — najpewniej roślinności SpeedTree (drzewa, krzaki). Wyższe wartości = prostsze modele roślin: więcej FPS, mniej detali. Wpływ na to, jak roślinność zasłania graczy, nie jest sprawdzony."
+      },
+      "impact": {"fps": 1},
+      "flags": ["advanced"],
+      "recommend": {"low_end": 2}
+    },
+    "SubdivisionLevel@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "Surface subdivision", "pl": "Podział powierzchni"},
+      "desc": {
+        "en": "Catmull-Clark subdivision level: how many times curved surfaces are subdivided to look smooth up close. Higher = rounder models, more GPU work.",
+        "pl": "Poziom podziału Catmull-Clark: ile razy zakrzywione powierzchnie są dzielone, by z bliska wyglądały gładko. Wyżej = bardziej zaokrąglone modele i więcej pracy GPU."
+      },
+      "impact": {"fps": 1},
+      "flags": ["advanced"],
+      "recommend": {"low_end": 0}
+    },
+    "Tessellation@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "Tessellation", "pl": "Teselacja"},
+      "desc": {
+        "en": "Adds geometric detail to surfaces such as terrain and rubble. 1_Near only for nearby objects, 2_All everywhere. Noticeable GPU cost for little competitive value.",
+        "pl": "Dodaje szczegóły geometryczne powierzchniom, np. terenowi i gruzowi. 1_Near tylko dla bliskich obiektów, 2_All wszędzie. Zauważalny koszt GPU przy niewielkim znaczeniu w rywalizacji."
+      },
+      "options": {"0_Off": {"pl": "Wyłączona"}, "1_Near": {"pl": "Tylko blisko"}, "2_All": {"pl": "Wszędzie"}},
+      "impact": {"fps": 2},
+      "recommend": {"competitive": "0_Off", "balanced": "1_Near", "quality": "2_All", "low_end": "0_Off"}
+    },
+    "TerrainQuality@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "Terrain quality", "pl": "Jakość terenu"},
+      "desc": {
+        "en": "Detail of ground meshes and terrain materials, especially in large Warzone maps.",
+        "pl": "Szczegółowość siatki i materiałów terenu, szczególnie na dużych mapach Warzone."
+      },
+      "options": {"Very Low": {"pl": "Bardzo niska"}, "Low": {"pl": "Niska"}, "Medium": {"pl": "Średnia"}, "High": {"pl": "Wysoka"}, "Very High": {"pl": "Bardzo wysoka"}},
+      "impact": {"fps": 1, "vram": 1},
+      "recommend": {"competitive": "Low", "balanced": "Medium", "quality": "Very High", "low_end": "Very Low"}
+    },
+    "WorldStreamingQuality@0": {
+      "subgroup": "textures_geometry",
+      "label": {"en": "World streaming quality", "pl": "Jakość strumieniowania świata"},
+      "desc": {
+        "en": "How much high-detail world data is streamed in from disk. High looks better at a distance but uses more VRAM, disk and CPU; on a slow drive or low VRAM it can cause hitching.",
+        "pl": "Ile szczegółowych danych świata jest doczytywanych z dysku. High lepiej wygląda w oddali, ale zużywa więcej VRAM, dysku i CPU; przy wolnym dysku lub małym VRAM może powodować przycięcia."
+      },
+      "options": {"Low": {"pl": "Niska"}, "High": {"pl": "Wysoka"}},
+      "impact": {"fps": 1, "vram": 2},
+      "recommend": {"competitive": "Low", "balanced": "High", "quality": "High", "low_end": "Low"}
+    },
+    "ShadowQuality@0": {
+      "subgroup": "shadows",
+      "label": {"en": "Shadow quality", "pl": "Jakość cieni"},
+      "desc": {
+        "en": "Resolution and detail of dynamic shadows. Big GPU cost at the top settings. Opinions differ: very low shadows give more FPS, but player shadows around corners can give away enemy positions, so many guides suggest Low/Medium rather than the minimum.",
+        "pl": "Rozdzielczość i szczegółowość dynamicznych cieni. Najwyższe ustawienia mocno obciążają GPU. Opinie są podzielone: bardzo niskie cienie dają więcej FPS, ale cienie graczy zza rogu potrafią zdradzić pozycję wroga — dlatego wiele poradników zaleca Low/Medium zamiast minimum."
+      },
+      "options": {"Very_Low": {"pl": "Bardzo niska"}, "Low": {"pl": "Niska"}, "Medium": {"pl": "Średnia"}, "High": {"pl": "Wysoka"}, "Very_High": {"pl": "Bardzo wysoka"}},
+      "impact": {"fps": 3, "visibility": 1, "vram": 1},
+      "recommend": {"competitive": "Low", "balanced": "Medium", "quality": "Very_High", "low_end": "Very_Low"}
+    },
+    "ScreenSpaceShadowQuality@0": {
+      "subgroup": "shadows",
+      "label": {"en": "Screen space shadows", "pl": "Cienie w przestrzeni ekranu"},
+      "desc": {
+        "en": "Small contact shadows computed from the screen image (under objects, in creases). Adds depth to the image, costs GPU time, little competitive value.",
+        "pl": "Drobne cienie kontaktowe liczone z obrazu na ekranie (pod obiektami, w zagłębieniach). Dodają głębi, kosztują czas GPU, mają niewielkie znaczenie w rywalizacji."
+      },
+      "options": {"Off": {"pl": "Wyłączone"}, "Low": {"pl": "Niska"}, "High": {"pl": "Wysoka"}},
+      "impact": {"fps": 2},
+      "recommend": {"competitive": "Off", "balanced": "Low", "quality": "High", "low_end": "Off"}
+    },
+    "StaticSunshadowClipmapResolution@0": {
+      "subgroup": "shadows",
+      "label": {"en": "Static sun shadow resolution", "pl": "Rozdzielczość statycznych cieni słońca"},
+      "desc": {
+        "en": "Resolution of the cached sun shadow map for static geometry. Usually managed by the shadow quality setting; editing it by hand is experimental.",
+        "pl": "Rozdzielczość buforowanej mapy cieni słońca dla statycznej geometrii. Zwykle ustawiana przez jakość cieni; ręczna zmiana to eksperyment."
+      },
+      "widget": "spin",
+      "unit": "px",
+      "impact": {"vram": 1},
+      "flags": ["advanced"]
+    },
+    "ShadowFilteringQuality@0": {
+      "subgroup": "shadows",
+      "label": {"en": "Shadow filtering", "pl": "Filtrowanie cieni"},
+      "desc": {
+        "en": "Softness / filtering quality of shadow edges (cod26). Higher looks smoother and more realistic at some GPU cost.",
+        "pl": "Miękkość i jakość filtrowania krawędzi cieni (cod26). Wyżej = gładsze, bardziej realistyczne cienie przy pewnym koszcie GPU."
+      },
+      "options": {"Low": {"pl": "Niska"}, "Medium": {"pl": "Średnia"}, "High": {"pl": "Wysoka"}},
+      "impact": {"fps": 1},
+      "recommend": {"competitive": "Low", "balanced": "Medium", "quality": "High", "low_end": "Low"}
+    },
+    "ShaderQuality@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Shader quality", "pl": "Jakość shaderów"},
+      "desc": {
+        "en": "Complexity of material and lighting shaders. 'Default' is full quality. 'Low' gives FPS but is reported to break lighting on some maps, creating dark spots where enemies are hard to see - Medium is the usual competitive minimum.",
+        "pl": "Złożoność shaderów materiałów i oświetlenia. „Default” to pełna jakość. „Low” daje FPS, ale według graczy psuje oświetlenie na części map, tworząc ciemne plamy, w których trudno dostrzec wrogów — Medium to zwykle minimum w grze rankingowej."
+      },
+      "options": {"Default": {"pl": "Domyślna (pełna)"}, "Medium": {"pl": "Średnia"}, "Low": {"pl": "Niska"}},
+      "impact": {"fps": 2, "visibility": 2},
+      "recommend": {"competitive": "Medium", "balanced": "Medium", "quality": "Default", "low_end": "Low"}
+    },
+    "ShadingQuality@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Shading quality", "pl": "Jakość cieniowania"},
+      "desc": {
+        "en": "Overall shading quality level (cod26 files). Low simplifies lighting calculations for more FPS.",
+        "pl": "Ogólny poziom jakości cieniowania (pliki cod26). Low upraszcza obliczenia oświetlenia na rzecz FPS."
+      },
+      "options": {"Low": {"pl": "Niska"}, "High": {"pl": "Wysoka"}},
+      "impact": {"fps": 2},
+      "recommend": {"balanced": "High", "quality": "High", "low_end": "Low"}
+    },
+    "AmbientLightingQuality@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Ambient lighting", "pl": "Oświetlenie otoczenia"},
+      "desc": {
+        "en": "Quality of indirect / ambient lighting and occlusion (the soft darkening in corners and under objects). Significant GPU cost; turning it down is a common FPS tweak and can make dark corners a bit brighter.",
+        "pl": "Jakość oświetlenia pośredniego i przesłaniania otoczenia (miękkie przyciemnienie w rogach i pod obiektami). Duży koszt GPU; obniżenie to popularny sposób na FPS i może lekko rozjaśnić ciemne zakamarki."
+      },
+      "options": {"Off": {"pl": "Wyłączone"}, "Low": {"pl": "Niskie"}, "Medium": {"pl": "Średnie"}, "High": {"pl": "Wysokie"}, "Ultra": {"pl": "Ultra"}},
+      "impact": {"fps": 2, "visibility": 1},
+      "recommend": {"competitive": "Off", "balanced": "Low", "quality": "High", "low_end": "Off"}
+    },
+    "VolumetricQuality@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Volumetric quality", "pl": "Jakość efektów wolumetrycznych"},
+      "desc": {
+        "en": "Resolution of volumetric fog and light shafts. Expensive at high settings; lower values make fog blockier but do not remove it.",
+        "pl": "Rozdzielczość mgły wolumetrycznej i smug światła. Kosztowna na wysokich ustawieniach; niższe wartości czynią mgłę bardziej „kanciastą”, ale jej nie usuwają."
+      },
+      "options": {"QUALITY_LOW": {"pl": "Niska"}, "QUALITY_MEDIUM": {"pl": "Średnia"}, "QUALITY_HIGH": {"pl": "Wysoka"}, "QUALITY_VERYHIGH": {"pl": "Bardzo wysoka"}},
+      "impact": {"fps": 2},
+      "recommend": {"competitive": "QUALITY_LOW", "balanced": "QUALITY_MEDIUM", "quality": "QUALITY_HIGH", "low_end": "QUALITY_LOW"},
+      "related": ["VolumetricQuality@1"]
+    },
+    "VolumetricQuality@1": {
+      "subgroup": "lighting",
+      "label": {"en": "Volumetric quality (cod26)", "pl": "Jakość efektów wolumetrycznych (cod26)"},
+      "desc": {
+        "en": "cod26 variant of volumetric quality with an extra 'very high' level.",
+        "pl": "Wariant z plików cod26 z dodatkowym poziomem „bardzo wysoka”."
+      },
+      "options": {"QUALITY_LOW": {"pl": "Niska"}, "QUALITY_MEDIUM": {"pl": "Średnia"}, "QUALITY_HIGH": {"pl": "Wysoka"}, "QUALITY_VERYHIGH": {"pl": "Bardzo wysoka"}},
+      "impact": {"fps": 2},
+      "recommend": {"competitive": "QUALITY_LOW", "balanced": "QUALITY_MEDIUM", "quality": "QUALITY_VERYHIGH", "low_end": "QUALITY_LOW"},
+      "related": ["VolumetricQuality@0"]
+    },
+    "ReflectionProbeHalfResolution@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Half-resolution reflection probes", "pl": "Sondy odbić w połowie rozdzielczości"},
+      "desc": {
+        "en": "Renders environment reflection probes at half resolution. Saves GPU time and VRAM; reflections become slightly blurrier.",
+        "pl": "Renderuje sondy odbić otoczenia w połowie rozdzielczości. Oszczędza czas GPU i VRAM; odbicia stają się nieco bardziej rozmyte."
+      },
+      "impact": {"fps": 1, "vram": 1},
+      "recommend": {"competitive": true, "balanced": true, "quality": false, "low_end": true}
+    },
+    "ReflectionProbeRelighting@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Reflection probe relighting stages", "pl": "Etapy przeliczania sond odbić"},
+      "desc": {
+        "en": "How many update stages are used to relight reflection probes when lighting changes. Exact effect is undocumented; leave the game's value unless you are experimenting.",
+        "pl": "Ile etapów aktualizacji służy do ponownego oświetlania sond odbić przy zmianie światła. Dokładny efekt nie jest udokumentowany; zostaw wartość gry, chyba że eksperymentujesz."
+      },
+      "flags": ["advanced"]
+    },
+    "SSRQuality@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Screen space reflections", "pl": "Odbicia w przestrzeni ekranu (SSR)"},
+      "desc": {
+        "en": "Real-time reflections on water, glass and wet surfaces. Costs GPU time, and reflections in windows and water can visually 'hide' enemies behind bright mirror images - commonly turned off for competitive play.",
+        "pl": "Odbicia w czasie rzeczywistym na wodzie, szybach i mokrych powierzchniach. Kosztują czas GPU, a odbicia w oknach i wodzie potrafią „schować” wrogów za jasnym lustrzanym obrazem — w grze rankingowej zwykle wyłączane."
+      },
+      "options": {"Off": {"pl": "Wyłączone"}, "Low": {"pl": "Niskie"}, "Medium": {"pl": "Średnie"}, "High": {"pl": "Wysokie"}},
+      "impact": {"fps": 2, "visibility": 2},
+      "recommend": {"competitive": "Off", "balanced": "Low", "quality": "High", "low_end": "Off"},
+      "related": ["SSRQuality@1"]
+    },
+    "SSRQuality@1": {
+      "subgroup": "lighting",
+      "label": {"en": "Screen space reflections (cod26)", "pl": "Odbicia SSR (cod26)"},
+      "desc": {
+        "en": "cod26 variant of screen space reflections with an extra Medium level.",
+        "pl": "Wariant z plików cod26 z dodatkowym poziomem Medium."
+      },
+      "options": {"Off": {"pl": "Wyłączone"}, "Low": {"pl": "Niskie"}, "Medium": {"pl": "Średnie"}, "High": {"pl": "Wysokie"}},
+      "impact": {"fps": 2, "visibility": 2},
+      "recommend": {"competitive": "Off", "balanced": "Low", "quality": "High", "low_end": "Off"},
+      "related": ["SSRQuality@0"]
+    },
+    "VRS@0": {
+      "subgroup": "lighting",
+      "label": {"en": "Variable rate shading", "pl": "Cieniowanie o zmiennej szybkości (VRS)"},
+      "desc": {
+        "en": "Shades low-detail or fast-moving parts of the image at a reduced rate. Gives a few percent FPS at the cost of slightly blurrier areas, which can include distant enemies.",
+        "pl": "Cieniuje mało szczegółowe lub szybko poruszające się części obrazu z mniejszą dokładnością. Daje kilka procent FPS kosztem lekko rozmytych obszarów — mogą to być także odlegli wrogowie."
+      },
+      "impact": {"fps": 1, "visibility": 1},
+      "recommend": {"competitive": false, "balanced": false, "quality": false, "low_end": true}
+    },
+    "DxrMode@0": {
+      "subgroup": "raytracing",
+      "label": {"en": "Ray tracing", "pl": "Ray tracing"},
+      "desc": {
+        "en": "Enables DirectX Raytracing. Big FPS cost for realistic lighting/reflections with no competitive benefit.",
+        "pl": "Włącza DirectX Raytracing. Duży koszt FPS za realistyczne oświetlenie/odbicia, bez korzyści w rywalizacji."
+      },
+      "options": {"Off": {"pl": "Wyłączony"}, "On": {"pl": "Włączony"}},
+      "impact": {"fps": 3, "vram": 2, "latency": 1},
+      "recommend": {"competitive": "Off", "balanced": "Off", "quality": "On", "low_end": "Off"},
+      "related": ["DxrMode@1", "DxrDenoiser@0"]
+    },
+    "DxrMode@1": {
+      "subgroup": "raytracing",
+      "label": {"en": "Ray tracing quality", "pl": "Jakość ray tracingu"},
+      "desc": {
+        "en": "Ray tracing quality level (the second variant of the ray tracing switch).",
+        "pl": "Poziom jakości ray tracingu (drugi wariant przełącznika RT)."
+      },
+      "options": {"Off": {"pl": "Wyłączony"}, "Low": {"pl": "Niska"}, "Medium": {"pl": "Średnia"}, "High": {"pl": "Wysoka"}, "Ultra": {"pl": "Ultra"}},
+      "impact": {"fps": 3, "vram": 2, "latency": 1},
+      "recommend": {"competitive": "Off", "balanced": "Off", "quality": "High", "low_end": "Off"},
+      "related": ["DxrMode@0"]
+    },
+    "DxrDenoiser@0": {
+      "subgroup": "raytracing",
+      "label": {"en": "Ray tracing denoiser", "pl": "Odszumianie ray tracingu"},
+      "desc": {
+        "en": "Denoiser that cleans up the noisy ray-traced image. DLSS Ray Reconstruction needs NVIDIA RTX, FSR Ray Regeneration needs a supported AMD GPU. Only matters with ray tracing on.",
+        "pl": "Odszumiacz czyszczący zaszumiony obraz ray tracingu. DLSS Ray Reconstruction wymaga NVIDIA RTX, FSR Ray Regeneration — obsługiwanej karty AMD. Ma znaczenie tylko przy włączonym RT."
+      },
+      "options": {"Default": {"pl": "Domyślny"}},
+      "flags": ["advanced"],
+      "related": ["DxrMode@0"]
+    },
+    "ParticleQuality@0": {
+      "subgroup": "effects",
+      "label": {"en": "Particle quality", "pl": "Jakość cząsteczek"},
+      "desc": {
+        "en": "Resolution of particle effects (smoke, fire, sparks, explosions). Lower values are cheaper in heavy fights; they do not make smoke see-through.",
+        "pl": "Rozdzielczość efektów cząsteczkowych (dym, ogień, iskry, wybuchy). Niższe wartości odciążają GPU w intensywnych walkach; nie sprawiają, że dym staje się przezroczysty."
+      },
+      "options": {"very low": {"pl": "bardzo niska"}, "low": {"pl": "niska"}, "medium": {"pl": "średnia"}, "high": {"pl": "wysoka"}},
+      "impact": {"fps": 2},
+      "recommend": {"competitive": "low", "balanced": "medium", "quality": "high", "low_end": "very low"}
+    },
+    "DeferredPhysics@0": {
+      "subgroup": "effects",
+      "label": {"en": "Deferred physics", "pl": "Fizyka odroczona"},
+      "desc": {
+        "en": "Quality of secondary physics simulation (debris, cloth, small objects). Mostly a CPU cost.",
+        "pl": "Jakość dodatkowej symulacji fizyki (gruz, tkaniny, drobne obiekty). Głównie koszt CPU."
+      },
+      "options": {"Low Quality": {"pl": "Niska"}, "Medium Quality": {"pl": "Średnia"}, "High Quality": {"pl": "Wysoka"}},
+      "impact": {"fps": 1},
+      "recommend": {"competitive": "Low Quality", "balanced": "Medium Quality", "quality": "High Quality", "low_end": "Low Quality"}
+    },
+    "WaterCausticsMode@0": {
+      "subgroup": "effects",
+      "label": {"en": "Water caustics", "pl": "Kaustyka wody"},
+      "desc": {
+        "en": "Light patterns projected by water onto surfaces below and near it. Pure eye candy.",
+        "pl": "Wzory światła rzucane przez wodę na powierzchnie pod nią i obok niej. Czysto kosmetyczny efekt."
+      },
+      "options": {"Off": {"pl": "Wyłączona"}, "Low Quality": {"pl": "Niska"}, "High Quality": {"pl": "Wysoka"}},
+      "impact": {"fps": 1},
+      "recommend": {"competitive": "Off", "balanced": "Low Quality", "quality": "High Quality", "low_end": "Off"}
+    },
+    "WaterWaveWetness@0": {
+      "subgroup": "effects",
+      "label": {"en": "Wave wetness", "pl": "Zamoczenie od fal"},
+      "desc": {
+        "en": "Leaves persistent wet patches on static geometry hit by water waves. Cosmetic.",
+        "pl": "Zostawia trwałe mokre plamy na statycznej geometrii, do której docierają fale. Efekt kosmetyczny."
+      },
+      "impact": {"fps": 1},
+      "recommend": {"competitive": false, "balanced": false, "quality": true, "low_end": false}
+    },
+    "WeatherGridVolumesQuality@0": {
+      "subgroup": "effects",
+      "label": {"en": "Weather volumes", "pl": "Wolumeny pogodowe"},
+      "desc": {
+        "en": "Quality of volumetric weather effects (local fog, rain and dust volumes). Can cost a lot of GPU time in Warzone weather events.",
+        "pl": "Jakość wolumetrycznych efektów pogodowych (lokalna mgła, deszcz, pył). W wydarzeniach pogodowych w Warzone potrafi mocno obciążyć GPU."
+      },
+      "options": {"Off": {"pl": "Wyłączone"}, "Low": {"pl": "Niska"}, "Medium": {"pl": "Średnia"}, "High": {"pl": "Wysoka"}, "Ultra": {"pl": "Ultra"}},
+      "impact": {"fps": 2, "visibility": 1},
+      "recommend": {"competitive": "Off", "balanced": "Low", "quality": "High", "low_end": "Off"}
+    },
+    "PersistentDamageLayer@0": {
+      "subgroup": "effects",
+      "label": {"en": "Persistent damage", "pl": "Trwałe uszkodzenia"},
+      "desc": {
+        "en": "Keeps damage marks (scorches, bullet damage) on surfaces for longer. Cosmetic, small GPU/VRAM cost.",
+        "pl": "Dłużej utrzymuje ślady zniszczeń (osmalenia, uszkodzenia od kul) na powierzchniach. Kosmetyka, niewielki koszt GPU/VRAM."
+      },
+      "impact": {"fps": 1},
+      "recommend": {"competitive": false, "balanced": false, "quality": true, "low_end": false}
+    },
+    "BulletImpacts@0": {
+      "subgroup": "effects",
+      "label": {"en": "Bullet impacts", "pl": "Ślady trafień pocisków"},
+      "desc": {
+        "en": "Shows impact effects and marks where bullets hit. Helps you see where your shots land (and where shots come from); small cost.",
+        "pl": "Pokazuje efekty i ślady w miejscach trafienia pocisków. Pomaga zobaczyć, gdzie trafiają Twoje strzały (i skąd ktoś strzela); niewielki koszt."
+      },
+      "impact": {"fps": 1, "visibility": 1},
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": false}
+    },
+    "CorpsesCullingThreshold@0": {
+      "subgroup": "effects",
+      "label": {"en": "Corpse culling threshold", "pl": "Próg ukrywania zwłok"},
+      "desc": {
+        "en": "Threshold used to decide when corpses are culled (hidden) to save performance. Exact semantics are undocumented.",
+        "pl": "Próg, przy którym zwłoki są ukrywane w celu oszczędzania wydajności. Dokładne znaczenie nie jest udokumentowane."
+      },
+      "widget": "percent",
+      "flags": ["advanced"]
+    },
+    "EnableVelocityBasedBlur@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "Speed-based radial blur", "pl": "Rozmycie radialne od prędkości"},
+      "desc": {
+        "en": "Applies radial motion blur based on how fast the player moves (sprinting, sliding, vehicles). Makes the edges of the screen blurry exactly when you need to spot enemies - turn it off for competitive play.",
+        "pl": "Dodaje radialne rozmycie ruchu zależne od prędkości gracza (sprint, ślizg, pojazdy). Rozmywa krawędzie ekranu dokładnie wtedy, gdy trzeba wypatrywać wrogów — w grze rankingowej wyłącz."
+      },
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": false, "balanced": false, "quality": true, "low_end": false}
+    },
+    "MotionBlur@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "World motion blur", "pl": "Rozmycie ruchu świata"},
+      "desc": {
+        "en": "Motion blur on the scene (cod26). 'Cinematic Only' keeps it for cutscenes. Blur hides detail while turning, so it is off in competitive setups.",
+        "pl": "Rozmycie ruchu sceny (cod26). „Cinematic Only” zostawia je tylko w przerywnikach. Rozmycie ukrywa szczegóły przy obracaniu się, dlatego w grze rankingowej jest wyłączane."
+      },
+      "options": {"Off": {"pl": "Wyłączone"}, "On": {"pl": "Włączone"}, "Cinematic Only": {"pl": "Tylko przerywniki"}},
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": "Off", "balanced": "Off", "quality": "Cinematic Only", "low_end": "Off"}
+    },
+    "WeaponMotionBlur@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "Weapon motion blur", "pl": "Rozmycie ruchu broni"},
+      "desc": {
+        "en": "Motion blur on your own weapon model (cod26). Purely cosmetic.",
+        "pl": "Rozmycie ruchu modelu Twojej broni (cod26). Czysto kosmetyczne."
+      },
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": false, "balanced": false, "quality": true, "low_end": false}
+    },
+    "DepthOfField@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "Depth of field", "pl": "Głębia ostrości"},
+      "desc": {
+        "en": "Blurs out-of-focus areas when aiming down sights. Looks cinematic but blurs the surroundings you should be watching.",
+        "pl": "Rozmywa obszary poza ostrością podczas celowania przez przyrządy. Wygląda filmowo, ale rozmywa otoczenie, które powinieneś obserwować."
+      },
+      "impact": {"visibility": 2, "fps": 1},
+      "recommend": {"competitive": false, "balanced": false, "quality": true, "low_end": false},
+      "related": ["DepthOfField@1", "DepthOfFieldQuality@0"]
+    },
+    "DepthOfField@1": {
+      "subgroup": "post_processing",
+      "label": {"en": "Depth of field mode", "pl": "Tryb głębi ostrości"},
+      "desc": {
+        "en": "Depth of field mode. Script = only when the game requests it (cutscenes, special moments); On = also when aiming.",
+        "pl": "Tryb głębi ostrości. Script = tylko gdy wymaga tego gra (przerywniki, specjalne momenty); On = także podczas celowania."
+      },
+      "options": {"Off": {"pl": "Wyłączona"}, "On": {"pl": "Włączona"}, "Script": {"pl": "Tylko skrypty"}},
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": "Off", "balanced": "Off", "quality": "Script", "low_end": "Off"},
+      "related": ["DepthOfField@0"]
+    },
+    "DepthOfFieldQuality@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "Depth of field quality", "pl": "Jakość głębi ostrości"},
+      "desc": {
+        "en": "Quality of the depth of field blur filter, when depth of field is used.",
+        "pl": "Jakość filtra rozmycia głębi ostrości, gdy jest używana."
+      },
+      "options": {"Low": {"pl": "Niska"}, "High": {"pl": "Wysoka"}},
+      "impact": {"fps": 1},
+      "recommend": {"quality": "High", "low_end": "Low"}
+    },
+    "DofEnable@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "Depth of field (cod26)", "pl": "Głębia ostrości (cod26)"},
+      "desc": {
+        "en": "cod26 replacement of the depth of field mode: Off, On, or Script (only when the game requests it).",
+        "pl": "Następca trybu głębi ostrości w cod26: Off, On lub Script (tylko gdy wymaga tego gra)."
+      },
+      "options": {"Off": {"pl": "Wyłączona"}, "On": {"pl": "Włączona"}, "Script": {"pl": "Tylko skrypty"}},
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": "Off", "balanced": "Off", "quality": "Script", "low_end": "Off"},
+      "related": ["DofWeaponDisable@0", "DofWorldDisable@0"]
+    },
+    "DofWeaponDisable@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "Disable weapon depth of field", "pl": "Wyłącz głębię ostrości broni"},
+      "desc": {
+        "en": "Turns off the blur applied to your own weapon model (cod26). On = weapon always sharp.",
+        "pl": "Wyłącza rozmycie modelu Twojej broni (cod26). Włączone = broń zawsze ostra."
+      },
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": true, "balanced": true, "quality": false, "low_end": true}
+    },
+    "DofWorldDisable@0": {
+      "subgroup": "post_processing",
+      "label": {"en": "Disable world depth of field", "pl": "Wyłącz głębię ostrości świata"},
+      "desc": {
+        "en": "Turns off the blur applied to the world around your sights (cod26). On = surroundings stay sharp while aiming.",
+        "pl": "Wyłącza rozmycie świata wokół przyrządów celowniczych (cod26). Włączone = otoczenie pozostaje ostre podczas celowania."
+      },
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": true, "balanced": true, "quality": false, "low_end": true}
+    }
+  }
+}

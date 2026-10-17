@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–1 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–2 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -20,16 +20,16 @@ src/wzce/
     paths.py       # %APPDATA%/WarzoneConfigEditor, game players folders         [done]
     history.py     # trwała historia zapisów (snapshoty + diff)
     templates.py   # szablony: zapis/odczyt/nakładanie częściowe, import/export
-    knowledge.py   # ładowanie bazy wiedzy (opisy PL/EN, grupy, wpływ, zalecenia)
+    knowledge.py   # knowledge base loader + unknown-key fallback                [done]
+    i18n.py        # UI translations with EN fallback, language listeners        [done]
     hardware.py    # CPU/VRAM/GPU/monitor → rekomendacje
   data/
-    settings_db.json   # baza wiedzy o każdym ustawieniu
-    presets/*.json     # wbudowane presety
-    i18n/en.json, pl.json
+    settings_db/       # baza wiedzy: _meta.json (grupy, presety) + plik na grupę  [done]
+    i18n/en.json, pl.json                                                      [done]
   ui/              # PySide6
     main_window.py, category_nav.py, setting_card.py, widgets/ (toggle, slider, segmented…)
     changes_panel.py, history_dialog.py, templates_dialog.py, optimizer_wizard.py
-    i18n.py, theme.qss
+    theme.qss
 tests/             # pytest, fixtures z examples/
 ```
 
@@ -53,11 +53,15 @@ tests/             # pytest, fixtures z examples/
 - [x] Tymczasowy raport CLI: `uv run python -m wzce` (tylko odczyt, do czasu GUI)
 
 ### Etap 2 — Baza wiedzy i tłumaczenia
-- [ ] `settings_db.json`: dla każdego z 147 (+ cod26) ustawień: grupa, podgrupa, nazwa PL/EN,
-      pełny opis PL/EN, wpływ (FPS / widoczność / opóźnienie / VRAM), zalecenia per preset,
-      flagi: `hardware_specific`, `read_only`, `advanced`, nadpisanie kontrolki
-- [ ] Fallback dla nieznanych kluczy: kontrolka z ograniczenia w pliku + opis z komentarza + odznaka „nowe”
-- [ ] `i18n/en.json`, `pl.json` dla całego interfejsu; przełączanie bez restartu
+- [x] Baza wiedzy `data/settings_db/` (folder: `_meta.json` + plik na kategorię zamiast jednego
+      `settings_db.json` — łatwiejsza edycja): 168 wpisów = 147 cod25 + 21 nowych z cod26;
+      kategoria/podkategoria, nazwa i pełny opis PL/EN, etykiety opcji, wpływ (FPS / opóźnienie /
+      widoczność / VRAM), zalecenia dla 4 presetów, flagi, producent GPU, podpowiedzi kontrolek,
+      reguły sprzętowe dla etapu 6. Schemat: [`KNOWLEDGE_BASE.md`](KNOWLEDGE_BASE.md)
+- [x] Fallback dla nieznanych kluczy: kategoria z sekcji pliku, nazwa z klucza, opis z komentarza, flaga „new”
+- [x] `i18n/en.json`, `pl.json` (~120 tekstów UI) + `Translator` z powiadamianiem o zmianie języka
+- [x] Testy spójności: pokrycie wszystkich kluczy, poprawność zaleceń względem plików gry, kompletność tłumaczeń
+- [ ] Baza wiedzy dla pliku konta (czułość, FOV — 67 ustawień) → razem z etapem 7
 
 ### Etap 3 — Interfejs MVP
 - [ ] Okno główne: pasek narzędzi, nawigacja kategorii, lista kart, pasek statusu
@@ -75,7 +79,8 @@ tests/             # pytest, fixtures z examples/
 ### Etap 5 — Szablony i presety
 - [ ] Zapis szablonu: całość lub wybrane kategorie; pomijanie danych sprzętowych
 - [ ] Nakładanie szablonu z podglądem różnic (wybór, które zmiany przyjąć)
-- [ ] Wbudowane presety: Competitive, Zbalansowany, Jakość, Słaby PC, Streaming
+- [ ] Wbudowane presety (zalecenia już są w bazie wiedzy): Competitive, Zbalansowany, Jakość, Słaby PC
+- [ ] Presety pomijają ustawienia innych producentów GPU i zgłaszają różnice między tytułami
 - [ ] Eksport/import `.json`; import wybranych kategorii z cudzego pliku `.txt0`
 
 ### Etap 6 — Optymalizator

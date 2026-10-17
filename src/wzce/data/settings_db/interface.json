@@ -1,0 +1,79 @@
+{
+  "group": "interface",
+  "settings": {
+    "EnableHUD@0": {
+      "subgroup": "hud",
+      "label": {"en": "Show HUD", "pl": "Pokazuj HUD"},
+      "desc": {
+        "en": "Shows heads-up display elements (minimap, ammo, compass...). Turn off only for screenshots and videos.",
+        "pl": "Pokazuje elementy HUD (minimapa, amunicja, kompas...). Wyłączaj tylko do zrzutów ekranu i nagrań."
+      },
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true}
+    },
+    "ShowFPSCounter@0": {
+      "subgroup": "hud",
+      "label": {"en": "FPS counter", "pl": "Licznik FPS"},
+      "desc": {
+        "en": "Shows the in-game FPS counter. For CPU vs GPU time use the telemetry options in the game's Interface menu.",
+        "pl": "Pokazuje licznik FPS w grze. Czas CPU i GPU pokażesz w opcjach telemetrii w menu Interfejs gry."
+      },
+      "recommend": {"competitive": true}
+    },
+    "UseOSCursors@1": {
+      "subgroup": "hud",
+      "label": {"en": "Use Windows cursor", "pl": "Kursor systemu Windows"},
+      "desc": {
+        "en": "Uses the standard Windows mouse cursor in menus instead of the game's custom one (accessibility).",
+        "pl": "Używa w menu standardowego kursora Windows zamiast kursora gry (dostępność)."
+      }
+    },
+    "SkipIntro@1": {
+      "subgroup": "videos",
+      "label": {"en": "Skip intro movie", "pl": "Pomiń film na starcie"},
+      "desc": {"en": "Skips the introduction movie played when the game starts. Faster startup.", "pl": "Pomija film wprowadzający przy uruchamianiu gry. Szybszy start."},
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true}
+    },
+    "ViewedSplashScreen@0": {
+      "subgroup": "videos",
+      "label": {"en": "Splash screen seen", "pl": "Ekran powitalny obejrzany"},
+      "desc": {
+        "en": "Marks the splash screen as already viewed, which allows skipping it on later starts.",
+        "pl": "Oznacza ekran powitalny jako obejrzany, dzięki czemu można go pomijać przy kolejnych startach."
+      },
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true},
+      "flags": ["game_managed"]
+    },
+    "SkipSeasonIntroVideo@0": {
+      "subgroup": "videos",
+      "label": {"en": "Skip season intro video", "pl": "Pomiń film sezonu"},
+      "desc": {"en": "Controls whether the season intro video plays.", "pl": "Określa, czy odtwarzany jest film wprowadzający sezon."},
+      "recommend": {"competitive": true, "balanced": true, "low_end": true}
+    },
+    "SkipSeasonVideo@0": {
+      "subgroup": "videos",
+      "label": {"en": "Skip repeated season video", "pl": "Pomijaj powtórny film sezonu"},
+      "desc": {
+        "en": "Skips the season video on later logins once you have seen it.",
+        "pl": "Pomija film sezonu przy kolejnych logowaniach, gdy już go obejrzałeś."
+      },
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true}
+    },
+    "CinematicEmissive@0": {
+      "subgroup": "videos",
+      "label": {"en": "In-game cinematics", "pl": "Przerywniki w grze"},
+      "desc": {"en": "Allows in-game cinematics to play.", "pl": "Pozwala na odtwarzanie przerywników w grze."},
+      "flags": ["advanced"]
+    },
+    "CinematicQuality@0": {
+      "subgroup": "videos",
+      "label": {"en": "Use fallback movies", "pl": "Filmy zastępcze"},
+      "desc": {
+        "en": "Plays lighter fallback versions of cinematic movies. Saves disk/VRAM, lower video quality.",
+        "pl": "Odtwarza lżejsze, zastępcze wersje filmów. Oszczędza dysk/VRAM kosztem jakości filmów."
+      },
+      "impact": {"vram": 1},
+      "flags": ["advanced"],
+      "recommend": {"low_end": true, "quality": false}
+    }
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "group": "audio",
+  "settings": {
+    "Volume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Master volume", "pl": "Głośność główna"},
+      "desc": {"en": "Overall game volume; all other volumes are relative to it.", "pl": "Ogólna głośność gry; pozostałe głośności są względem niej."},
+      "widget": "percent"
+    },
+    "EffectsVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Sound effects volume", "pl": "Głośność efektów"},
+      "desc": {
+        "en": "Volume of sound effects - footsteps, gunfire, vehicles. This is the channel that tells you where enemies are; keep it high.",
+        "pl": "Głośność efektów dźwiękowych — kroki, strzały, pojazdy. To ten kanał zdradza pozycję wrogów; trzymaj go wysoko."
+      },
+      "widget": "percent",
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": 1.0, "balanced": 1.0}
+    },
+    "MusicVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Music volume", "pl": "Głośność muzyki"},
+      "desc": {
+        "en": "Volume of the game's music. Music can mask footsteps - many players turn it off in matches.",
+        "pl": "Głośność muzyki w grze. Muzyka potrafi zagłuszyć kroki — wielu graczy wyłącza ją w meczach."
+      },
+      "widget": "percent",
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": 0.0}
+    },
+    "LicensedMusicVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Licensed music volume", "pl": "Głośność muzyki licencjonowanej"},
+      "desc": {
+        "en": "Volume of licensed (real-world) songs, e.g. from bundles. Streamers often mute it to avoid copyright claims.",
+        "pl": "Głośność licencjonowanych utworów (prawdziwych piosenek, np. z pakietów). Streamerzy często ją wyciszają, by uniknąć roszczeń praw autorskich."
+      },
+      "widget": "percent",
+      "recommend": {"competitive": 0.0}
+    },
+    "WarTracksVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "War Tracks volume", "pl": "Głośność War Tracks"},
+      "desc": {
+        "en": "Volume of War Tracks - music that plays from vehicle radios. Also audible to nearby players.",
+        "pl": "Głośność War Tracks — muzyki z radia pojazdów. Słyszą ją też gracze w pobliżu."
+      },
+      "widget": "percent"
+    },
+    "VoiceVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Dialogue volume", "pl": "Głośność dialogów"},
+      "desc": {"en": "Volume of character dialogue and announcer voices (not voice chat).", "pl": "Głośność dialogów postaci i komentatora (nie czatu głosowego)."},
+      "widget": "percent"
+    },
+    "CinematicVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Cinematics volume", "pl": "Głośność przerywników"},
+      "desc": {"en": "Volume of audio in cinematics and cutscenes.", "pl": "Głośność dźwięku w przerywnikach filmowych."},
+      "widget": "percent"
+    },
+    "HitMarkersVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Hit marker volume", "pl": "Głośność znaczników trafień"},
+      "desc": {
+        "en": "Volume of the hit marker sound you hear when your shots connect. Useful audio feedback in fights.",
+        "pl": "Głośność dźwięku potwierdzającego trafienie. Przydatna informacja zwrotna w walce."
+      },
+      "widget": "percent",
+      "recommend": {"competitive": 1.0}
+    },
+    "TelescopeVolume@0": {
+      "subgroup": "volume",
+      "label": {"en": "Menu news volume (Telescope)", "pl": "Głośność wiadomości w menu (Telescope)"},
+      "desc": {"en": "Volume of videos in the in-game news/message-of-the-day panel (Telescope / MOTD).", "pl": "Głośność filmów w panelu wiadomości w menu (Telescope / MOTD)."},
+      "widget": "percent"
+    },
+    "SoundOutputDevice@0": {
+      "subgroup": "devices",
+      "label": {"en": "Speaker / headphone device", "pl": "Urządzenie głośników / słuchawek"},
+      "desc": {
+        "en": "Windows audio output device used for game sound, stored as a device ID. Empty or invalid = system default. Pick the device in-game; IDs differ per PC.",
+        "pl": "Urządzenie wyjściowe Windows używane dla dźwięku gry, zapisane jako identyfikator. Puste lub błędne = domyślne systemowe. Wybieraj je w grze — identyfikatory są inne na każdym PC."
+      },
+      "widget": "device",
+      "flags": ["hardware_specific", "advanced"]
+    },
+    "VoiceOutputDevice@0": {
+      "subgroup": "devices",
+      "label": {"en": "Voice chat output device", "pl": "Urządzenie wyjściowe czatu głosowego"},
+      "desc": {
+        "en": "Audio device used for voice chat playback, stored as a device ID.",
+        "pl": "Urządzenie audio do odtwarzania czatu głosowego, zapisane jako identyfikator."
+      },
+      "widget": "device",
+      "flags": ["hardware_specific", "advanced"]
+    },
+    "SoundInputDevice@0": {
+      "subgroup": "devices",
+      "label": {"en": "Microphone device", "pl": "Mikrofon"},
+      "desc": {
+        "en": "Microphone used for voice chat, stored as a device ID. Empty = system default microphone.",
+        "pl": "Mikrofon używany w czacie głosowym, zapisany jako identyfikator. Puste = domyślny mikrofon systemu."
+      },
+      "widget": "device",
+      "flags": ["hardware_specific", "advanced"]
+    },
+    "AudioWantedChannelsNumber@0": {
+      "subgroup": "devices",
+      "label": {"en": "Output channels", "pl": "Liczba kanałów wyjściowych"},
+      "desc": {
+        "en": "Number of speaker channels requested: 2 (stereo), 4, 6 (5.1), 8 (7.1) or 16. 0 = use the Windows setting. For headphones, stereo or the game's own headphone mix usually gives the clearest directional audio.",
+        "pl": "Żądana liczba kanałów: 2 (stereo), 4, 6 (5.1), 8 (7.1) lub 16. 0 = ustawienie z Windows. Na słuchawkach najczytelniejszy kierunek dźwięku zwykle daje stereo lub miks słuchawkowy gry."
+      },
+      "widget": "spin",
+      "flags": ["advanced"]
+    },
+    "WindowsSonicEnable@0": {
+      "subgroup": "devices",
+      "label": {"en": "Allow Windows Sonic", "pl": "Zezwól na Windows Sonic"},
+      "desc": {
+        "en": "Allows Microsoft's 3D spatializer 'Windows Sonic' for headphones. Off = the game presents a standard 7.1 mix. Most players prefer the game's own headphone mix.",
+        "pl": "Pozwala na przestrzenny dźwięk Microsoft „Windows Sonic” dla słuchawek. Wyłączone = gra wysyła standardowy miks 7.1. Większość graczy woli własny miks słuchawkowy gry."
+      },
+      "recommend": {"competitive": false}
+    },
+    "VoicePushToTalk@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Push to talk", "pl": "Naciśnij, aby mówić"},
+      "desc": {
+        "en": "Microphone transmits only while the push-to-talk key is held, instead of voice activation.",
+        "pl": "Mikrofon nadaje tylko przy przytrzymanym klawiszu, zamiast aktywacji głosem."
+      }
+    },
+    "MicThreshold@0": {
+      "subgroup": "voice_chat",
+      "label": {"en": "Microphone activation threshold", "pl": "Próg aktywacji mikrofonu"},
+      "desc": {
+        "en": "Minimum input level before voice activation opens the microphone. Raise it if teammates hear your keyboard or fan. (0.0316 ≈ -30 dB.)",
+        "pl": "Minimalny poziom sygnału, przy którym aktywacja głosem włącza mikrofon. Podnieś, jeśli drużyna słyszy Twoją klawiaturę lub wentylator. (0,0316 ≈ -30 dB.)"
+      },
+      "widget": "percent"
+    }
+  }
+}

@@ -16,6 +16,8 @@ from .errors import (
     WriteVerificationError,
     WzceError,
 )
+from .i18n import Translator
+from .knowledge import KnowledgeBase, KnowledgeEntry, KnowledgeError, localized
 from .model import Constraint, Setting, ValueType
 from .process import is_game_running
 from .storage import LoadedConfig, SaveResult, SettingsFileSet
@@ -30,6 +32,9 @@ __all__ = [
     "Constraint",
     "FileKind",
     "GameRunningError",
+    "KnowledgeBase",
+    "KnowledgeEntry",
+    "KnowledgeError",
     "LoadedConfig",
     "ParseError",
     "SaveResult",
@@ -37,6 +42,7 @@ __all__ = [
     "Setting",
     "SettingChange",
     "SettingsFileSet",
+    "Translator",
     "UnknownSettingError",
     "ValidationError",
     "ValueChange",
@@ -47,4 +53,5 @@ __all__ = [
     "diff_values",
     "discover",
     "is_game_running",
+    "localized",
 ]

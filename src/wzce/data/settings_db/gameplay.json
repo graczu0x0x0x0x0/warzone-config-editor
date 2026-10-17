@@ -1,0 +1,98 @@
+{
+  "group": "gameplay",
+  "settings": {
+    "ShowBlood@0": {
+      "subgroup": "gore",
+      "label": {"en": "Show blood", "pl": "Pokazuj krew"},
+      "desc": {
+        "en": "Shows blood effects. Some players turn it off to reduce screen clutter when getting hit.",
+        "pl": "Pokazuje efekty krwi. Część graczy wyłącza je, by zmniejszyć bałagan na ekranie przy otrzymywaniu obrażeń."
+      },
+      "impact": {"visibility": 1}
+    },
+    "BloodLimit@0": {
+      "subgroup": "gore",
+      "label": {"en": "Limit blood effects", "pl": "Ogranicz efekty krwi"},
+      "desc": {
+        "en": "Limits how often blood effects can play, preventing them from stacking up on screen.",
+        "pl": "Ogranicza, jak często mogą pojawiać się efekty krwi, aby nie nakładały się na ekranie."
+      },
+      "related": ["BloodLimitInterval@0"]
+    },
+    "BloodLimitInterval@0": {
+      "subgroup": "gore",
+      "label": {"en": "Blood effect interval", "pl": "Odstęp efektów krwi"},
+      "desc": {
+        "en": "Minimum time between blood effects when limiting is on, in milliseconds.",
+        "pl": "Minimalny czas między efektami krwi przy włączonym ograniczeniu, w milisekundach."
+      },
+      "unit": "ms",
+      "flags": ["advanced"],
+      "related": ["BloodLimit@0"]
+    },
+    "ShowBrass@0": {
+      "subgroup": "gore",
+      "label": {"en": "Ejected shell casings", "pl": "Wyrzucane łuski"},
+      "desc": {"en": "Weapons eject brass shell casings. Cosmetic.", "pl": "Broń wyrzuca łuski. Efekt kosmetyczny."},
+      "impact": {"fps": 1}
+    },
+    "MarksEntsPlayerOnly@0": {
+      "subgroup": "gore",
+      "label": {"en": "Impact marks from my bullets only", "pl": "Ślady na obiektach tylko od moich kul"},
+      "desc": {
+        "en": "Only your own bullets leave marks on entities (characters, vehicles). Reduces effect load in big fights.",
+        "pl": "Tylko Twoje pociski zostawiają ślady na obiektach (postacie, pojazdy). Zmniejsza liczbę efektów w dużych walkach."
+      },
+      "impact": {"fps": 1},
+      "flags": ["advanced"]
+    },
+    "CorpseLimit@0": {
+      "subgroup": "gore",
+      "label": {"en": "Maximum AI corpses", "pl": "Maks. liczba zwłok AI"},
+      "desc": {
+        "en": "Maximum number of AI corpses kept in the world (Zombies, campaign, AI modes). Fewer = less CPU/GPU load.",
+        "pl": "Maksymalna liczba zwłok przeciwników AI pozostających w świecie (Zombies, kampania, tryby z AI). Mniej = mniejsze obciążenie CPU/GPU."
+      },
+      "impact": {"fps": 1},
+      "recommend": {"low_end": 8}
+    },
+    "MapLocationSelectionCursorSpeedMouse@0": {
+      "subgroup": "map_cursor",
+      "label": {"en": "Map cursor speed (mouse)", "pl": "Prędkość kursora mapy (mysz)"},
+      "desc": {
+        "en": "Cursor speed when selecting a location on the map with a mouse (e.g. killstreak targeting).",
+        "pl": "Prędkość kursora przy wybieraniu miejsca na mapie myszą (np. namierzanie serii zabójstw)."
+      },
+      "unit": "x"
+    },
+    "MapLocationSelectionCursorSpeed@0": {
+      "subgroup": "map_cursor",
+      "label": {"en": "Map cursor speed (gamepad)", "pl": "Prędkość kursora mapy (pad)"},
+      "desc": {
+        "en": "Cursor speed when selecting a location on the map with a gamepad.",
+        "pl": "Prędkość kursora przy wybieraniu miejsca na mapie padem."
+      },
+      "unit": "x"
+    },
+    "InvalidCmdHintBlinkInterval@0": {
+      "subgroup": "hints",
+      "label": {"en": "Invalid action hint blink rate", "pl": "Miganie podpowiedzi o błędnej akcji"},
+      "desc": {
+        "en": "Blink interval of the hint shown when an action is not possible right now, in milliseconds.",
+        "pl": "Odstęp migania podpowiedzi wyświetlanej, gdy akcja nie jest teraz możliwa, w milisekundach."
+      },
+      "unit": "ms",
+      "flags": ["advanced"]
+    },
+    "InvalidCmdHintDuration@0": {
+      "subgroup": "hints",
+      "label": {"en": "Invalid action hint duration", "pl": "Czas podpowiedzi o błędnej akcji"},
+      "desc": {
+        "en": "How long the 'action not possible' hint stays on screen, in milliseconds. 0 hides it.",
+        "pl": "Jak długo podpowiedź „akcja niemożliwa” zostaje na ekranie, w milisekundach. 0 ją ukrywa."
+      },
+      "unit": "ms",
+      "flags": ["advanced"]
+    }
+  }
+}

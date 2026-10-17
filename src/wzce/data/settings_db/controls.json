@@ -1,0 +1,91 @@
+{
+  "group": "controls",
+  "settings": {
+    "MouseUsesRawInput@0": {
+      "subgroup": "mouse",
+      "label": {"en": "Raw mouse input", "pl": "Surowe wejście myszy"},
+      "desc": {
+        "en": "Reads the mouse directly, bypassing Windows pointer speed and acceleration. Gives consistent 1:1 aim - keep it on.",
+        "pl": "Czyta mysz bezpośrednio, z pominięciem prędkości i akceleracji wskaźnika Windows. Daje powtarzalne celowanie 1:1 — zostaw włączone."
+      },
+      "impact": {"latency": 1},
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true}
+    },
+    "WeaponCycleDelay@0": {
+      "subgroup": "mouse",
+      "label": {"en": "Mouse wheel weapon switch delay", "pl": "Opóźnienie zmiany broni kółkiem"},
+      "desc": {
+        "en": "Minimum delay between accepted mouse wheel inputs, in milliseconds. 0 = every notch counts. Raise it (e.g. 100-200) if one scroll switches weapons twice.",
+        "pl": "Minimalny odstęp między uznawanymi ruchami kółka myszy, w milisekundach. 0 = liczy się każdy skok. Zwiększ (np. 100–200), jeśli jeden ruch kółkiem zmienia broń dwa razy."
+      },
+      "unit": "ms",
+      "widget": "spin"
+    },
+    "VehicleMouseSteerSensitivity@0": {
+      "subgroup": "mouse",
+      "label": {"en": "Vehicle mouse steering", "pl": "Czułość sterowania pojazdem myszą"},
+      "desc": {"en": "Mouse steering sensitivity when driving vehicles.", "pl": "Czułość sterowania pojazdami za pomocą myszy."},
+      "unit": "x"
+    },
+    "YawSpeed@0": {
+      "subgroup": "gamepad",
+      "label": {"en": "Max yaw (horizontal) speed", "pl": "Maks. prędkość obrotu w poziomie"},
+      "desc": {
+        "en": "Maximum horizontal turn speed for gamepad (and keyboard look), in degrees per second. Regular sensitivity settings are in the account profile, not here.",
+        "pl": "Maksymalna prędkość obrotu w poziomie dla pada (i rozglądania klawiaturą), w stopniach na sekundę. Zwykła czułość jest w profilu konta, nie tutaj."
+      },
+      "unit": "°/s",
+      "flags": ["advanced"]
+    },
+    "PitchSpeed@0": {
+      "subgroup": "gamepad",
+      "label": {"en": "Max pitch (vertical) speed", "pl": "Maks. prędkość obrotu w pionie"},
+      "desc": {
+        "en": "Maximum vertical look speed for gamepad, in degrees per second.",
+        "pl": "Maksymalna prędkość rozglądania się w pionie dla pada, w stopniach na sekundę."
+      },
+      "unit": "°/s",
+      "flags": ["advanced"]
+    },
+    "GamepadMenuScrollDelayFirst@0": {
+      "subgroup": "menu",
+      "label": {"en": "Menu scroll: first repeat delay", "pl": "Przewijanie menu: pierwsze opóźnienie"},
+      "desc": {
+        "en": "When holding a direction in menus, delay before the first repeat, in milliseconds.",
+        "pl": "Przy przytrzymaniu kierunku w menu: opóźnienie przed pierwszym powtórzeniem, w milisekundach."
+      },
+      "unit": "ms",
+      "flags": ["advanced"]
+    },
+    "GamepadMenuScrollDelayRestStart@0": {
+      "subgroup": "menu",
+      "label": {"en": "Menu scroll: repeat delay start", "pl": "Przewijanie menu: początkowy odstęp"},
+      "desc": {
+        "en": "Delay between repeats right after the first one, in milliseconds.",
+        "pl": "Odstęp między powtórzeniami tuż po pierwszym, w milisekundach."
+      },
+      "unit": "ms",
+      "flags": ["advanced"]
+    },
+    "GamepadMenuScrollDelayRestEnd@0": {
+      "subgroup": "menu",
+      "label": {"en": "Menu scroll: repeat delay end", "pl": "Przewijanie menu: końcowy odstęp"},
+      "desc": {
+        "en": "Shortest delay between repeats once scrolling has accelerated, in milliseconds.",
+        "pl": "Najkrótszy odstęp między powtórzeniami po przyspieszeniu przewijania, w milisekundach."
+      },
+      "unit": "ms",
+      "flags": ["advanced"]
+    },
+    "GamepadMenuScrollDelayRestAccel@0": {
+      "subgroup": "menu",
+      "label": {"en": "Menu scroll: acceleration", "pl": "Przewijanie menu: przyspieszenie"},
+      "desc": {
+        "en": "How much the repeat delay shrinks with each repeat, in milliseconds per repeat.",
+        "pl": "O ile skraca się odstęp przy każdym powtórzeniu, w milisekundach na powtórzenie."
+      },
+      "unit": "ms",
+      "flags": ["advanced"]
+    }
+  }
+}

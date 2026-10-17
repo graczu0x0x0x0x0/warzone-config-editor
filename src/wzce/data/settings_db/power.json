@@ -1,0 +1,84 @@
+{
+  "group": "power",
+  "settings": {
+    "SustainabilityMenuSceneResolution@0": {
+      "subgroup": "sustainability",
+      "label": {"en": "Lower resolution in menus", "pl": "Niższa rozdzielczość w menu"},
+      "desc": {
+        "en": "Drops the dynamic scene resolution in non-interactive scenes (menus, lobby) to save power. 'full' = strongest saving. No effect on gameplay.",
+        "pl": "Obniża dynamiczną rozdzielczość w scenach nieinteraktywnych (menu, lobby), by oszczędzać energię. „full” = największa oszczędność. Bez wpływu na rozgrywkę."
+      },
+      "options": {"off": {"pl": "wyłączone"}, "min": {"pl": "minimalne"}, "full": {"pl": "pełne"}},
+      "recommend": {"competitive": "min", "balanced": "min", "quality": "off", "low_end": "full"}
+    },
+    "SustainabilityReduceQualityIdle@0": {
+      "subgroup": "sustainability",
+      "label": {"en": "Reduce quality when idle", "pl": "Obniżaj jakość przy bezczynności"},
+      "desc": {
+        "en": "How strongly rendering quality is reduced after you have been idle for the time below (e.g. AFK in the lobby).",
+        "pl": "Jak mocno obniżana jest jakość renderowania po czasie bezczynności ustawionym niżej (np. AFK w lobby)."
+      },
+      "options": {"off": {"pl": "wyłączone"}, "min": {"pl": "minimalnie"}, "full": {"pl": "w pełni"}},
+      "related": ["SustainabilityReduceQualityIdle@1"]
+    },
+    "SustainabilityReduceQualityIdle@1": {
+      "subgroup": "sustainability",
+      "label": {"en": "Idle time before reducing quality", "pl": "Czas bezczynności przed obniżeniem jakości"},
+      "desc": {
+        "en": "How long you must be idle before quality is reduced.",
+        "pl": "Po jakim czasie bezczynności jakość zostaje obniżona."
+      },
+      "options": {"off": {"pl": "wyłączone"}, "10 minutes": {"pl": "10 minut"}, "5 minutes": {"pl": "5 minut"}, "1 minute": {"pl": "1 minuta"}, "30 seconds": {"pl": "30 sekund"}},
+      "related": ["SustainabilityReduceQualityIdle@0"]
+    },
+    "SustainabilityPauseRendering@0": {
+      "subgroup": "sustainability",
+      "label": {"en": "Pause rendering when paused / unfocused", "pl": "Wstrzymuj renderowanie w pauzie / w tle"},
+      "desc": {
+        "en": "Stops rendering in multiplayer when the pause menu is open or the window is out of focus, to save power. You will not see the match behind the menu.",
+        "pl": "Wstrzymuje renderowanie w multiplayerze, gdy otwarte jest menu pauzy lub okno jest w tle, by oszczędzać energię. Nie widać wtedy meczu za menu."
+      },
+      "recommend": {"competitive": false, "balanced": false, "low_end": true},
+      "related": ["SustainabilityPauseRendering@1"]
+    },
+    "SustainabilityPauseRendering@1": {
+      "subgroup": "sustainability",
+      "label": {"en": "Pause rendering (variant 2)", "pl": "Wstrzymuj renderowanie (wariant 2)"},
+      "desc": {
+        "en": "Numeric variant (0/1) of the pause-rendering switch found in cod26 files.",
+        "pl": "Liczbowy wariant (0/1) przełącznika wstrzymywania renderowania z plików cod26."
+      },
+      "flags": ["advanced"],
+      "related": ["SustainabilityPauseRendering@0"]
+    },
+    "UserEcoLowBatteryModeUI@0": {
+      "subgroup": "battery",
+      "label": {"en": "Low battery mode", "pl": "Tryb niskiego poziomu baterii"},
+      "desc": {
+        "en": "Lowers high-impact settings to use less power and extend play time on battery (laptops, handhelds).",
+        "pl": "Obniża najbardziej wymagające ustawienia, by zużywać mniej energii i dłużej grać na baterii (laptopy, konsole przenośne)."
+      },
+      "related": ["UserEcoLowBatteryThresholdUI@0"]
+    },
+    "UserEcoLowBatteryThresholdUI@0": {
+      "subgroup": "battery",
+      "label": {"en": "Auto low battery mode at", "pl": "Automatyczny tryb baterii od"},
+      "desc": {
+        "en": "Battery level at which Low battery mode turns on automatically.",
+        "pl": "Poziom baterii, przy którym tryb niskiego poziomu baterii włącza się automatycznie."
+      },
+      "unit": "%",
+      "related": ["UserEcoLowBatteryThresholdUI@1"]
+    },
+    "UserEcoLowBatteryThresholdUI@1": {
+      "subgroup": "battery",
+      "label": {"en": "Auto low battery mode at (variant 2)", "pl": "Automatyczny tryb baterii (wariant 2)"},
+      "desc": {
+        "en": "Second variant of the battery threshold stored by the game; its role is undocumented.",
+        "pl": "Drugi wariant progu baterii przechowywany przez grę; jego rola nie jest udokumentowana."
+      },
+      "unit": "%",
+      "flags": ["advanced"]
+    }
+  }
+}

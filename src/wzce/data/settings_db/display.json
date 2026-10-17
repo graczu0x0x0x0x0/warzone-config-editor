@@ -1,0 +1,253 @@
+{
+  "group": "display",
+  "settings": {
+    "DisplayMode@0": {
+      "subgroup": "mode",
+      "label": {"en": "Display mode", "pl": "Tryb wyświetlania"},
+      "desc": {
+        "en": "How the game window is presented. Exclusive Fullscreen gives the game direct control of the monitor and usually the lowest input latency. Borderless modes make Alt+Tab instant and play nicer with overlays, at a small latency cost on some systems. 'Extended' borderless spans multiple monitors.",
+        "pl": "Sposób wyświetlania okna gry. Pełny ekran (wyłączny) daje grze bezpośrednią kontrolę nad monitorem i zwykle najniższe opóźnienie. Tryby bez ramki pozwalają na błyskawiczny Alt+Tab i lepiej współpracują z nakładkami, ale na części systemów dodają odrobinę opóźnienia. Wariant „extended” rozciąga obraz na kilka monitorów."
+      },
+      "options": {
+        "Windowed": {"pl": "W oknie"},
+        "Fullscreen": {"pl": "Pełny ekran"},
+        "Fullscreen borderless window": {"pl": "Pełny ekran bez ramki"},
+        "Fullscreen borderless extended window": {"pl": "Pełny ekran bez ramki (rozszerzony)"}
+      },
+      "impact": {"latency": 2, "fps": 1},
+      "recommend": {"competitive": "Fullscreen", "balanced": "Fullscreen", "quality": "Fullscreen borderless window", "low_end": "Fullscreen"},
+      "tip": {
+        "en": "Exclusive Fullscreen is the standard competitive choice; use borderless only if you Alt+Tab a lot.",
+        "pl": "Wyłączny pełny ekran to standard w grze rankingowej; tryb bez ramki wybierz, jeśli często używasz Alt+Tab."
+      },
+      "related": ["PreferredDisplayMode@0"]
+    },
+    "PreferredDisplayMode@0": {
+      "subgroup": "mode",
+      "label": {"en": "Preferred fullscreen mode", "pl": "Preferowany tryb pełnoekranowy"},
+      "desc": {
+        "en": "Fullscreen flavour the game returns to when you switch back from windowed mode (e.g. with Alt+Enter). Keep it equal to Display mode unless you deliberately toggle between modes.",
+        "pl": "Rodzaj pełnego ekranu, do którego gra wraca po przełączeniu z trybu okna (np. Alt+Enter). Ustaw tak samo jak Tryb wyświetlania, chyba że celowo przełączasz się między trybami."
+      },
+      "options": {
+        "Fullscreen": {"pl": "Pełny ekran"},
+        "Fullscreen borderless window": {"pl": "Pełny ekran bez ramki"},
+        "Fullscreen borderless extended window": {"pl": "Pełny ekran bez ramki (rozszerzony)"}
+      },
+      "recommend": {"competitive": "Fullscreen", "balanced": "Fullscreen", "quality": "Fullscreen borderless window", "low_end": "Fullscreen"},
+      "flags": ["advanced"],
+      "related": ["DisplayMode@0"]
+    },
+    "Monitor@0": {
+      "subgroup": "mode",
+      "label": {"en": "Monitor", "pl": "Monitor"},
+      "desc": {
+        "en": "Name of the monitor the game opens on, as reported by Windows. Change it in-game when you have several displays; editing the text only helps if you type the exact name.",
+        "pl": "Nazwa monitora, na którym gra się otwiera, tak jak podaje ją Windows. Przy kilku ekranach lepiej zmienić to w grze; ręczna edycja działa tylko przy dokładnie wpisanej nazwie."
+      },
+      "flags": ["hardware_specific", "advanced"],
+      "widget": "text"
+    },
+    "Resolution@0": {
+      "subgroup": "mode",
+      "label": {"en": "Fullscreen resolution", "pl": "Rozdzielczość pełnego ekranu"},
+      "desc": {
+        "en": "Output resolution in exclusive fullscreen. 'Auto' uses the desktop (native) resolution, which is what you want for sharp image and correct scaling. Otherwise the value looks like '2560x1440'.",
+        "pl": "Rozdzielczość wyjściowa w wyłącznym pełnym ekranie. „Auto” oznacza rozdzielczość pulpitu (natywną) — to najlepszy wybór dla ostrego obrazu. W przeciwnym razie wartość ma postać np. „2560x1440”."
+      },
+      "flags": ["hardware_specific"],
+      "widget": "text",
+      "recommend": {"competitive": "Auto", "balanced": "Auto", "quality": "Auto"},
+      "tip": {
+        "en": "Lower the render resolution or use upscaling instead of a non-native output resolution.",
+        "pl": "Zamiast obniżać rozdzielczość wyjściową, lepiej zmniejszyć rozdzielczość renderowania lub użyć upscalingu."
+      }
+    },
+    "RefreshRate@0": {
+      "subgroup": "mode",
+      "label": {"en": "Refresh rate", "pl": "Częstotliwość odświeżania"},
+      "desc": {
+        "en": "Monitor refresh rate used in fullscreen. 'Auto' picks the current Windows setting. Make sure Windows itself is set to your monitor's maximum (e.g. 144/165/240 Hz).",
+        "pl": "Częstotliwość odświeżania monitora w pełnym ekranie. „Auto” bierze ustawienie z Windows — upewnij się, że w Windows ustawione jest maksimum monitora (np. 144/165/240 Hz)."
+      },
+      "flags": ["hardware_specific"],
+      "widget": "text",
+      "unit": "Hz",
+      "recommend": {"competitive": "Auto", "balanced": "Auto", "quality": "Auto", "low_end": "Auto"}
+    },
+    "AspectRatio@0": {
+      "subgroup": "mode",
+      "label": {"en": "Aspect ratio", "pl": "Proporcje obrazu"},
+      "desc": {
+        "en": "Forces an aspect ratio independent of the window shape. 'auto' follows the window/monitor. Forcing a narrower ratio than your screen adds black bars; ultrawide ratios widen the horizontal view.",
+        "pl": "Wymusza proporcje obrazu niezależnie od kształtu okna. „auto” dopasowuje się do okna/monitora. Węższe proporcje niż ekran dodają czarne pasy, a ultraszerokie poszerzają pole widzenia w poziomie."
+      },
+      "options": {"auto": {"pl": "automatycznie"}, "standard": {"pl": "standardowe (4:3)"}},
+      "recommend": {"competitive": "auto", "balanced": "auto", "quality": "auto", "low_end": "auto"},
+      "flags": ["hardware_specific"]
+    },
+    "VSync@0": {
+      "subgroup": "sync_latency",
+      "label": {"en": "V-Sync (gameplay)", "pl": "V-Sync (w grze)"},
+      "desc": {
+        "en": "Synchronizes frames with the monitor refresh to remove tearing. 100% = every refresh, 50% = every second refresh (half the frame rate) and so on. V-Sync adds noticeable input latency; with a G-Sync/FreeSync monitor use a frame cap a few FPS below the refresh rate instead.",
+        "pl": "Synchronizuje klatki z odświeżaniem monitora, usuwając rozrywanie obrazu. 100% = każde odświeżenie, 50% = co drugie (połowa klatek) itd. V-Sync wyraźnie zwiększa opóźnienie; przy monitorze G-Sync/FreeSync lepiej ustawić limit FPS kilka klatek poniżej odświeżania."
+      },
+      "options": {"disabled": {"pl": "wyłączony"}},
+      "impact": {"latency": 3, "fps": 2},
+      "recommend": {"competitive": "disabled", "balanced": "disabled", "quality": "disabled", "low_end": "disabled"},
+      "related": ["CapFps@0", "MaxFpsInGame@0"]
+    },
+    "VSyncInMenu@0": {
+      "subgroup": "sync_latency",
+      "label": {"en": "V-Sync (menus)", "pl": "V-Sync (w menu)"},
+      "desc": {
+        "en": "V-Sync used only in menus. Harmless for gameplay; enabling it can reduce GPU heat and coil whine in the lobby.",
+        "pl": "V-Sync stosowany tylko w menu. Nie wpływa na rozgrywkę; włączenie może zmniejszyć grzanie GPU i piszczenie cewek w lobby."
+      },
+      "options": {"disabled": {"pl": "wyłączony"}},
+      "recommend": {"competitive": "disabled", "balanced": "disabled", "quality": "disabled", "low_end": "100%"},
+      "related": ["MaxFpsInMenu@0"]
+    },
+    "NvidiaReflex@0": {
+      "subgroup": "sync_latency",
+      "label": {"en": "NVIDIA Reflex Low Latency", "pl": "NVIDIA Reflex (niskie opóźnienie)"},
+      "desc": {
+        "en": "Keeps the CPU from queuing frames ahead of the GPU, cutting system latency. 'Enabled + boost' additionally keeps GPU clocks high even when the GPU is not fully loaded - helps most when you are CPU-bound (high FPS at 1080p/1440p), costs some power.",
+        "pl": "Nie pozwala procesorowi kolejkować klatek przed kartą graficzną, co obniża opóźnienie całego systemu. „Enabled + boost” dodatkowo utrzymuje wysokie taktowanie GPU nawet przy niepełnym obciążeniu — pomaga głównie, gdy ogranicza Cię procesor (wysokie FPS w 1080p/1440p), kosztem większego poboru prądu."
+      },
+      "options": {"Disabled": {"pl": "Wyłączony"}, "Enabled": {"pl": "Włączony"}, "Enabled + boost": {"pl": "Włączony + boost"}},
+      "impact": {"latency": 3},
+      "vendor": "nvidia",
+      "recommend": {"competitive": "Enabled + boost", "balanced": "Enabled", "quality": "Enabled", "low_end": "Enabled"},
+      "tip": {
+        "en": "GPU-bound (GPU time > CPU time in the telemetry): Enabled. CPU-bound: Enabled + boost.",
+        "pl": "Gdy ogranicza GPU (czas GPU > czas CPU w telemetrii): Enabled. Gdy ogranicza CPU: Enabled + boost."
+      },
+      "related": ["GPUUploadHeaps@0"]
+    },
+    "AmdAntilag2@0": {
+      "subgroup": "sync_latency",
+      "label": {"en": "AMD Anti-Lag 2", "pl": "AMD Anti-Lag 2"},
+      "desc": {
+        "en": "AMD's in-game latency reduction, the Radeon counterpart of NVIDIA Reflex. Only works on supported Radeon GPUs and drivers.",
+        "pl": "Mechanizm AMD zmniejszający opóźnienie, odpowiednik NVIDIA Reflex dla kart Radeon. Działa tylko na obsługiwanych kartach i sterownikach AMD."
+      },
+      "impact": {"latency": 3},
+      "vendor": "amd",
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true}
+    },
+    "IntelXeLL@0": {
+      "subgroup": "sync_latency",
+      "label": {"en": "Intel XeLL low latency", "pl": "Intel XeLL (niskie opóźnienie)"},
+      "desc": {
+        "en": "Intel Xe Low Latency - Intel Arc's counterpart of NVIDIA Reflex. Two variants exist in the file; the purpose of the second one is not documented.",
+        "pl": "Intel Xe Low Latency — odpowiednik NVIDIA Reflex dla kart Intel Arc. W pliku są dwa warianty; przeznaczenie drugiego nie jest udokumentowane."
+      },
+      "impact": {"latency": 3},
+      "vendor": "intel",
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true},
+      "related": ["IntelXeLL@1"]
+    },
+    "IntelXeLL@1": {
+      "subgroup": "sync_latency",
+      "label": {"en": "Intel XeLL low latency (variant 2)", "pl": "Intel XeLL (wariant 2)"},
+      "desc": {
+        "en": "Second variant of the Intel XeLL switch (cod26 files). Its exact role is unknown - keep it equal to the first variant.",
+        "pl": "Drugi wariant przełącznika Intel XeLL (pliki cod26). Dokładna rola nie jest znana — ustaw tak samo jak pierwszy wariant."
+      },
+      "vendor": "intel",
+      "flags": ["advanced"],
+      "related": ["IntelXeLL@0"]
+    },
+    "HDR@0": {
+      "subgroup": "color",
+      "label": {"en": "HDR", "pl": "HDR"},
+      "desc": {
+        "en": "High Dynamic Range output. Only takes effect on an HDR display with HDR enabled in Windows. Good HDR looks great, but many monitors render dark areas worse than SDR, and some players find enemies in shadows harder to spot.",
+        "pl": "Wyjście HDR (szeroki zakres dynamiki). Działa tylko na monitorze HDR z włączonym HDR w Windows. Dobre HDR wygląda świetnie, ale wiele monitorów gorzej pokazuje ciemne obszary niż SDR i części graczy trudniej wtedy dostrzec wrogów w cieniu."
+      },
+      "options": {"Off": {"pl": "Wyłączone"}, "On": {"pl": "Włączone"}, "Automatic": {"pl": "Automatycznie"}},
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": "Off", "balanced": "Automatic", "quality": "On", "low_end": "Off"},
+      "flags": ["hardware_specific"]
+    },
+    "DisplayGamma@0": {
+      "subgroup": "color",
+      "label": {"en": "Display gamma", "pl": "Gamma wyświetlania"},
+      "desc": {
+        "en": "Color space / gamma curve for SDR output. BT709_sRGB (gamma ~2.2) is standard for PC monitors and gives brighter shadows. BT709_BT1886 (gamma 2.4) targets TVs in dark rooms and makes dark areas darker.",
+        "pl": "Przestrzeń barw / krzywa gamma dla obrazu SDR. BT709_sRGB (gamma ok. 2,2) to standard monitorów PC i jaśniejsze cienie. BT709_BT1886 (gamma 2,4) jest przeznaczona dla telewizorów w ciemnym pokoju i przyciemnia ciemne obszary."
+      },
+      "impact": {"visibility": 2},
+      "recommend": {"competitive": "BT709_sRGB", "balanced": "BT709_sRGB", "quality": "BT709_sRGB", "low_end": "BT709_sRGB"}
+    },
+    "WindowWidth@0": {
+      "subgroup": "window",
+      "label": {"en": "Window width", "pl": "Szerokość okna"},
+      "desc": {"en": "Width of the game window in windowed mode, in pixels.", "pl": "Szerokość okna gry w trybie okna, w pikselach."},
+      "unit": "px", "widget": "spin",
+      "flags": ["hardware_specific", "advanced", "game_managed"]
+    },
+    "WindowHeight@0": {
+      "subgroup": "window",
+      "label": {"en": "Window height", "pl": "Wysokość okna"},
+      "desc": {"en": "Height of the game window in windowed mode, in pixels.", "pl": "Wysokość okna gry w trybie okna, w pikselach."},
+      "unit": "px", "widget": "spin",
+      "flags": ["hardware_specific", "advanced", "game_managed"]
+    },
+    "WindowX@0": {
+      "subgroup": "window",
+      "label": {"en": "Window X position", "pl": "Pozycja okna X"},
+      "desc": {"en": "Horizontal position of the window's left edge on the desktop, in pixels.", "pl": "Pozioma pozycja lewej krawędzi okna na pulpicie, w pikselach."},
+      "unit": "px", "widget": "spin",
+      "flags": ["hardware_specific", "advanced", "game_managed"]
+    },
+    "WindowY@0": {
+      "subgroup": "window",
+      "label": {"en": "Window Y position", "pl": "Pozycja okna Y"},
+      "desc": {"en": "Vertical position of the window's top edge on the desktop, in pixels.", "pl": "Pionowa pozycja górnej krawędzi okna na pulpicie, w pikselach."},
+      "unit": "px", "widget": "spin",
+      "flags": ["hardware_specific", "advanced", "game_managed"]
+    },
+    "WindowMaximized@0": {
+      "subgroup": "window",
+      "label": {"en": "Start maximized", "pl": "Uruchamiaj zmaksymalizowane"},
+      "desc": {
+        "en": "Whether the window is maximized when the game starts in windowed mode. The game toggles this itself, which is why txt0 and txt1 often differ only in this line.",
+        "pl": "Czy okno jest zmaksymalizowane przy starcie w trybie okna. Gra sama to przełącza — dlatego txt0 i txt1 często różnią się tylko tą linią."
+      },
+      "flags": ["hardware_specific", "advanced", "game_managed"]
+    },
+    "ConstrainMouse@1": {
+      "subgroup": "window",
+      "label": {"en": "Lock cursor to game window", "pl": "Zablokuj kursor w oknie gry"},
+      "desc": {
+        "en": "Keeps the mouse cursor inside the game window. Useful in borderless/windowed mode on multi-monitor setups so a flick does not click onto the second screen.",
+        "pl": "Zatrzymuje kursor myszy w oknie gry. Przydatne w trybie bez ramki/okna przy kilku monitorach, aby szybki ruch nie kliknął w drugi ekran."
+      },
+      "recommend": {"competitive": true, "balanced": true}
+    },
+    "FocusedMode@0": {
+      "subgroup": "window",
+      "label": {"en": "Focused mode", "pl": "Tryb skupienia"},
+      "desc": {
+        "en": "Dims everything around the game window (other monitors / desktop area) with an overlay, so you focus on the game when it does not fill the screen.",
+        "pl": "Przyciemnia wszystko wokół okna gry (inne monitory / pulpit) nakładką, aby skupić uwagę na grze, gdy nie wypełnia całego ekranu."
+      },
+      "flags": ["advanced"],
+      "related": ["FocusedModeOpacity@0"]
+    },
+    "FocusedModeOpacity@0": {
+      "subgroup": "window",
+      "label": {"en": "Focused mode opacity", "pl": "Krycie trybu skupienia"},
+      "desc": {
+        "en": "How dark the Focused mode overlay is. 100% hides everything around the game completely.",
+        "pl": "Jak ciemna jest nakładka trybu skupienia. 100% całkowicie zasłania wszystko wokół gry."
+      },
+      "widget": "percent",
+      "flags": ["advanced"],
+      "related": ["FocusedMode@0"]
+    }
+  }
+}

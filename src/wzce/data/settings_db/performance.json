@@ -1,0 +1,163 @@
+{
+  "group": "performance",
+  "settings": {
+    "CapFps@0": {
+      "subgroup": "fps_limits",
+      "label": {"en": "Custom frame rate limit", "pl": "Własny limit klatek"},
+      "desc": {
+        "en": "Turns on the custom FPS limits below. A stable cap usually feels smoother than a fluctuating uncapped frame rate (better frame pacing, lower GPU load and temperature). With G-Sync/FreeSync, cap 3-5 FPS below the refresh rate to stay in the variable refresh range.",
+        "pl": "Włącza własne limity FPS poniżej. Stały limit zwykle daje płynniejszy obraz niż skaczące FPS bez limitu (równiejsze czasy klatek, mniejsze obciążenie i temperatura GPU). Przy G-Sync/FreeSync ustaw limit 3–5 FPS poniżej odświeżania monitora."
+      },
+      "impact": {"fps": 2, "latency": 1},
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true},
+      "related": ["MaxFpsInGame@0", "MaxFpsInMenu@0", "MaxFpsOutOfFocus@0"]
+    },
+    "MaxFpsInGame@0": {
+      "subgroup": "fps_limits",
+      "label": {"en": "Max FPS in match", "pl": "Maks. FPS w meczu"},
+      "desc": {
+        "en": "Frame rate limit during a match (only when the custom limit is on). Pick a value your PC can hold most of the time - e.g. your refresh rate minus 3 on a G-Sync/FreeSync monitor, or a bit above the refresh rate on a fixed-refresh monitor.",
+        "pl": "Limit klatek w trakcie meczu (tylko przy włączonym własnym limicie). Wybierz wartość, którą komputer utrzymuje przez większość czasu — np. odświeżanie monitora minus 3 przy G-Sync/FreeSync albo trochę powyżej odświeżania przy zwykłym monitorze."
+      },
+      "unit": "fps",
+      "impact": {"fps": 2, "latency": 1},
+      "rule": "refresh_rate_cap",
+      "recommend": {"low_end": 60},
+      "related": ["CapFps@0"]
+    },
+    "MaxFpsInMenu@0": {
+      "subgroup": "fps_limits",
+      "label": {"en": "Max FPS in menus", "pl": "Maks. FPS w menu"},
+      "desc": {
+        "en": "Frame rate limit in menus and lobby. Lower values keep the GPU cool and quiet between matches without affecting gameplay.",
+        "pl": "Limit klatek w menu i lobby. Niższa wartość utrzymuje GPU chłodne i ciche między meczami, bez wpływu na rozgrywkę."
+      },
+      "unit": "fps",
+      "recommend": {"competitive": 120, "balanced": 90, "quality": 90, "low_end": 60}
+    },
+    "MaxFpsOutOfFocus@0": {
+      "subgroup": "fps_limits",
+      "label": {"en": "Max FPS in background", "pl": "Maks. FPS w tle"},
+      "desc": {
+        "en": "Frame rate limit while the game window is not focused (e.g. you Alt+Tabbed). Saves power and keeps other apps responsive.",
+        "pl": "Limit klatek, gdy okno gry nie jest aktywne (np. po Alt+Tab). Oszczędza energię i nie spowalnia innych programów."
+      },
+      "unit": "fps",
+      "recommend": {"competitive": 30, "balanced": 30, "quality": 30, "low_end": 15}
+    },
+    "ResolutionMultiplier@0": {
+      "subgroup": "render_resolution",
+      "label": {"en": "Render resolution", "pl": "Rozdzielczość renderowania"},
+      "desc": {
+        "en": "Percentage of the output resolution the 3D scene is rendered at. Below 100% the image gets blurry and distant enemies are harder to see; above 100% is supersampling (sharper, very expensive). When an upscaler (DLSS/FSR/XeSS) is active it controls the internal resolution instead.",
+        "pl": "Procent rozdzielczości wyjściowej, w jakim renderowana jest scena 3D. Poniżej 100% obraz się rozmywa i trudniej dostrzec odległych wrogów; powyżej 100% to supersampling (ostrzej, ale bardzo kosztownie). Gdy działa upscaler (DLSS/FSR/XeSS), to on steruje rozdzielczością wewnętrzną."
+      },
+      "unit": "%",
+      "impact": {"fps": 3, "visibility": 2, "vram": 1},
+      "recommend": {"competitive": 100, "balanced": 100, "quality": 100, "low_end": 100},
+      "tip": {
+        "en": "Keep 100% and use DLSS/FSR/XeSS for more FPS - they look far better than a lower render resolution.",
+        "pl": "Zostaw 100% i dla większej liczby FPS użyj DLSS/FSR/XeSS — wyglądają dużo lepiej niż obniżona rozdzielczość renderowania."
+      }
+    },
+    "DynamicSceneResolution@0": {
+      "subgroup": "render_resolution",
+      "label": {"en": "Dynamic resolution", "pl": "Dynamiczna rozdzielczość"},
+      "desc": {
+        "en": "Automatically lowers the render resolution when the frame time exceeds the target below. Keeps FPS stable on weak GPUs, but sharpness changes constantly, which is distracting when aiming.",
+        "pl": "Automatycznie obniża rozdzielczość renderowania, gdy czas klatki przekracza cel poniżej. Stabilizuje FPS na słabych kartach, ale ostrość ciągle się zmienia, co przeszkadza w celowaniu."
+      },
+      "impact": {"fps": 2, "visibility": 1},
+      "recommend": {"competitive": false, "balanced": false, "quality": false, "low_end": true},
+      "related": ["DynamicSceneResolutionTarget@0"]
+    },
+    "DynamicSceneResolutionTarget@0": {
+      "subgroup": "render_resolution",
+      "label": {"en": "Dynamic resolution target", "pl": "Cel dynamicznej rozdzielczości"},
+      "desc": {
+        "en": "Target frame time for dynamic resolution, in milliseconds. 1000 / FPS: 16.67 ms = 60 FPS, 8.33 ms = 120 FPS, 6.94 ms = 144 FPS.",
+        "pl": "Docelowy czas klatki dla dynamicznej rozdzielczości, w milisekundach. 1000 / FPS: 16,67 ms = 60 FPS, 8,33 ms = 120 FPS, 6,94 ms = 144 FPS."
+      },
+      "unit": "ms",
+      "widget": "spin",
+      "recommend": {"low_end": 16.67},
+      "related": ["DynamicSceneResolution@0"]
+    },
+    "AbsoluteTargetResolution@0": {
+      "subgroup": "render_resolution",
+      "label": {"en": "Absolute target resolution", "pl": "Docelowa rozdzielczość bezwzględna"},
+      "desc": {
+        "en": "Forces a fixed internal render resolution (e.g. 1080P) regardless of the output resolution. 'none' disables it and the render resolution percentage applies; 'native' renders at monitor resolution.",
+        "pl": "Wymusza stałą wewnętrzną rozdzielczość renderowania (np. 1080P) niezależnie od rozdzielczości wyjściowej. „none” wyłącza tę opcję i działa procentowa rozdzielczość renderowania; „native” renderuje w rozdzielczości monitora."
+      },
+      "options": {"native": {"pl": "natywna"}, "none": {"pl": "brak (wyłączone)"}},
+      "impact": {"fps": 3, "visibility": 2},
+      "recommend": {"competitive": "none", "balanced": "none", "quality": "none", "low_end": "none"},
+      "flags": ["advanced"]
+    },
+    "RendererWorkerCount@0": {
+      "subgroup": "cpu_memory",
+      "label": {"en": "Renderer worker threads", "pl": "Wątki renderera"},
+      "desc": {
+        "en": "Number of CPU threads that process the render job queue. -1 lets the game decide. The most popular tweak is to set it to the number of physical cores (on Intel 12th-14th gen: performance cores only), which can reduce stutter and improve 1% lows. Too low leaves cores idle, too high causes contention and stutter. Results vary - test in a real match.",
+        "pl": "Liczba wątków procesora obsługujących kolejkę zadań renderowania. -1 = decyduje gra. Najpopularniejszy tweak to ustawienie liczby rdzeni fizycznych (w Intel 12–14 gen. tylko rdzeni wydajnych P), co może zmniejszyć przycięcia i poprawić 1% low. Za mało — rdzenie się nudzą, za dużo — wątki walczą o zasoby i pojawiają się przycięcia. Efekty bywają różne — testuj w prawdziwym meczu."
+      },
+      "impact": {"fps": 2, "latency": 1},
+      "rule": "physical_cores",
+      "widget": "spin",
+      "tip": {
+        "en": "Start with your physical core count, then try one or two fewer and compare frame time stability.",
+        "pl": "Zacznij od liczby rdzeni fizycznych, potem spróbuj o jeden–dwa mniej i porównaj stabilność czasu klatki."
+      }
+    },
+    "VideoMemoryScaleMP@0": {
+      "subgroup": "cpu_memory",
+      "label": {"en": "VRAM usage target", "pl": "Docelowe użycie VRAM"},
+      "desc": {
+        "en": "Fraction of your graphics card's memory the game may use in multiplayer (Warzone included); in-game called 'VRAM Scale Target'. Too high competes with Windows, Discord and the browser for VRAM and causes stutter; too low makes textures stream in late. Guides suggest 60-80% (lower on 8 GB cards).",
+        "pl": "Część pamięci karty graficznej, z której gra może korzystać w multiplayerze (także Warzone); w grze nazywa się „VRAM Scale Target”. Za wysoko — gra walczy o VRAM z Windows, Discordem i przeglądarką, co powoduje przycięcia; za nisko — tekstury doczytują się z opóźnieniem. Poradniki zalecają 60–80% (mniej przy kartach 8 GB)."
+      },
+      "widget": "percent",
+      "impact": {"fps": 1, "vram": 3},
+      "rule": "vram_fraction",
+      "recommend": {"competitive": 0.7, "balanced": 0.75, "quality": 0.85, "low_end": 0.6}
+    },
+    "GPUUploadHeaps@0": {
+      "subgroup": "cpu_memory",
+      "label": {"en": "GPU upload heaps (ReBAR)", "pl": "GPU Upload Heaps (ReBAR)"},
+      "desc": {
+        "en": "Uploads more data directly to VRAM when Resizable BAR is supported (enable ReBAR / Smart Access Memory in BIOS). Usually helps when the GPU is the bottleneck; some CPU-bound systems get steadier frame times with it off. Test both.",
+        "pl": "Przesyła więcej danych bezpośrednio do VRAM, gdy obsługiwany jest Resizable BAR (włącz ReBAR / Smart Access Memory w BIOS). Zwykle pomaga, gdy ogranicza karta graficzna; w części systemów ograniczanych przez CPU czasy klatek są równiejsze po wyłączeniu. Przetestuj oba warianty."
+      },
+      "impact": {"fps": 1},
+      "recommend": {"competitive": false, "balanced": true, "quality": true, "low_end": true},
+      "tip": {
+        "en": "Community rule of thumb: GPU-bound -> true (Reflex Enabled); CPU-bound -> false (Reflex Enabled + boost).",
+        "pl": "Reguła społeczności: ogranicza GPU -> true (Reflex Enabled); ogranicza CPU -> false (Reflex Enabled + boost)."
+      },
+      "related": ["NvidiaReflex@0"]
+    },
+    "EnableOfflineGameUpdater@0": {
+      "subgroup": "cpu_memory",
+      "label": {"en": "Shader preloading", "pl": "Wstępne ładowanie shaderów"},
+      "desc": {
+        "en": "Compiles shaders in the background (also in menus) so they do not have to be built during a match. Turning it off is the main cause of stutter in the first matches after an update or driver change.",
+        "pl": "Kompiluje shadery w tle (także w menu), aby nie musiały powstawać w trakcie meczu. Wyłączenie to główna przyczyna przycięć w pierwszych meczach po aktualizacji gry lub sterownika."
+      },
+      "impact": {"fps": 2},
+      "recommend": {"competitive": true, "balanced": true, "quality": true, "low_end": true}
+    },
+    "OfflineGameUpdaterUsage@0": {
+      "subgroup": "cpu_memory",
+      "label": {"en": "Shader preloading intensity", "pl": "Intensywność ładowania shaderów"},
+      "desc": {
+        "en": "How much CPU background shader compilation may use (cod26 files). 'maximum' finishes fastest but can cause hiccups if it runs while you play; 'minimum' is gentle but takes longer.",
+        "pl": "Ile procesora może zużywać kompilacja shaderów w tle (pliki cod26). „maximum” kończy najszybciej, ale może powodować przycięcia, jeśli trwa podczas gry; „minimum” jest łagodne, ale trwa dłużej."
+      },
+      "options": {"minimum": {"pl": "minimalna"}, "efficient": {"pl": "wydajna"}, "maximum": {"pl": "maksymalna"}},
+      "impact": {"fps": 1},
+      "recommend": {"competitive": "efficient", "balanced": "efficient", "quality": "maximum", "low_end": "minimum"},
+      "related": ["EnableOfflineGameUpdater@0"]
+    }
+  }
+}

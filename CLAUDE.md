@@ -6,6 +6,7 @@ GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
 ## Read first
 - `docs/FILE_FORMAT.md` — file grammar, A/B slot mechanism, special keys. **Source of truth for parsing.**
 - `docs/PLAN.md` — phased plan with checkboxes. Update checkboxes when finishing work.
+- `docs/KNOWLEDGE_BASE.md` — schema/conventions of the settings knowledge base (labels, descriptions, presets).
 - `docs/RAPORT.md` — research report for the user (Polish), optimization recommendations + sources.
 
 ## Communication
@@ -31,6 +32,9 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   `.apply_values(mapping)` -> `(applied, errors)`, `.copy()`, `.to_bytes()`
 - `Setting`: `.id` (`Key@Variant`), `.value_type`, `.value`, `.constraint`, `.description`, `.section`, `.read_only`
 - `BackupManager().create/list/restore/prune`; `diff_documents(a, b)`
+- `KnowledgeBase.load()`: `.groups`, `.presets`, `.entries[id]`, `.entry_for(setting)` (synthesizes unknown ids),
+  `.preset_values(preset_id)`; `KnowledgeEntry.label/desc` are `{en, pl}` -> use `localized(text, lang)`
+- `Translator(lang)`: `tr("key", **params)`, `.set_language()`, `.add_listener(cb)` for live re-labelling
 - Inject `game_running=lambda: False` in tests; `WZCE_DATA_DIR` redirects app data (autouse fixture does it).
 
 ## Hard rules for touching game files
@@ -62,6 +66,10 @@ uv run python -m wzce        # read-only report of real files (GUI comes in stag
 ```
 Run pytest + ruff before every commit. Tests import helpers with `from conftest import ...`.
 
-## i18n
-UI strings: `src/wzce/data/i18n/{en,pl}.json`. Setting labels/descriptions: `src/wzce/data/settings_db.json`
-(fields `label.en/pl`, `desc.en/pl`). Every new UI string goes into **both** files.
+## i18n and knowledge base
+- UI strings: `src/wzce/data/i18n/{en,pl}.json` (flat keys, `{placeholder}` format). Every new key goes
+  into **both** files with the same placeholders - `tests/test_i18n.py` enforces it.
+- Setting labels/descriptions/recommendations: `src/wzce/data/settings_db/<group>.json`
+  (one file per editor category + `_meta.json`). Polish must be a real translation, enum values in
+  `recommend` must use the game's exact spelling - `tests/test_knowledge.py` enforces it.
+- New game setting -> add a sample file to `examples/`, run the knowledge tests, they list missing ids.

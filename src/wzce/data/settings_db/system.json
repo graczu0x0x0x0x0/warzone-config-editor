@@ -1,0 +1,115 @@
+{
+  "group": "system",
+  "settings": {
+    "ConfigCloudStorageEnabled@0": {
+      "subgroup": "behaviour",
+      "label": {"en": "Cloud sync of settings", "pl": "Synchronizacja ustawień z chmurą"},
+      "desc": {
+        "en": "Syncs locally stored settings files with the cloud. Handy across PCs, but a cloud copy may overwrite edits made outside the game.",
+        "pl": "Synchronizuje lokalne pliki ustawień z chmurą. Wygodne przy kilku komputerach, ale kopia z chmury może nadpisać zmiany zrobione poza grą."
+      },
+      "tip": {
+        "en": "If your edits keep getting reverted, try turning this off.",
+        "pl": "Jeśli Twoje zmiany są cofane, spróbuj to wyłączyć."
+      }
+    },
+    "DisableHWChangeDetection@0": {
+      "subgroup": "behaviour",
+      "label": {"en": "Ignore hardware changes", "pl": "Ignoruj zmiany sprzętu"},
+      "desc": {
+        "en": "When on, the game does not re-run hardware autodetection after a GPU, CPU or driver change - which otherwise can reset your settings to recommended values.",
+        "pl": "Gdy włączone, gra nie wykrywa sprzętu ponownie po zmianie GPU, CPU lub sterownika — co inaczej może zresetować ustawienia do zalecanych."
+      }
+    },
+    "RecommendedSet@0": {
+      "subgroup": "behaviour",
+      "label": {"en": "Recommended settings applied", "pl": "Zastosowano zalecane ustawienia"},
+      "desc": {
+        "en": "Records that the game has applied its recommended settings. Setting it to off makes the game reset ALL settings to its recommendations on the next start - a quick 'factory reset'.",
+        "pl": "Oznacza, że gra zastosowała już swoje zalecane ustawienia. Wyłączenie sprawi, że przy następnym starcie gra przywróci WSZYSTKIE ustawienia do zalecanych — szybki „reset fabryczny”."
+      },
+      "flags": ["game_managed"]
+    },
+    "GPUName@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "Preferred GPU", "pl": "Preferowana karta graficzna"},
+      "desc": {
+        "en": "Graphics card the game should use on multi-GPU systems (e.g. laptops with integrated + dedicated GPU). Must match the adapter name exactly.",
+        "pl": "Karta graficzna, której gra ma używać w systemach z kilkoma GPU (np. laptop z kartą zintegrowaną i dedykowaną). Nazwa musi dokładnie odpowiadać adapterowi."
+      },
+      "widget": "text",
+      "flags": ["hardware_specific", "advanced"]
+    },
+    "LastUsedGPU@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "Last used GPU", "pl": "Ostatnio używana karta"},
+      "desc": {"en": "Graphics card used in the last session (managed by the game).", "pl": "Karta graficzna użyta w ostatniej sesji (zarządzane przez grę)."},
+      "flags": ["hardware_specific", "game_managed"]
+    },
+    "GPUDriverVersion@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "GPU driver version", "pl": "Wersja sterownika GPU"},
+      "desc": {"en": "Last detected GPU driver version (managed by the game).", "pl": "Ostatnio wykryta wersja sterownika GPU (zarządzane przez grę)."},
+      "flags": ["hardware_specific", "game_managed"]
+    },
+    "DisplayDriverVersion@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "Display driver version", "pl": "Wersja sterownika ekranu"},
+      "desc": {
+        "en": "Version of the display driver used in the last session. A change triggers hardware re-detection unless that is disabled.",
+        "pl": "Wersja sterownika ekranu z ostatniej sesji. Jej zmiana uruchamia ponowne wykrywanie sprzętu, chyba że jest wyłączone."
+      },
+      "flags": ["hardware_specific", "game_managed", "advanced"]
+    },
+    "DisplayDriverVersionRecommended@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "Recommended driver version", "pl": "Zalecana wersja sterownika"},
+      "desc": {
+        "en": "Minimum display driver version recommended by the game at the last start. If your driver is older, update it.",
+        "pl": "Minimalna wersja sterownika zalecana przez grę przy ostatnim starcie. Jeśli masz starszy sterownik — zaktualizuj go."
+      },
+      "flags": ["hardware_specific", "game_managed", "advanced"]
+    },
+    "DetectedFrequencyGHz@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "Detected CPU power", "pl": "Wykryta moc CPU"},
+      "desc": {
+        "en": "Normalized total CPU power (cores x clock) detected by the game, used for autodetected defaults. Do not modify.",
+        "pl": "Znormalizowana łączna moc CPU (rdzenie x taktowanie) wykryta przez grę, używana do automatycznych ustawień. Nie modyfikować."
+      },
+      "unit": "GHz",
+      "flags": ["hardware_specific", "game_managed"]
+    },
+    "DetectedMemoryAmountMB@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "Detected RAM", "pl": "Wykryta pamięć RAM"},
+      "desc": {"en": "Physical memory detected by the game. Do not modify.", "pl": "Pamięć RAM wykryta przez grę. Nie modyfikować."},
+      "unit": "MB",
+      "flags": ["hardware_specific", "game_managed"]
+    },
+    "LastSavedDriveType@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "Install drive type", "pl": "Typ dysku z grą"},
+      "desc": {
+        "en": "Drive type the game was last run from; an HDD triggers a 'move to SSD' warning popup.",
+        "pl": "Typ dysku, z którego ostatnio uruchomiono grę; HDD wywołuje okienko z zaleceniem przeniesienia na SSD."
+      },
+      "flags": ["hardware_specific", "game_managed", "advanced"]
+    },
+    "VRSValidationMask@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "VRS validation mask", "pl": "Maska walidacji VRS"},
+      "desc": {"en": "Internal variable rate shading support mask. Do not modify.", "pl": "Wewnętrzna maska obsługi VRS. Nie modyfikować."},
+      "flags": ["hardware_specific", "game_managed", "advanced"]
+    },
+    "ESSDI@0": {
+      "subgroup": "hardware_info",
+      "label": {"en": "ESSDI", "pl": "ESSDI"},
+      "desc": {
+        "en": "Undocumented internal value (the file only says 'essdi'). Usually empty - leave it alone.",
+        "pl": "Nieudokumentowana wartość wewnętrzna (plik opisuje ją tylko jako „essdi”). Zwykle pusta — nie ruszaj."
+      },
+      "flags": ["hardware_specific", "game_managed", "advanced"]
+    }
+  }
+}

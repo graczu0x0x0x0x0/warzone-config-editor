@@ -1,0 +1,297 @@
+{
+  "group": "upscaling",
+  "settings": {
+    "AATechniquePreferredMP@0": {
+      "subgroup": "antialiasing",
+      "label": {"en": "Anti-aliasing / upscaling technique", "pl": "Technika wygładzania / upscalingu"},
+      "desc": {
+        "en": "Main anti-aliasing technique, which also decides the upscaler. SMAA = classic AA at native resolution (sharp, cheap, a bit of shimmer). DLSS = NVIDIA RTX only, best image per FPS. XeSS = Intel, runs on most modern GPUs. FSR AA = AMD, runs on any GPU.",
+        "pl": "Główna technika wygładzania krawędzi, która wybiera też upscaler. SMAA = klasyczne wygładzanie w rozdzielczości natywnej (ostre, tanie, lekkie migotanie). DLSS = tylko NVIDIA RTX, najlepszy obraz w stosunku do FPS. XeSS = Intel, działa na większości nowych kart. FSR AA = AMD, działa na każdej karcie."
+      },
+      "impact": {"fps": 3, "visibility": 2},
+      "tip": {
+        "en": "NVIDIA RTX: DLSS (or DLAA on strong cards). AMD/older GPUs: FSR AA or SMAA. Intel Arc: XeSS.",
+        "pl": "NVIDIA RTX: DLSS (lub DLAA na mocnych kartach). AMD/starsze karty: FSR AA albo SMAA. Intel Arc: XeSS."
+      }
+    },
+    "SMAAFilmicAlphaStrength@0": {
+      "subgroup": "antialiasing",
+      "label": {"en": "SMAA filmic history strength", "pl": "Siła historii SMAA filmic"},
+      "desc": {
+        "en": "Dampens how much the previous frames are blended into the current one by filmic (temporal) SMAA once the image has settled (cod26 files). More history means a smoother, more stable image but softer and with possible ghosting in motion; less history is sharper but shimmers more.",
+        "pl": "Tłumi, jak mocno poprzednie klatki są mieszane z bieżącą w czasowym SMAA „filmic”, gdy obraz jest ustabilizowany (pliki cod26). Więcej historii = gładszy i stabilniejszy obraz, ale bardziej miękki i z możliwymi smugami w ruchu; mniej = ostrzej, ale więcej migotania."
+      },
+      "widget": "percent",
+      "flags": ["advanced"]
+    },
+    "DLSSModeMP@0": {
+      "subgroup": "dlss",
+      "label": {"en": "DLSS mode", "pl": "Tryb DLSS"},
+      "desc": {
+        "en": "DLSS = upscaling from a lower internal resolution (more FPS). DLAA = DLSS anti-aliasing at native resolution (best image, no FPS gain). DLSS-D = DLSS with the ray-tracing denoiser (Ray Reconstruction) - only useful with ray tracing on. Newer titles (cod26) only offer DLSS here.",
+        "pl": "DLSS = upscaling z niższej rozdzielczości wewnętrznej (więcej FPS). DLAA = wygładzanie DLSS w rozdzielczości natywnej (najlepszy obraz, bez zysku FPS). DLSS-D = DLSS z odszumianiem ray tracingu (Ray Reconstruction) — ma sens tylko z włączonym RT. Nowsze tytuły (cod26) oferują tu tylko DLSS."
+      },
+      "vendor": "nvidia",
+      "impact": {"fps": 3, "visibility": 1},
+      "recommend": {"competitive": "DLSS", "balanced": "DLSS", "quality": "DLAA", "low_end": "DLSS"},
+      "related": ["DLSSPerfModeMP@0", "AATechniquePreferredMP@0"]
+    },
+    "DLSSModeMP@1": {
+      "subgroup": "dlss",
+      "label": {"en": "DLSS mode (variant 2)", "pl": "Tryb DLSS (wariant 2)"},
+      "desc": {
+        "en": "Second DLSS mode variant found in cod26 files; currently it only allows 'DLSS'.",
+        "pl": "Drugi wariant trybu DLSS w plikach cod26; obecnie dopuszcza tylko „DLSS”."
+      },
+      "vendor": "nvidia",
+      "flags": ["advanced"]
+    },
+    "DLSSPerfModeMP@0": {
+      "subgroup": "dlss",
+      "label": {"en": "DLSS quality mode", "pl": "Tryb jakości DLSS"},
+      "desc": {
+        "en": "Internal resolution used by DLSS upscaling. Maximum Quality ≈ 67% (Quality), Balanced ≈ 58%, Maximum Performance ≈ 50% (Performance), Ultra Performance ≈ 33% (for 8K/very weak GPUs). With the Transformer model even Performance looks good at 4K. cod26 adds 'Native Resolution'.",
+        "pl": "Rozdzielczość wewnętrzna upscalingu DLSS. Maximum Quality ≈ 67% (Jakość), Balanced ≈ 58%, Maximum Performance ≈ 50% (Wydajność), Ultra Performance ≈ 33% (8K/bardzo słabe karty). Z modelem Transformer nawet tryb Wydajność dobrze wygląda w 4K. cod26 dodaje „Native Resolution”."
+      },
+      "options": {
+        "Ultra Performance": {"pl": "Ultra wydajność"},
+        "Maximum Performance": {"pl": "Wydajność"},
+        "Balanced": {"pl": "Zbalansowany"},
+        "Maximum Quality": {"pl": "Jakość"},
+        "Native Resolution": {"pl": "Rozdzielczość natywna"}
+      },
+      "vendor": "nvidia",
+      "impact": {"fps": 3, "visibility": 2},
+      "recommend": {"competitive": "Maximum Quality", "balanced": "Maximum Quality", "quality": "Maximum Quality", "low_end": "Maximum Performance"},
+      "related": ["DLSSModeMP@0"]
+    },
+    "DLSSSharpnessMP@0": {
+      "subgroup": "dlss",
+      "label": {"en": "DLSS sharpness", "pl": "Ostrość DLSS"},
+      "desc": {
+        "en": "Extra sharpening applied after DLSS. The Transformer model is already sharp; high values add halos and noise on edges. Around 30-50% is a good start.",
+        "pl": "Dodatkowe wyostrzanie po DLSS. Model Transformer jest już ostry; wysokie wartości dodają obwódki i szum na krawędziach. Około 30–50% to dobry początek."
+      },
+      "widget": "percent",
+      "vendor": "nvidia",
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": 0.5, "balanced": 0.4, "quality": 0.2, "low_end": 0.5}
+    },
+    "DLSSModelUI@0": {
+      "subgroup": "dlss",
+      "label": {"en": "DLSS model", "pl": "Model DLSS"},
+      "desc": {
+        "en": "TRANSFORMER (DLSS 4) gives a much sharper, more stable image with less ghosting; it costs a little more on RTX 20/30 cards. CNN is the older, lighter model.",
+        "pl": "TRANSFORMER (DLSS 4) daje znacznie ostrzejszy, stabilniejszy obraz z mniejszymi smugami; na kartach RTX 20/30 kosztuje odrobinę więcej. CNN to starszy, lżejszy model."
+      },
+      "vendor": "nvidia",
+      "impact": {"fps": 1, "visibility": 2},
+      "recommend": {"competitive": "TRANSFORMER", "balanced": "TRANSFORMER", "quality": "TRANSFORMER", "low_end": "CNN"}
+    },
+    "DLSSFrameGeneration@0": {
+      "subgroup": "frame_generation",
+      "label": {"en": "DLSS Frame Generation", "pl": "DLSS Frame Generation"},
+      "desc": {
+        "en": "Inserts AI-generated frames between rendered ones (RTX 40/50). The FPS counter goes up a lot, but input latency does not improve - it gets slightly worse - and generated frames can show artifacts. Fine for single-player, not recommended for competitive play.",
+        "pl": "Wstawia generowane przez AI klatki między renderowane (RTX 40/50). Licznik FPS mocno rośnie, ale opóźnienie się nie poprawia — wręcz lekko rośnie — a generowane klatki mogą mieć artefakty. Dobre do gry solo, niezalecane w grze rankingowej."
+      },
+      "vendor": "nvidia",
+      "impact": {"fps": 3, "latency": 2},
+      "recommend": {"competitive": false, "balanced": false, "quality": true},
+      "related": ["DLSSFrameGenerationmulti@0", "DLSSFrameGenerationmultiType@0"]
+    },
+    "DLSSFrameGenerationmulti@0": {
+      "subgroup": "frame_generation",
+      "label": {"en": "Generated frames per rendered frame", "pl": "Generowane klatki na klatkę"},
+      "desc": {
+        "en": "How many frames DLSS Frame Generation creates per rendered frame (Multi Frame Generation needs RTX 50). 1 = 2x FPS, 2 = 3x, 3 = 4x. More frames = smoother motion on high-refresh monitors, more latency and artifacts.",
+        "pl": "Ile klatek DLSS Frame Generation tworzy na jedną renderowaną (Multi Frame Generation wymaga RTX 50). 1 = 2x FPS, 2 = 3x, 3 = 4x. Więcej klatek = płynniejszy ruch na monitorach o wysokim odświeżaniu, ale większe opóźnienie i więcej artefaktów."
+      },
+      "vendor": "nvidia",
+      "unit": "x",
+      "impact": {"fps": 2, "latency": 1},
+      "flags": ["advanced"],
+      "related": ["DLSSFrameGeneration@0"]
+    },
+    "DLSSFrameGenerationmulti@1": {
+      "subgroup": "frame_generation",
+      "label": {"en": "Generated frames per rendered frame (cod26)", "pl": "Generowane klatki na klatkę (cod26)"},
+      "desc": {
+        "en": "cod26 variant of the multi frame generation count, allowing up to 5 generated frames.",
+        "pl": "Wariant z plików cod26 — liczba generowanych klatek, do 5."
+      },
+      "vendor": "nvidia",
+      "unit": "x",
+      "flags": ["advanced"]
+    },
+    "DLSSFrameGenerationmultiType@0": {
+      "subgroup": "frame_generation",
+      "label": {"en": "Multi frame generation mode", "pl": "Tryb generowania wielu klatek"},
+      "desc": {
+        "en": "How the number of generated frames is chosen (cod26). Fixed = always the count set above. Dynamic Auto = the driver adjusts it to reach the monitor's refresh rate. Dynamic Manual = adjusts it to reach the target frame rate below.",
+        "pl": "Jak dobierana jest liczba generowanych klatek (cod26). Fixed = zawsze liczba ustawiona wyżej. Dynamic Auto = sterownik dobiera ją, aby osiągnąć odświeżanie monitora. Dynamic Manual = dobiera ją do docelowego FPS poniżej."
+      },
+      "vendor": "nvidia",
+      "flags": ["advanced"],
+      "related": ["DLSSFrameGenerationDynamicMulti@1"]
+    },
+    "DLSSFrameGenerationDynamicMulti@0": {
+      "subgroup": "frame_generation",
+      "label": {"en": "Dynamic frame generation target (raw)", "pl": "Cel dynamicznego generowania (surowy)"},
+      "desc": {
+        "en": "Internal target frame rate for dynamic multi frame generation (cod26). 0 or -1 likely means 'not set'. Prefer the variant with the 100-480 range.",
+        "pl": "Wewnętrzny docelowy FPS dla dynamicznego generowania klatek (cod26). 0 lub -1 oznacza prawdopodobnie „nie ustawiono”. Lepiej używać wariantu z zakresem 100–480."
+      },
+      "vendor": "nvidia",
+      "unit": "fps",
+      "widget": "spin",
+      "flags": ["advanced"]
+    },
+    "DLSSFrameGenerationDynamicMulti@1": {
+      "subgroup": "frame_generation",
+      "label": {"en": "Dynamic frame generation target", "pl": "Cel dynamicznego generowania klatek"},
+      "desc": {
+        "en": "Target frame rate for 'Dynamic Manual' multi frame generation (cod26), typically your monitor's refresh rate.",
+        "pl": "Docelowy FPS dla trybu „Dynamic Manual” (cod26), zwykle odświeżanie Twojego monitora."
+      },
+      "vendor": "nvidia",
+      "unit": "fps",
+      "flags": ["advanced"],
+      "related": ["DLSSFrameGenerationmultiType@0"]
+    },
+    "FSRFrameInterpolation@0": {
+      "subgroup": "frame_generation",
+      "label": {"en": "FSR 3 Frame Generation", "pl": "FSR 3 Frame Generation"},
+      "desc": {
+        "en": "AMD's frame generation, works on most modern GPUs. Same trade-off as DLSS Frame Generation: higher FPS counter, slightly higher latency, possible artifacts.",
+        "pl": "Generowanie klatek AMD, działa na większości nowych kart. Ten sam kompromis co DLSS Frame Generation: wyższy licznik FPS, nieco większe opóźnienie, możliwe artefakty."
+      },
+      "impact": {"fps": 3, "latency": 2},
+      "recommend": {"competitive": false, "balanced": false}
+    },
+    "IntelXeFG@0": {
+      "subgroup": "frame_generation",
+      "label": {"en": "XeSS Frame Generation", "pl": "XeSS Frame Generation"},
+      "desc": {
+        "en": "Intel's frame generation (XeSS-FG, cod26 files). Same trade-off as other frame generation: smoother picture, no latency benefit.",
+        "pl": "Generowanie klatek Intel (XeSS-FG, pliki cod26). Ten sam kompromis co przy innych generatorach: płynniejszy obraz, bez zysku w opóźnieniu."
+      },
+      "vendor": "intel",
+      "impact": {"fps": 3, "latency": 2},
+      "recommend": {"competitive": false, "balanced": false},
+      "related": ["IntelXEFGMulti@0"]
+    },
+    "IntelXEFGMulti@0": {
+      "subgroup": "frame_generation",
+      "label": {"en": "XeSS generated frames", "pl": "Generowane klatki XeSS"},
+      "desc": {
+        "en": "How many frames XeSS Frame Generation creates per rendered frame (cod26).",
+        "pl": "Ile klatek XeSS Frame Generation tworzy na jedną renderowaną (cod26)."
+      },
+      "vendor": "intel",
+      "unit": "x",
+      "flags": ["advanced"],
+      "related": ["IntelXeFG@0"]
+    },
+    "AMDFidelityFX@0": {
+      "subgroup": "amd",
+      "label": {"en": "AMD FidelityFX", "pl": "AMD FidelityFX"},
+      "desc": {
+        "en": "AMD post-processing / upscaling selection. CAS = Contrast Adaptive Sharpening only (sharper image at native resolution, almost free). FSR 1 = simple spatial upscaler (blurry). FSR 3 = modern temporal upscaler. Works on any GPU. Avoid stacking CAS on top of strong DLSS sharpening.",
+        "pl": "Wybór obróbki / upscalingu AMD. CAS = samo wyostrzanie adaptacyjne (ostrzejszy obraz w rozdzielczości natywnej, prawie bez kosztu). FSR 1 = prosty upscaler przestrzenny (rozmyty). FSR 3 = nowoczesny upscaler czasowy. Działa na każdej karcie. Nie łącz CAS z mocnym wyostrzaniem DLSS."
+      },
+      "impact": {"fps": 2, "visibility": 1},
+      "related": ["AMDContrastAdaptiveSharpeningStrength@0", "AMDFidelityFX@1"]
+    },
+    "AMDFidelityFX@1": {
+      "subgroup": "amd",
+      "label": {"en": "AMD FidelityFX (variant 2)", "pl": "AMD FidelityFX (wariant 2)"},
+      "desc": {
+        "en": "Second variant of the FidelityFX selection kept by the game; keep it equal to the first one.",
+        "pl": "Drugi wariant wyboru FidelityFX przechowywany przez grę; ustaw tak samo jak pierwszy."
+      },
+      "flags": ["advanced"],
+      "related": ["AMDFidelityFX@0"]
+    },
+    "AMDContrastAdaptiveSharpeningStrength@0": {
+      "subgroup": "amd",
+      "label": {"en": "CAS sharpening strength", "pl": "Siła wyostrzania CAS"},
+      "desc": {
+        "en": "Strength of FidelityFX CAS sharpening (when CAS is selected). Popular competitive range: 75-90% - makes distant targets crisper, too high adds grain.",
+        "pl": "Siła wyostrzania FidelityFX CAS (gdy wybrano CAS). Popularny zakres w grze rankingowej: 75–90% — odległe cele są wyraźniejsze, za dużo dodaje ziarna."
+      },
+      "widget": "percent",
+      "impact": {"visibility": 1},
+      "recommend": {"competitive": 0.85, "balanced": 0.75, "quality": 0.5},
+      "related": ["AMDFidelityFX@0"]
+    },
+    "AMDSuperResolutionQuality@0": {
+      "subgroup": "amd",
+      "label": {"en": "FSR 1 quality", "pl": "Jakość FSR 1"},
+      "desc": {
+        "en": "Internal resolution of the old FSR 1 spatial upscaler. Ultra Quality ≈ 77%, Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%.",
+        "pl": "Rozdzielczość wewnętrzna starego, przestrzennego FSR 1. Ultra Quality ≈ 77%, Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%."
+      },
+      "impact": {"fps": 2, "visibility": 2},
+      "flags": ["advanced"],
+      "recommend": {"low_end": "Balanced"}
+    },
+    "AMDSuperResolution2Quality@0": {
+      "subgroup": "amd",
+      "label": {"en": "FSR 2/3 quality", "pl": "Jakość FSR 2/3"},
+      "desc": {
+        "en": "Internal resolution of the FSR 2/3 temporal upscaler (used with 'FSR AA' / FSR 3). Native Resolution = FSR as anti-aliasing only (like DLAA). Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%, Ultra Performance ≈ 33%.",
+        "pl": "Rozdzielczość wewnętrzna czasowego upscalera FSR 2/3 (przy „FSR AA” / FSR 3). Native Resolution = FSR tylko jako wygładzanie (jak DLAA). Maximum Quality ≈ 67%, Balanced ≈ 59%, Maximum Performance = 50%, Ultra Performance ≈ 33%."
+      },
+      "options": {"Native Resolution": {"pl": "Rozdzielczość natywna"}},
+      "impact": {"fps": 3, "visibility": 2},
+      "recommend": {"competitive": "Maximum Quality", "balanced": "Maximum Quality", "quality": "Native Resolution", "low_end": "Balanced"}
+    },
+    "XeSSQuality@0": {
+      "subgroup": "other_scalers",
+      "label": {"en": "XeSS quality", "pl": "Jakość XeSS"},
+      "desc": {
+        "en": "Internal resolution of Intel XeSS upscaling. Native Resolution = anti-aliasing only. Works on most GPUs, best on Intel Arc.",
+        "pl": "Rozdzielczość wewnętrzna upscalingu Intel XeSS. Native Resolution = samo wygładzanie. Działa na większości kart, najlepiej na Intel Arc."
+      },
+      "options": {"Native Resolution": {"pl": "Rozdzielczość natywna"}},
+      "impact": {"fps": 3, "visibility": 2},
+      "recommend": {"competitive": "Maximum Quality", "balanced": "Maximum Quality", "quality": "Ultra Quality Plus", "low_end": "Balanced"}
+    },
+    "NVIDIAImageScalingMP@0": {
+      "subgroup": "other_scalers",
+      "label": {"en": "NVIDIA Image Scaling", "pl": "NVIDIA Image Scaling"},
+      "desc": {
+        "en": "NVIDIA's simple spatial upscaler with sharpening (NIS), for GPUs without DLSS (GTX). On RTX cards DLSS is far better.",
+        "pl": "Prosty przestrzenny upscaler NVIDIA z wyostrzaniem (NIS), dla kart bez DLSS (GTX). Na kartach RTX DLSS jest dużo lepszy."
+      },
+      "vendor": "nvidia",
+      "impact": {"fps": 2, "visibility": 1},
+      "recommend": {"competitive": false, "balanced": false, "quality": false},
+      "related": ["NVIDIAImageScalingQualityMP@0", "NVIDIAImageScalingSharpnessMP@0"]
+    },
+    "NVIDIAImageScalingQualityMP@0": {
+      "subgroup": "other_scalers",
+      "label": {"en": "NIS quality", "pl": "Jakość NIS"},
+      "desc": {
+        "en": "Internal resolution used by NVIDIA Image Scaling.",
+        "pl": "Rozdzielczość wewnętrzna używana przez NVIDIA Image Scaling."
+      },
+      "vendor": "nvidia",
+      "flags": ["advanced"],
+      "related": ["NVIDIAImageScalingMP@0"]
+    },
+    "NVIDIAImageScalingSharpnessMP@0": {
+      "subgroup": "other_scalers",
+      "label": {"en": "NIS sharpness", "pl": "Ostrość NIS"},
+      "desc": {
+        "en": "Sharpening strength of NVIDIA Image Scaling.",
+        "pl": "Siła wyostrzania NVIDIA Image Scaling."
+      },
+      "widget": "percent",
+      "vendor": "nvidia",
+      "flags": ["advanced"],
+      "related": ["NVIDIAImageScalingMP@0"]
+    }
+  }
+}
