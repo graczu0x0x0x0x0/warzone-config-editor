@@ -4,7 +4,7 @@ GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
 (`%LOCALAPPDATA%\Activision\Call of Duty\players\s.1.0.cod25.txt0` / `.txt1`).
 
 ## Status
-Released and working: **v1.2.0**, stages 0–9 of `docs/PLAN.md` done, ~340 tests green.
+Released and working: **v1.2.0**, stages 0–9 of `docs/PLAN.md` done, ~375 tests green.
 Current version: `src/wzce/__init__.py`; what changed recently: `CHANGELOG.md` + `git log`.
 Remaining ideas are the unchecked `[ ]` items in `docs/PLAN.md` - nothing is in progress unless
 the user says so.
@@ -77,10 +77,13 @@ Environment quirks (Windows 11, repo inside a Syncthing folder):
   `MainWindow.hardware` detects lazily once (`hardware_provider` is injectable for tests).
 - Optimizer (`core/optimizer.py`): `recommend(kb, doc, hw, Goal, Bottleneck)` -> values + `Reason`
   (i18n key + params); always feed the values through `plan_template` before applying.
-- System (`core/system_info.py`, `core/system_checks.py`): `collect_system_info()` (slow, 2-4 s,
+- System (`core/system_info.py`, `core/system_checks.py`): `collect_system_info()` (slow, 3-5 s,
   never raises) -> `SystemInfo`; `evaluate_checks(info, hardware, machine_doc)` -> `CheckResult`s
   (texts: i18n `checks.<id>.title/problem[_variant]/fix/ok`). UI runs the probe in `SystemProbe`
   (daemon thread); tests pass `system_info_provider=None` or a fixture (`tests/fixtures/system_cim.json`).
+- Windows settings (`core/windows_info.py`, stage 10): `SystemInfo.windows` -> `WindowsInfo`
+  (Secure Boot/TPM/GPT, hypervisor/VBS, AV, DirectX, power, background apps). Read-only, no admin;
+  absent registry value = Windows default, `None` = unknown. Plan: `docs/RAPORT_WINDOWS.md` §7.
 - Display & sharing: `core/display.display_value(raw, setting, entry, tr)` renders values for every
   view (cards, panels, exports). `core/share_export.build_share(...)` -> `to_markdown/to_json`;
   it reuses `exclusion_reason()` and skips other GPU vendors - keep exports free of identifying data.
@@ -131,7 +134,7 @@ examples/        sample files from the user's machine (fixtures for tests)
 scripts/         build_exe.py (PyInstaller), build_icon.py (svg -> png/ico), launcher.py (exe entry)
 src/wzce/
   __init__.py    __version__ (single source of the version)
-  __main__.py    CLI: GUI (default), --report, --smoke-test, --version
+  __main__.py    CLI: GUI (default), --report, --system-report, --smoke-test, --version
   core/          Qt-free logic: parsing, storage, session, history, templates, hardware, exports
   data/          settings_db/ (knowledge base), i18n/{en,pl}.json, icons/
   ui/            PySide6 widgets and dialogs
@@ -147,6 +150,7 @@ uv run pytest
 uv run ruff check . && uv run ruff format .
 uv run wzce                   # start the GUI
 uv run wzce --report          # read-only text report of the real files
+uv run wzce --system-report   # read-only hardware + Windows settings probe as JSON
 uv run wzce --smoke-test      # build the UI headless and exit (0 = OK)
 uv run python scripts/build_exe.py [--onedir]   # PyInstaller build + smoke test -> dist/
 uv run python scripts/build_icon.py             # after editing data/icons/app.svg

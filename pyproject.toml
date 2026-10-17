@@ -51,3 +51,4 @@ native-tls = true
 "src/wzce/ui/theme.py" = ["E501"]
 # Embedded PowerShell script (CIM queries) is kept as one readable block.
 "src/wzce/core/system_info.py" = ["E501"]
+"src/wzce/core/windows_info.py" = ["E501"]

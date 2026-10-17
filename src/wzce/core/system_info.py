@@ -9,6 +9,9 @@ hides the others:
   optimizations, Windows display version, game install location)
 * ``nvidia-smi`` when present (PCIe link, Resizable BAR via BAR1 size, power limit)
 
+``SystemInfo.windows`` holds the gaming-related Windows settings; their probes live in
+``core/windows_info.py`` and run as further independent steps of the same collection.
+
 Collection takes 2-4 s (WMI is slow), so the UI runs ``collect_system_info`` in a
 background thread. Every parser is a pure function over plain data so it can be
 tested with fixtures; ``collect_system_info`` is the only part that touches the OS.
@@ -24,12 +27,15 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import windows_info
+from .windows_info import WindowsInfo, apply_windows_cim
+
 # Text describing the queries lives here so the probe stays a single process start.
-_POWERSHELL_SCRIPT = r"""
+_POWERSHELL_HARDWARE = r"""
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $r = [ordered]@{}
-$r.cpu = Get-CimInstance Win32_Processor | Select-Object -First 1 Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize, SocketDesignation
+$r.cpu = Get-CimInstance Win32_Processor | Select-Object -First 1 Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize, SocketDesignation, VirtualizationFirmwareEnabled
 $r.memory = @(Get-CimInstance Win32_PhysicalMemory | Select-Object BankLabel, DeviceLocator, Manufacturer, PartNumber, Capacity, Speed, ConfiguredClockSpeed, ConfiguredVoltage, SMBIOSMemoryType)
 $r.memory_slots = (Get-CimInstance Win32_PhysicalMemoryArray | Measure-Object -Property MemoryDevices -Sum).Sum
 $r.gpus = @(Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion, @{n='DriverDate';e={ if ($_.DriverDate) { $_.DriverDate.ToString('yyyy-MM-dd') } }}, CurrentHorizontalResolution, CurrentVerticalResolution, CurrentRefreshRate, MaxRefreshRate)
@@ -50,8 +56,13 @@ $r.drives = @(Get-Partition | Where-Object { $_.DriveLetter } | ForEach-Object {
     $d = $disks | Where-Object { $_.DeviceId -eq [string]$p.DiskNumber } | Select-Object -First 1
     [ordered]@{ letter = [string]$p.DriveLetter; disk = $d.FriendlyName; media = [string]$d.MediaType; bus = [string]$d.BusType }
 })
-$r | ConvertTo-Json -Depth 5 -Compress
 """
+# The Windows-settings queries (core/windows_info.py) share the same process.
+_POWERSHELL_SCRIPT = (
+    _POWERSHELL_HARDWARE
+    + windows_info.POWERSHELL_PART
+    + "\n$r | ConvertTo-Json -Depth 5 -Compress\n"
+)
 
 POWERSHELL_TIMEOUT_S = 25
 NVIDIA_SMI_TIMEOUT_S = 8
@@ -175,6 +186,7 @@ class SystemInfo:
     hvci_running: bool | None = None
     drives: list[DriveInfo] = field(default_factory=list)
     game_install: GameInstall | None = None
+    windows: WindowsInfo = field(default_factory=WindowsInfo)
     errors: list[str] = field(default_factory=list)  # probes that failed (diagnostics)
 
     # ------------------------------------------------------------ derived facts
@@ -424,6 +436,7 @@ def apply_cim_json(info: SystemInfo, data: dict) -> None:
         for d in _as_list(data.get("drives"))
         if d.get("letter")
     ]
+    apply_windows_cim(info.windows, data)
 
 
 def _as_list(value: object) -> list:
@@ -580,6 +593,10 @@ def collect_system_info() -> SystemInfo:
         ("power", _probe_power_plan),
         ("nvidia", _probe_nvidia),
         ("game", _probe_game_install),
+        ("windows-registry", lambda i: windows_info.probe_registry(i.windows)),
+        ("windows-native", lambda i: windows_info.probe_native(i.windows)),
+        ("windows-processes", lambda i: windows_info.probe_processes(i.windows)),
+        ("windows-storage", lambda i: windows_info.probe_storage(i.windows)),
     ):
         try:
             probe(info)

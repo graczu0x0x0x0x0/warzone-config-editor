@@ -1,0 +1,25 @@
+{
+  "cpu": {"Name": "AMD Ryzen 7 9800X3D 8-Core Processor", "VirtualizationFirmwareEnabled": false},
+  "vbs": {"status": 1, "running": [0]},
+  "win": {
+    "cs": {"HypervisorPresent": false, "AutomaticManagedPagefile": false},
+    "features": [
+      {"Name": "VirtualMachinePlatform", "InstallState": 1},
+      {"Name": "HypervisorPlatform", "InstallState": 2},
+      {"Name": "Microsoft-Windows-Subsystem-Linux", "InstallState": 1},
+      {"Name": "Microsoft-Hyper-V-All", "InstallState": 2},
+      {"Name": "Containers-DisposableClientVM", "InstallState": 2}
+    ],
+    "av": [
+      {"displayName": "Norton 360", "productState": 266240},
+      {"displayName": "Windows Defender", "productState": 393472}
+    ],
+    "defender": {"RealTimeProtectionEnabled": false, "AMRunningMode": "Passive Mode"},
+    "pagefiles": {"Name": "C:\\pagefile.sys", "AllocatedBaseSize": 131072},
+    "boot_partition_style": "GPT",
+    "net": [
+      {"InterfaceDescription": "Realtek PCIe 2.5GbE Family Controller", "NdisPhysicalMedium": 14, "Speed": 1000000000, "MediaConnectState": 1},
+      {"InterfaceDescription": "Qualcomm FastConnect 7800 Wi-Fi 7", "NdisPhysicalMedium": 9, "Speed": 0, "MediaConnectState": 2}
+    ]
+  }
+}

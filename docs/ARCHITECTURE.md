@@ -8,7 +8,7 @@ File-format facts live in [`FILE_FORMAT.md`](FILE_FORMAT.md), the knowledge-base
 ## 1. Layers
 
 ```
-wzce.__main__  (CLI: GUI | --report | --smoke-test | --version)
+wzce.__main__  (CLI: GUI | --report | --system-report | --smoke-test | --version)
       │
       ▼
 wzce.ui        PySide6 widgets/dialogs. Reads and drives an EditorSession.
@@ -47,6 +47,7 @@ the game-file logic reviewable on its own.
 | `hardware.py` | `detect_hardware()` → `HardwareInfo` (cores/P-cores, VRAM, GPU vendor, refresh rate, ReBAR) |
 | `optimizer.py` | `recommend()`: goal + bottleneck + hardware → values with `Reason`s |
 | `system_info.py` | `collect_system_info()` → `SystemInfo` (PowerShell CIM JSON, registry, powercfg, nvidia-smi, Steam manifests); pure `parse_*` helpers |
+| `windows_info.py` | `WindowsInfo` (= `SystemInfo.windows`): gaming-relevant Windows settings - anti-cheat requirements, virtualization/security, DirectX, power, background apps; registry + ctypes + psutil probes, pure parsers |
 | `system_checks.py` | `evaluate_checks()` → 15 `CheckResult`s (EXPO, channels, HDD, refresh, driver, PCIe, ReBAR, power plan…) |
 | `display.py` | `display_value()`: one human-readable rendering of a value for cards, panels and exports |
 | `share_export.py` | `build_share()` → `to_markdown()` / `to_json()` for "Share settings" |
@@ -103,7 +104,7 @@ error) → history SAVE entry → `last_seen` updated → prune (50 backups, 200
 silently; a dirty one only shows a status warning.
 
 **Hardware/system.** `detect_hardware(doc)` is fast and synchronous (Win32 + values the game
-wrote into the machine file). `collect_system_info()` takes 2–4 s and runs in `SystemProbe`
+wrote into the machine file). `collect_system_info()` takes 3–5 s and runs in `SystemProbe`
 (daemon thread, result delivered to the UI thread by a signal). Both never raise: unknown
 values are `None` and the UI shows "unknown".
 

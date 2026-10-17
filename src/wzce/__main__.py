@@ -3,6 +3,7 @@
 * no arguments  -> start the GUI
 * ``--report``  -> print a read-only report of the settings files found on this
                    machine (handy to check discovery and parsing on real data)
+* ``--system-report`` -> print the read-only hardware/Windows probe as JSON
 * ``--smoke-test`` -> build the whole UI headless and exit (used to verify the
                    frozen .exe: bundled data, Qt plugins, imports). Exit code 0 = OK.
 """
@@ -47,14 +48,31 @@ def report() -> int:
     return 0
 
 
+def system_report() -> int:
+    """Everything the system probe collects (hardware + Windows settings) as JSON."""
+    import dataclasses
+    import json
+
+    from .core.system_info import collect_system_info
+
+    info = collect_system_info()
+    print(json.dumps(dataclasses.asdict(info), indent=2, ensure_ascii=False, default=str))
+    return 1 if info.errors else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="wzce", description="Warzone Config Editor")
     parser.add_argument("--report", action="store_true", help="print a read-only file report")
+    parser.add_argument(
+        "--system-report", action="store_true", help="print the read-only system probe as JSON"
+    )
     parser.add_argument("--smoke-test", action="store_true", help="build the UI headless and exit")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     args = parser.parse_args()
     if args.report:
         return report()
+    if args.system_report:
+        return system_report()
     if args.smoke_test:
         from .ui.app import smoke_test
 

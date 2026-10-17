@@ -4,6 +4,20 @@ Format oparty na [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/), wersj
 [Semantic Versioning](https://semver.org/lang/pl/). Wersja programu jest zdefiniowana w jednym
 miejscu: `src/wzce/__init__.py`.
 
+## [Nieopublikowane]
+
+### Dodano
+
+- Odczyt ustawień Windows ważnych dla gier (etap 10a, na razie bez interfejsu): wymagania
+  anty-cheatu Ricochet (UEFI, Secure Boot, dysk GPT, TPM 2.0 z wersją firmware, certyfikaty
+  Secure Boot 2023), wirtualizacja i zabezpieczenia (hypervisor, SVM/VT-x, VBS/HVCI, WSL/Hyper-V,
+  antywirus), opcje DirectX (Auto HDR, VRR, preferencja GPU dla gry), MPO, Game DVR, tryb
+  zasilania i parametry procesora, plik stronicowania, TRIM, akceleracja myszy, łącze sieciowe
+  i programy działające w tle. Wszystko tylko do odczytu, bez uprawnień administratora.
+- `wzce --system-report` — pełny wynik sondy sprzętu i systemu jako JSON (diagnostyka).
+- Raport [`docs/RAPORT_WINDOWS.md`](docs/RAPORT_WINDOWS.md): research optymalizacji Windows 11
+  pod gry (co działa, co jest mitem) i plan zakładki „Optymalizacja Windows”.
+
 ## [1.2.0] — 2026-10-17
 
 ### Dodano

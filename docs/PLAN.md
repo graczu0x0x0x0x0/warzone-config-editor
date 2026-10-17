@@ -175,6 +175,24 @@ Propozycja i analiza: [`RAPORT_SPRZET.md`](RAPORT_SPRZET.md).
 - [x] Testy: 29 rdzenia (parsowanie, EXPO, sprawdzenia „mój PC” i „PC z problemami”) + 9 GUI
 - [ ] Później: HDR Windows (DisplayConfig), szczegóły PCIe/ReBAR dla AMD/Intel, więcej marek RAM
 
+### Etap 10 — Optymalizacja Windows 11
+Research, stan PC autora i propozycja: [`RAPORT_WINDOWS.md`](RAPORT_WINDOWS.md).
+- [x] 10a Odczyt bez administratora: `core/windows_info.py` (`SystemInfo.windows`) — UEFI,
+      Secure Boot, GPT, TPM (wersja, producent, firmware), certyfikaty Secure Boot 2023, UAC,
+      hypervisor, SVM/VT-x, VBS/HVCI, funkcje VM (WSL, Hyper-V…), lista blokowanych sterowników,
+      Smart App Control, WinRing0, antywirusy, Defender; Auto HDR, VRR, preferencja GPU i FSO dla
+      `cod.exe`, MPO; Game DVR, Game Bar; tryb zasilania, min./maks. stan CPU, parkowanie rdzeni,
+      uśpienie USB, usługa AMD 3D V-Cache, mikrokod; plik stronicowania, wolne miejsce na C:,
+      TRIM, akceleracja myszy, łącze sieciowe, programy w tle. CLI `wzce --system-report` (JSON).
+      Testy na fixturze `tests/fixtures/windows_cim.json`
+- [ ] 10b Ocena (`core/windows_checks.py`): reguły zależne od CPU (X3D z 1/2 CCD, Intel 13/14,
+      Arrow Lake), wymagania Ricochet, sekcja mitów; poprawka sprawdzenia planu zasilania
+      dla X3D z dwoma CCD
+- [ ] 10c Zakładka „Windows” w oknie „Sprzęt i system” (sekcje, wartości obecne/zalecane, linki,
+      instrukcje BIOS, filtr, PL/EN)
+- [ ] 10d Zmiany bez administratora (HKCU, `powercfg`) z kopią i przywracaniem — po teście u autora
+- [ ] 10e (opcjonalnie) Zmiany przez UAC: HAGS, przywrócenie MPO, wyłączenie nieużywanych funkcji VM
+
 ### Poprawki i dodatki po 1.1.0
 - [x] 1.1.1 — lista ustawień zachowuje pozycję przewinięcia po zapisie / cofnięciu / przeładowaniu
 - [x] 1.1.2 — oryginalna nazwa z pliku (np. `DLSSModeMP@0`) w nawiasie przy nazwie ustawienia
