@@ -688,11 +688,36 @@ class MainWindow(QMainWindow):
         header.setObjectName("subgroupTitle")
         return header
 
+    def _page_key(self) -> tuple[object, ...]:
+        """Identity of what the card page shows. Same key = same list of cards."""
+        fileset = self.session.fileset if self.session else None
+        return (
+            fileset,
+            self._nav_key,
+            self.search.text().strip(),
+            self.advanced_check.isChecked(),
+            self.vendor_check.isChecked(),
+        )
+
     def _set_page(self, page: QWidget) -> None:
+        # Rebuilding the same view (after save, undo, reload, language switch...)
+        # must not throw the user back to the top of a long list: keep the scroll
+        # offset. A different view (other category, search, file) starts at the top.
+        key = self._page_key()
+        bar = self.scroll.verticalScrollBar()
+        offset = bar.value() if key == getattr(self, "_shown_page_key", None) else 0
+        self._shown_page_key = key
+
         old = self.scroll.takeWidget()
         self.scroll.setWidget(page)
         if old is not None:
             old.deleteLater()
+        if offset:
+            # The new page gets its final height only after the scroll area lays it
+            # out, so apply now (usually enough) and once more after the event loop.
+            page.layout().activate()
+            bar.setValue(offset)
+            QTimer.singleShot(0, page, lambda: bar.setValue(offset))
 
     # ============================================================ editing
     def _on_value_edited(self, setting_id: str, value: object) -> None:

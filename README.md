@@ -55,7 +55,7 @@ pilnuje poprawności wartości i bezpiecznie je zapisuje — z kopią zapasową 
 
 ### Pobranie i uruchomienie
 
-1. Pobierz `WarzoneConfigEditor-1.1.0.exe` (jeden plik, bez instalacji).
+1. Pobierz `WarzoneConfigEditor-1.1.1.exe` (jeden plik, bez instalacji).
 2. Uruchom. Przy pierwszym uruchomieniu Windows SmartScreen może pokazać ostrzeżenie
    („Nieznany wydawca”) — plik nie jest podpisany certyfikatem. Wybierz *Więcej informacji →
    Uruchom mimo to*. Sumę kontrolną SHA-256 znajdziesz w pliku `.sha256` obok.
@@ -155,7 +155,7 @@ validates every value and saves safely — with backups and a change history.
 
 ### Download & run
 
-Download `WarzoneConfigEditor-1.1.0.exe` (single file, no installation) and run it. Windows
+Download `WarzoneConfigEditor-1.1.1.exe` (single file, no installation) and run it. Windows
 SmartScreen may warn about an unknown publisher because the file is not code-signed — choose
 *More info → Run anyway*. The SHA-256 checksum is in the `.sha256` file next to it.
 

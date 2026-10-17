@@ -4,6 +4,14 @@ Format oparty na [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/), wersj
 [Semantic Versioning](https://semver.org/lang/pl/). Wersja programu jest zdefiniowana w jednym
 miejscu: `src/wzce/__init__.py`.
 
+## [1.1.1] — 2026-10-17
+
+### Poprawiono
+
+- Po zapisie (a także po cofnięciu, ponownym wczytaniu czy zmianie języka) lista ustawień nie
+  przeskakuje już na samą górę — zostaje w miejscu, w którym była. Lista wraca na górę tylko
+  przy przejściu do innej kategorii, innego pliku albo zmianie wyszukiwania/filtrów.
+
 ## [1.1.0] — 2026-10-17
 
 ### Dodano

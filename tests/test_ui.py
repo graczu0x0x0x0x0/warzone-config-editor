@@ -875,3 +875,38 @@ def test_probe_signal_after_close_is_harmless(qtbot) -> None:
     with qtbot.waitSignal(probe.ready, timeout=5000):
         probe.start(_system_fixture)
     assert received and received[0].cpu_cores == 8
+
+
+# ------------------------------------------------ scroll position (bug fix)
+
+
+def test_save_keeps_scroll_position(window: MainWindow, qtbot) -> None:
+    """Regression: saving rebuilt the page and jumped back to the top of the list."""
+    window.resize(1440, 800)
+    window.show()
+    window.navigate_to("ShaderQuality@0")  # long "Graphics quality" page
+    bar = window.scroll.verticalScrollBar()
+    qtbot.waitUntil(lambda: bar.maximum() > 1500)
+    bar.setValue(1200)
+
+    window.cards["ShaderQuality@0"].editor.edited.emit("Medium")
+    assert window.save() is True
+    qtbot.wait(20)
+    assert bar.value() == 1200
+
+    window.cards["ShaderQuality@0"].editor.edited.emit("Low")
+    window.undo()
+    qtbot.wait(20)
+    assert bar.value() == 1200
+
+
+def test_other_view_starts_at_top(window: MainWindow, qtbot) -> None:
+    window.resize(1440, 800)
+    window.show()
+    window.navigate_to("ShaderQuality@0")
+    bar = window.scroll.verticalScrollBar()
+    qtbot.waitUntil(lambda: bar.maximum() > 1500)
+    bar.setValue(1200)
+    window.search.setText("vsync")  # a different view
+    qtbot.wait(20)
+    assert bar.value() == 0
