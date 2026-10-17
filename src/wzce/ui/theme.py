@@ -211,7 +211,7 @@ def stylesheet() -> str:
     #card[flash="true"] {{ border-color: {c["accent"]}; }}
     #cardTitle {{ font-size: 11pt; font-weight: 600; }}
     #cardDesc {{ color: {c["text_muted"]}; }}
-    #cardKey {{ color: {c["text_faint"]}; font-family: {MONO_FAMILY}; font-size: 8.5pt; }}
+    #cardKey {{ color: {c["text_muted"]}; font-family: {MONO_FAMILY}; font-size: 9pt; padding-left: 2px; }}
     #cardRecommend {{ color: {c["text_muted"]}; font-size: 9pt; }}
     #cardRecommend[match="true"] {{ color: {c["success"]}; }}
     #cardOriginal {{ color: {c["accent"]}; font-size: 9pt; }}

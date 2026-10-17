@@ -4,6 +4,14 @@ Format oparty na [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/), wersj
 [Semantic Versioning](https://semver.org/lang/pl/). Wersja programu jest zdefiniowana w jednym
 miejscu: `src/wzce/__init__.py`.
 
+## [1.1.2] — 2026-10-17
+
+### Zmieniono
+
+- Przy nazwie każdego ustawienia widać w nawiasie, mniejszą czcionką, jego oryginalną nazwę
+  z pliku gry (np. „Tryb DLSS (DLSSModeMP@0)”) — łatwiej porównać z poradnikami i samym plikiem.
+  Nazwę można zaznaczyć i skopiować. Wcześniej była tylko w prawym dolnym rogu karty.
+
 ## [1.1.1] — 2026-10-17
 
 ### Poprawiono

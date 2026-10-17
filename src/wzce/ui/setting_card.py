@@ -66,6 +66,13 @@ class SettingCard(QFrame):
         title = QLabel(localized(entry.label, lang))
         title.setObjectName("cardTitle")
         title_row.addWidget(title)
+        # The original name from the game file, so users can match it with guides,
+        # forum posts or the file itself. Selectable to allow copying.
+        self.key_label = QLabel(f"({setting.id})")
+        self.key_label.setObjectName("cardKey")
+        self.key_label.setToolTip(tr("card.technical_key"))
+        self.key_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        title_row.addWidget(self.key_label, 0, Qt.AlignmentFlag.AlignBaseline)
         title_row.addStretch()
         for chip in self._chips(setting):
             title_row.addWidget(chip)
@@ -98,7 +105,7 @@ class SettingCard(QFrame):
         editor_row.addWidget(self.revert_button)
         root.addLayout(editor_row)
 
-        # --- footer: recommendation, original value, technical key ----------
+        # --- footer: recommendation and the value before the change -----------
         footer = QHBoxLayout()
         footer.setSpacing(8)
         self.recommend_label = QLabel()
@@ -115,11 +122,6 @@ class SettingCard(QFrame):
         self.original_label = QLabel()
         self.original_label.setObjectName("cardOriginal")
         footer.addWidget(self.original_label)
-        key = QLabel(setting.id)
-        key.setObjectName("cardKey")
-        key.setToolTip(tr("card.technical_key"))
-        key.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        footer.addWidget(key)
         root.addLayout(footer)
 
         self._recommended_raw = self._compute_recommended_raw(setting)

@@ -24,7 +24,7 @@
   "card.current": "Current: {value}",
   "card.original": "Before: {value}",
   "card.range": "Range: {min} – {max}",
-  "card.technical_key": "Key in file",
+  "card.technical_key": "Original setting name in the game file",
   "card.read_only": "Managed by the game - read only",
   "card.unlock": "Edit anyway",
   "card.new_badge": "New",

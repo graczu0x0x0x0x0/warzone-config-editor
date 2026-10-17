@@ -24,7 +24,7 @@
   "card.current": "Obecnie: {value}",
   "card.original": "Przed zmianą: {value}",
   "card.range": "Zakres: {min} – {max}",
-  "card.technical_key": "Klucz w pliku",
+  "card.technical_key": "Oryginalna nazwa ustawienia w pliku gry",
   "card.read_only": "Zarządzane przez grę — tylko do odczytu",
   "card.unlock": "Edytuj mimo to",
   "card.new_badge": "Nowe",

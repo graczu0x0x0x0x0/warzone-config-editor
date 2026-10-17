@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from PySide6.QtCore import QPoint, QPointF, QSettings, Qt
 from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QLabel
 
 from wzce.core import ConfigDocument, KnowledgeBase, SettingsFileSet, Translator, discover
 from wzce.ui.app_settings import AppSettings
@@ -910,3 +910,13 @@ def test_other_view_starts_at_top(window: MainWindow, qtbot) -> None:
     window.search.setText("vsync")  # a different view
     qtbot.wait(20)
     assert bar.value() == 0
+
+
+def test_card_title_shows_original_file_name(window: MainWindow) -> None:
+    window.navigate_to("DLSSModeMP@0")
+    card = window.cards["DLSSModeMP@0"]
+    assert card.key_label.text() == "(DLSSModeMP@0)"
+    assert card.key_label.toolTip() == "Original setting name in the game file"
+    # The key is shown once, next to the title - not repeated in the footer.
+    keys = [w for w in card.findChildren(QLabel) if w.objectName() == "cardKey"]
+    assert keys == [card.key_label]
