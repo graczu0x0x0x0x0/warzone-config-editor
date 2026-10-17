@@ -4,7 +4,7 @@ GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
 (`%LOCALAPPDATA%\Activision\Call of Duty\players\s.1.0.cod25.txt0` / `.txt1`).
 
 ## Status
-Released and working: **v1.2.0**, stages 0–9 of `docs/PLAN.md` done, ~375 tests green.
+Released and working: **v1.2.0**, stages 0–9 of `docs/PLAN.md` done, ~420 tests green.
 Current version: `src/wzce/__init__.py`; what changed recently: `CHANGELOG.md` + `git log`.
 Remaining ideas are the unchecked `[ ]` items in `docs/PLAN.md` - nothing is in progress unless
 the user says so.
@@ -84,6 +84,8 @@ Environment quirks (Windows 11, repo inside a Syncthing folder):
 - Windows settings (`core/windows_info.py`, stage 10): `SystemInfo.windows` -> `WindowsInfo`
   (Secure Boot/TPM/GPT, hypervisor/VBS, AV, DirectX, power, background apps). Read-only, no admin;
   absent registry value = Windows default, `None` = unknown. Plan: `docs/RAPORT_WINDOWS.md` §7.
+  Rules: `core/windows_checks.py` (`CHECKS` id -> section/impact, `MYTHS`); niche rules return
+  `None` when not applicable. `evaluate_checks()` merges them with the hardware checks.
 - Display & sharing: `core/display.display_value(raw, setting, entry, tr)` renders values for every
   view (cards, panels, exports). `core/share_export.build_share(...)` -> `to_markdown/to_json`;
   it reuses `exclusion_reason()` and skips other GPU vendors - keep exports free of identifying data.

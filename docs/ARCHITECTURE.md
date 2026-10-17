@@ -48,7 +48,9 @@ the game-file logic reviewable on its own.
 | `optimizer.py` | `recommend()`: goal + bottleneck + hardware → values with `Reason`s |
 | `system_info.py` | `collect_system_info()` → `SystemInfo` (PowerShell CIM JSON, registry, powercfg, nvidia-smi, Steam manifests); pure `parse_*` helpers |
 | `windows_info.py` | `WindowsInfo` (= `SystemInfo.windows`): gaming-relevant Windows settings - anti-cheat requirements, virtualization/security, DirectX, power, background apps; registry + ctypes + psutil probes, pure parsers |
-| `system_checks.py` | `evaluate_checks()` → 15 `CheckResult`s (EXPO, channels, HDD, refresh, driver, PCIe, ReBAR, power plan…) |
+| `check_types.py` | `CheckResult`, `Status`, `Severity` (shared by both check modules) |
+| `system_checks.py` | `evaluate_checks()` → hardware `CheckResult`s (EXPO, channels, HDD, refresh, driver, PCIe, ReBAR, iGPU) + all Windows checks |
+| `windows_checks.py` | `evaluate_windows_checks()` → Windows-settings checks; `CHECKS` (id → `Section`, `Impact`), `MYTHS`; CPU-specific rules (dual-CCD X3D, Intel 13/14, Arrow Lake, Zen 3+) |
 | `display.py` | `display_value()`: one human-readable rendering of a value for cards, panels and exports |
 | `share_export.py` | `build_share()` → `to_markdown()` / `to_json()` for "Share settings" |
 
@@ -134,8 +136,10 @@ paths or account ids.
   placeholders (`tests/test_i18n.py`).
 - **New dialog**: open it through `MainWindow._exec_dialog` so tests can replace it; questions
   and messages through `_ask` / `_show_message`.
-- **New system check**: add it to `system_checks.py` with texts `checks.<id>.title/problem/fix/ok`
-  and a case in `tests/test_system.py` (use `tests/fixtures/system_cim.json`).
+- **New system check**: hardware → `system_checks.py`, Windows setting → `windows_checks.py`
+  (also add it to `CHECKS` with a section and impact). Texts `checks.<id>.title/problem/fix/ok`
+  (+ `_<variant>`); tests in `tests/test_system.py` / `tests/test_windows_checks.py` -
+  `test_every_outcome_has_texts` lists every variant, extend it.
 - **New optimizer rule**: knowledge-base `rule` field + implementation in `optimizer.py`;
   results always go through `plan_template()`.
 - **Anything that writes game files** must follow the hard rules in `CLAUDE.md`.

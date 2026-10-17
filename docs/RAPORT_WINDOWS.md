@@ -1,6 +1,7 @@
 # Raport: zakładka „Optymalizacja Windows 11” — co pokazać, co zmieniać, czego nie ruszać
 
-> **Status:** etap 10a (odczyt) wdrożony w `core/windows_info.py`; 10b–10e czekają — patrz `PLAN.md`.
+> **Status:** etapy 10a (odczyt, `core/windows_info.py`) i 10b (ocena, `core/windows_checks.py`)
+> wdrożone; 10c–10e czekają — patrz `PLAN.md`.
 
 *Data: 2026-10-17. Dane w §2 odczytałem z Twojego PC bez uprawnień administratora (rejestr, WMI/CIM,
 `powercfg`, `tpmtool`/TBS). Nic nie zostało zmienione. Źródła są w §9. Liczby pochodzą z testów

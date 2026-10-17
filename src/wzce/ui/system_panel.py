@@ -443,9 +443,8 @@ class SystemDialog(QDialog):
         body.setObjectName("cardDesc")
         body.setWordWrap(True)
         texts.addWidget(body)
-        # Fix instructions only where there is something to do: warnings, and
-        # information that comes with an action (e.g. memory integrity).
-        if check.status is Status.WARN or (check.status is Status.INFO and check.action):
+        # Fix instructions only where there is something to do: warnings and information.
+        if check.status in (Status.WARN, Status.INFO):
             fix = QLabel(tr(f"checks.{check.id}.fix", **check.params))
             fix.setObjectName("checkFix")
             fix.setWordWrap(True)
@@ -476,7 +475,8 @@ def check_text(check: CheckResult, tr: Translator) -> str:
     if check.status is Status.UNKNOWN:
         return tr("checks.unknown")
     if check.status is Status.OK:
-        return tr(f"checks.{check.id}.ok", **check.params)
+        key = f"checks.{check.id}.ok" + (f"_{check.variant}" if check.variant else "")
+        return tr(key, **check.params)
     key = f"checks.{check.id}.problem" + (f"_{check.variant}" if check.variant else "")
     return tr(key, **check.params)
 

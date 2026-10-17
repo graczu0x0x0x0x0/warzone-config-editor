@@ -185,9 +185,13 @@ Research, stan PC autora i propozycja: [`RAPORT_WINDOWS.md`](RAPORT_WINDOWS.md).
       uśpienie USB, usługa AMD 3D V-Cache, mikrokod; plik stronicowania, wolne miejsce na C:,
       TRIM, akceleracja myszy, łącze sieciowe, programy w tle. CLI `wzce --system-report` (JSON).
       Testy na fixturze `tests/fixtures/windows_cim.json`
-- [ ] 10b Ocena (`core/windows_checks.py`): reguły zależne od CPU (X3D z 1/2 CCD, Intel 13/14,
-      Arrow Lake), wymagania Ricochet, sekcja mitów; poprawka sprawdzenia planu zasilania
-      dla X3D z dwoma CCD
+- [x] 10b Ocena (`core/windows_checks.py`): 33 sprawdzenia w 9 sekcjach z siłą dowodów
+      (wymagane / zmierzone / zależy / bez wpływu), reguły zależne od CPU (X3D z 1/2 CCD,
+      Intel 13/14 — mikrokod 0x12B, Arrow Lake, Ryzen Zen 3–5 — poprawka 24H2), wymagania
+      Ricochet (Secure Boot, UEFI/GPT, TPM z wadliwym firmware, UAC, reWASD/Cronus), regresja
+      KB5066835 + NVIDIA, 11 mitów (teksty `myths.*`). Plan zasilania: X3D z dwoma CCD wymaga
+      „Zrównoważonego”, plan zrównoważony bez trybu „Najlepsza wydajność” = uwaga. Do czasu 10c
+      sprawdzenia są w zakładce „Kontrola systemu”. Typy wyników w `core/check_types.py`
 - [ ] 10c Zakładka „Windows” w oknie „Sprzęt i system” (sekcje, wartości obecne/zalecane, linki,
       instrukcje BIOS, filtr, PL/EN)
 - [ ] 10d Zmiany bez administratora (HKCU, `powercfg`) z kopią i przywracaniem — po teście u autora

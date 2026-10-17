@@ -1,54 +1,29 @@
 """System checks: turn ``SystemInfo`` (+ the game's settings file) into advice.
 
+This module holds the hardware checks (RAM, drives, GPU, monitor); the checks of
+Windows settings live in ``core/windows_checks.py`` and are merged in here.
+
 Each check returns a ``CheckResult`` with a status (ok / warn / info / unknown),
 a severity for warnings, parameters for the translated texts and an optional
 action (a Windows settings URI, a web page, or a setting in the editor).
 
 Texts live in the i18n catalogs under ``checks.<id>.title`` / ``.problem`` /
-``.fix`` / ``.ok`` (``.problem_<variant>`` when a check has variants). Checks never
-change anything - they only report.
+``.fix`` / ``.ok`` (``.problem_<variant>`` / ``.ok_<variant>`` when a check has
+variants). Checks never change anything - they only report.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from enum import StrEnum
-
+from .check_types import CheckResult, Severity, Status
 from .document import ConfigDocument
 from .hardware import HardwareInfo
 from .system_info import SystemInfo
+from .windows_checks import evaluate_windows_checks
+
+__all__ = ["CheckResult", "Severity", "Status", "evaluate_checks", "warnings"]
 
 LOW_RAM_GB = 16
 LOW_DISK_GB = 50
-
-
-class Status(StrEnum):
-    WARN = "warn"
-    INFO = "info"
-    OK = "ok"
-    UNKNOWN = "unknown"  # data not available on this PC
-
-
-class Severity(StrEnum):
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
-
-
-@dataclass(frozen=True, slots=True)
-class CheckResult:
-    id: str
-    status: Status
-    severity: Severity | None = None
-    params: dict[str, object] = field(default_factory=dict)
-    variant: str | None = None  # selects checks.<id>.problem_<variant>
-    action: str | None = None  # "ms-settings:...", "https://...", "setting:Key@0"
-
-    @property
-    def sort_key(self) -> tuple[int, int]:
-        status_rank = {Status.WARN: 0, Status.INFO: 1, Status.UNKNOWN: 3, Status.OK: 2}
-        severity_rank = {Severity.HIGH: 0, Severity.MEDIUM: 1, Severity.LOW: 2, None: 3}
-        return status_rank[self.status], severity_rank[self.severity]
 
 
 def _raw(document: ConfigDocument | None, setting_id: str) -> str | None:
@@ -80,12 +55,8 @@ def evaluate_checks(
         _check_driver(info, document),
         _check_pcie(info),
         _check_rebar(info, document),
-        _check_power_plan(info),
-        _check_hags(info),
-        _check_game_mode(info),
-        _check_recording(info),
-        _check_hvci(info),
         _check_igpu(info, document),
+        *evaluate_windows_checks(info),
     ]
     return sorted(results, key=lambda r: r.sort_key)
 
@@ -219,47 +190,6 @@ def _check_rebar(info: SystemInfo, document: ConfigDocument | None) -> CheckResu
             action="setting:GPUUploadHeaps@0",
         )
     return CheckResult("rebar", Status.WARN, Severity.LOW)
-
-
-def _check_power_plan(info: SystemInfo) -> CheckResult:
-    plan = info.power_plan
-    if plan is None:
-        return CheckResult("power_plan", Status.UNKNOWN)
-    params = {"plan": plan}
-    if plan in ("balanced", "power_saver"):
-        return CheckResult(
-            "power_plan", Status.WARN, Severity.LOW, params, action="ms-settings:powersleep"
-        )
-    return CheckResult("power_plan", Status.OK, params=params)
-
-
-def _flag_check(check_id: str, value: bool | None, want: bool, action: str) -> CheckResult:
-    if value is None:
-        return CheckResult(check_id, Status.UNKNOWN)
-    if value != want:
-        return CheckResult(check_id, Status.WARN, Severity.LOW, action=action)
-    return CheckResult(check_id, Status.OK)
-
-
-def _check_hags(info: SystemInfo) -> CheckResult:
-    return _flag_check("hags", info.hags, True, "ms-settings:display-advancedgraphics")
-
-
-def _check_game_mode(info: SystemInfo) -> CheckResult:
-    return _flag_check("game_mode", info.game_mode, True, "ms-settings:gaming-gamemode")
-
-
-def _check_recording(info: SystemInfo) -> CheckResult:
-    return _flag_check("recording", info.background_recording, False, "ms-settings:gaming-gamedvr")
-
-
-def _check_hvci(info: SystemInfo) -> CheckResult:
-    if info.hvci_running is None:
-        return CheckResult("hvci", Status.UNKNOWN)
-    if info.hvci_running:
-        # A security trade-off, so information rather than a warning.
-        return CheckResult("hvci", Status.INFO, action="windowsdefender://coreisolation")
-    return CheckResult("hvci", Status.OK)
 
 
 def _check_igpu(info: SystemInfo, document: ConfigDocument | None) -> CheckResult:

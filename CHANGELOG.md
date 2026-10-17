@@ -14,7 +14,21 @@ miejscu: `src/wzce/__init__.py`.
   antywirus), opcje DirectX (Auto HDR, VRR, preferencja GPU dla gry), MPO, Game DVR, tryb
   zasilania i parametry procesora, plik stronicowania, TRIM, akceleracja myszy, łącze sieciowe
   i programy działające w tle. Wszystko tylko do odczytu, bez uprawnień administratora.
+- **Kontrola ustawień Windows** (etap 10b) — w oknie „Sprzęt i system” → „Kontrola systemu”
+  doszło ok. 30 sprawdzeń z wyjaśnieniem i instrukcją: wymagania anty-cheatu (Secure Boot,
+  UEFI/GPT, TPM 2.0 i jego firmware, UAC, programy do przemapowania sterowania), wirtualizacja
+  (WSL/Hyper-V przy wyłączonym SVM), antywirus, sterownik WinRing0, karta graficzna dla gry,
+  Auto HDR, wyłączone MPO, Xbox Game Bar, limity procesora, sterownik AMD 3D V-Cache
+  i parkowanie rdzeni (X3D z dwoma CCD), mikrokod Intel 13./14. gen., wersja Windows (poprawki
+  dla Ryzenów i Core Ultra 200S), regresja sterownika NVIDIA po KB5066835, oczekujący restart,
+  plik stronicowania, miejsce na C:, TRIM, nakładki w tle, akceleracja myszy, Wi-Fi.
 - `wzce --system-report` — pełny wynik sondy sprzętu i systemu jako JSON (diagnostyka).
+
+### Zmieniono
+
+- Plan zasilania: na Ryzenach X3D z dwoma CCD zalecany jest plan zrównoważony (wymóg sterownika
+  AMD), a przy planie zrównoważonym ważny jest tryb zasilania „Najlepsza wydajność”.
+- Wskazówki naprawy są pokazywane także przy pozycjach informacyjnych.
 - Raport [`docs/RAPORT_WINDOWS.md`](docs/RAPORT_WINDOWS.md): research optymalizacji Windows 11
   pod gry (co działa, co jest mitem) i plan zakładki „Optymalizacja Windows”.
 
