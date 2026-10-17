@@ -233,6 +233,10 @@ def stylesheet() -> str:
     #chip[kind="amd"] {{ color: {c["amd"]}; border-color: #4a1416; }}
     #chip[kind="intel"] {{ color: {c["intel"]}; border-color: #13324d; }}
     #chip[kind="hw"] {{ color: {c["text_faint"]}; }}
+    #chip[kind="impact_required"] {{ background: #3a1716; color: {c["danger"]}; border-color: #5a2421; }}
+    #chip[kind="impact_proven"] {{ background: #173326; color: {c["success"]}; border-color: #1f4a37; }}
+    #chip[kind="impact_situational"] {{ color: {c["text_muted"]}; }}
+    #chip[kind="impact_none"] {{ color: {c["text_faint"]}; }}
     #navCount {{ color: {c["accent"]}; font-weight: 700; }}
 
     /* ---------- changes panel ---------- */

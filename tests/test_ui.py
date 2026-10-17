@@ -987,3 +987,120 @@ def test_share_dialog_includes_hardware_when_known(window: MainWindow) -> None:
     assert "## Hardware" in text and "EXPO/XMP off" in text
     dialog.include_hardware.setChecked(False)
     assert "## Hardware" not in dialog.preview.toPlainText()
+
+
+# ------------------------------------------- stage 10c: Windows optimization tab
+
+
+def _windows_dialog(window: MainWindow, info=None, tab: str = "windows"):
+    from test_windows_checks import _users_pc
+
+    window._on_system_info(info or _users_pc())
+    captured = {}
+
+    def run(dialog) -> bool:
+        captured["dialog"] = dialog
+        return False
+
+    window._exec_dialog = run
+    window.open_system_dialog(tab=tab)
+    return captured["dialog"]
+
+
+def test_windows_tab_groups_checks_by_section(window: MainWindow) -> None:
+    from wzce.core.windows_checks import is_windows_check
+
+    dialog = _windows_dialog(window)
+    assert dialog.tabs.currentIndex() == 2
+    assert dialog.tabs.tabText(2) == "Windows optimization"
+    assert dialog.tabs.tabText(1) == "Hardware check"
+    summary = dialog.windows_summary.text()
+    assert summary == "Game requirements: met ✓ · To improve: 0 · Information: 7"
+    headers = [header.text() for header, _rows in dialog._section_widgets]
+    assert headers[0] == "GAME REQUIREMENTS (ANTI-CHEAT)" and "MOUSE AND NETWORK" in headers
+    # Every check sits in exactly one tab: hardware rows are not repeated here.
+    windows_rows = {c.id for _h, rows in dialog._section_widgets for _r, c in rows}
+    assert windows_rows == {c.id for c in window.system_checks if is_windows_check(c.id)}
+    assert "expo" not in windows_rows and "expo" in dialog.check_rows
+    chips = [w.text() for w in dialog.findChildren(QLabel) if w.objectName() == "chip"]
+    assert "Required by the game" in chips and "No effect on CoD" in chips
+
+
+def test_windows_tab_filter_hides_ok_rows_myths_and_bios(window: MainWindow) -> None:
+    dialog = _windows_dialog(window)
+    dialog.show()
+    assert dialog.check_rows["secure_boot"].isVisible() and dialog.myths_box.isVisible()
+    dialog.only_problems_check.setChecked(True)
+    assert not dialog.check_rows["secure_boot"].isVisible()
+    assert dialog.check_rows["virtualization"].isVisible()  # information stays
+    assert not dialog.myths_box.isVisible() and not dialog.bios_box.isVisible()
+    requirements = dialog._section_widgets[0][0]
+    assert not requirements.isVisible()  # all OK -> the section header hides too
+    dialog.close()
+
+
+def test_windows_action_in_tools_menu(window: MainWindow) -> None:
+    assert not window.windows_action.isEnabled()  # no probe result yet
+    assert window.windows_action.text() == "Windows optimization…"
+    from test_windows_checks import _users_pc
+
+    window._on_system_info(_users_pc())
+    assert window.windows_action.isEnabled()
+    opened = []
+    window._exec_dialog = lambda dialog: opened.append(dialog.tabs.currentIndex()) or False
+    window.windows_action.trigger()
+    assert opened == [2]
+
+
+def test_checks_button_lands_on_tab_with_warnings(window: MainWindow) -> None:
+    import dataclasses
+
+    from test_windows_checks import _users_pc
+
+    info = _users_pc()
+    info.windows.secure_boot = False  # only a Windows warning, hardware is fine
+    info.memory = [dataclasses.replace(m, speed_mts=6000, voltage_mv=1350) for m in info.memory]
+    nvme = next(d for d in info.drives if d.letter == "C")
+    info.game_install = dataclasses.replace(info.game_install, drive=nvme)
+    dialog = _windows_dialog(window, info, tab=None)
+    assert dialog.tabs.currentIndex() == 0  # plain "details" opens the specification
+
+    opened = []
+    window._exec_dialog = lambda dialog: opened.append(dialog.tabs.currentIndex()) or False
+    window.hw_bar.checks_requested.emit()
+    assert opened == [2]
+    window._on_system_info(_users_pc())  # EXPO off again: hardware warning first
+    window.hw_bar.checks_requested.emit()
+    assert opened == [2, 1]
+
+
+def test_refresh_updates_the_open_dialog(window: MainWindow) -> None:
+    from test_windows_checks import _users_pc
+
+    fresh = _users_pc()
+    fresh.windows.auto_hdr = False  # the user turned Auto HDR off meanwhile
+    window._system_info_provider = lambda: fresh
+    window._system_probe.start = lambda provider: window._on_system_info(provider())
+    window._on_system_info(_users_pc())
+    seen = {}
+
+    def run(dialog) -> bool:
+        assert dialog.refresh_button.isVisibleTo(dialog)
+        assert dialog.check_rows["auto_hdr"].property("status") == "info"
+        dialog.refresh_button.click()
+        seen["status"] = dialog.check_rows["auto_hdr"].property("status")
+        seen["tab"] = dialog.tabs.currentIndex()
+        return False
+
+    window._exec_dialog = run
+    window.open_system_dialog(tab="windows")
+    assert seen == {"status": "ok", "tab": 2}
+    assert window._system_dialog is None
+
+
+def test_windows_tab_in_polish(window: MainWindow) -> None:
+    window.set_language("pl")
+    dialog = _windows_dialog(window)
+    assert dialog.tabs.tabText(2) == "Optymalizacja Windows"
+    assert dialog.windows_summary.text().startswith("Wymagania gry: spełnione ✓")
+    assert window.windows_action.text() == "Optymalizacja Windows…"

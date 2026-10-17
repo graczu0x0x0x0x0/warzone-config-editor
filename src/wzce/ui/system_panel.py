@@ -1,12 +1,15 @@
 """'Your hardware' bar, the hardware/system dialog and the background probe thread.
 
-* ``SystemProbe`` runs ``collect_system_info`` (2-4 s of WMI queries) in a daemon
+* ``SystemProbe`` runs ``collect_system_info`` (3-5 s of WMI queries) in a daemon
   thread and hands the result back through a Qt signal (queued to the UI thread).
   A daemon thread - unlike a QThread - never delays closing the app.
 * ``HardwareBar`` is the compact, collapsible one-line summary under the header,
   with a button showing how many system checks need attention.
-* ``SystemDialog`` has two tabs: the full specification (with "Copy specification"
-  to the clipboard) and the system check list with explanations and actions.
+* ``SystemDialog`` has three tabs: the full specification (with "Copy specification"
+  to the clipboard), the hardware check list, and "Windows optimization" - the
+  Windows-settings checks grouped by section with an evidence chip per row, a
+  "only what needs attention" filter, the myths list, a manual BIOS checklist and
+  "Refresh" (the main window re-runs the probe and calls ``set_data``).
 
 ``spec_rows`` builds the specification once for both the dialog and the clipboard
 text, so they never disagree.
@@ -21,6 +24,7 @@ from collections.abc import Callable
 from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import (
+    QCheckBox,
     QDialog,
     QFrame,
     QGridLayout,
@@ -37,6 +41,7 @@ from ..core.hardware import HardwareInfo
 from ..core.i18n import Translator
 from ..core.system_checks import CheckResult, Severity, Status
 from ..core.system_info import SystemInfo
+from ..core.windows_checks import CHECKS, MYTHS, Impact, Section, is_windows_check
 from .theme import repolish
 
 SpecRow = tuple[str, str, str]  # (section key, label, value)
@@ -326,7 +331,12 @@ STATUS_ICONS = {Status.WARN: "⚠", Status.INFO: "ℹ", Status.OK: "✓", Status
 
 
 class SystemDialog(QDialog):
+    """Specification, hardware checks and the Windows optimization tab."""
+
     action_requested = Signal(str)  # check action: URI or "setting:Key@0"
+    refresh_requested = Signal()  # run the system probe again (Windows tab)
+
+    TABS = ("spec", "checks", "windows")
 
     def __init__(
         self,
@@ -336,20 +346,25 @@ class SystemDialog(QDialog):
         tr: Translator,
         *,
         show_checks: bool = False,
+        tab: str | None = None,
+        can_refresh: bool = False,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
-        self._info, self._hardware, self._tr = info, hardware, tr
+        self._tr = tr
+        self._can_refresh = can_refresh
+        self.only_problems = False
         self.setWindowTitle(tr("spec.title"))
-        self.resize(960, 700)
+        self.resize(1000, 760)
         root = QVBoxLayout(self)
         root.setContentsMargins(16, 16, 16, 16)
         self.tabs = QTabWidget()
-        self.tabs.addTab(self._spec_tab(), tr("spec.tab_spec"))
-        self.tabs.addTab(self._checks_tab(checks), tr("spec.tab_checks"))
-        if show_checks:
-            self.tabs.setCurrentIndex(1)
         root.addWidget(self.tabs, 1)
+        self.set_data(info, hardware, checks)
+        if tab is None and show_checks:
+            tab = default_checks_tab(checks)
+        if tab in self.TABS:
+            self.tabs.setCurrentIndex(self.TABS.index(tab))
 
         buttons = QHBoxLayout()
         self.copy_button = QPushButton(tr("spec.copy"))
@@ -364,6 +379,25 @@ class SystemDialog(QDialog):
         close.clicked.connect(self.accept)
         buttons.addWidget(close)
         root.addLayout(buttons)
+
+    def set_data(
+        self, info: SystemInfo, hardware: HardwareInfo | None, checks: list[CheckResult]
+    ) -> None:
+        """(Re)build every tab - also after "Refresh" delivered a new probe result."""
+        self._info, self._hardware, self._checks = info, hardware, checks
+        current = self.tabs.currentIndex()
+        while self.tabs.count():
+            widget = self.tabs.widget(0)
+            self.tabs.removeTab(0)
+            widget.deleteLater()
+        tr = self._tr
+        self.check_rows: dict[str, QFrame] = {}
+        self.tabs.addTab(self._spec_tab(), tr("spec.tab_spec"))
+        hardware_checks = [c for c in checks if not is_windows_check(c.id)]
+        self.tabs.addTab(self._checks_tab(hardware_checks), tr("spec.tab_checks"))
+        self.tabs.addTab(self._windows_tab(), tr("win.tab"))
+        if current >= 0:
+            self.tabs.setCurrentIndex(current)
 
     # ------------------------------------------------------------------ spec
     def _spec_tab(self) -> QWidget:
@@ -413,7 +447,6 @@ class SystemDialog(QDialog):
         note.setObjectName("cardDesc")
         note.setWordWrap(True)
         layout.addWidget(note)
-        self.check_rows: dict[str, QFrame] = {}
         for check in checks:
             row = self._check_row(check)
             self.check_rows[check.id] = row
@@ -421,7 +454,7 @@ class SystemDialog(QDialog):
         layout.addStretch()
         return self._scroll(host)
 
-    def _check_row(self, check: CheckResult) -> QFrame:
+    def _check_row(self, check: CheckResult, impact: Impact | None = None) -> QFrame:
         tr = self._tr
         frame = QFrame()
         frame.setObjectName("checkRow")
@@ -435,10 +468,19 @@ class SystemDialog(QDialog):
         layout.addWidget(icon)
         texts = QVBoxLayout()
         texts.setSpacing(2)
-        title = check_title(check, tr)
-        title_label = QLabel(title)
+        heading = QHBoxLayout()
+        heading.setSpacing(8)
+        title_label = QLabel(check_title(check, tr))
         title_label.setObjectName("cardTitle")
-        texts.addWidget(title_label)
+        heading.addWidget(title_label)
+        if impact is not None:
+            chip = QLabel(tr(f"win.impact.{impact.value}"))
+            chip.setObjectName("chip")
+            chip.setProperty("kind", f"impact_{impact.value}")
+            chip.setToolTip(tr(f"win.impact.{impact.value}_tip"))
+            heading.addWidget(chip)
+        heading.addStretch()
+        texts.addLayout(heading)
         body = QLabel(check_text(check, tr))
         body.setObjectName("cardDesc")
         body.setWordWrap(True)
@@ -456,12 +498,152 @@ class SystemDialog(QDialog):
             layout.addWidget(button)
         return frame
 
+    # --------------------------------------------------------------- windows
+    def _windows_tab(self) -> QWidget:
+        tr = self._tr
+        checks = [c for c in self._checks if is_windows_check(c.id)]
+        host = QWidget()
+        layout = QVBoxLayout(host)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(8)
+
+        self.windows_summary = QLabel(windows_summary(checks, tr))
+        self.windows_summary.setObjectName("panelTitle")
+        self.windows_summary.setWordWrap(True)
+        layout.addWidget(self.windows_summary)
+        note = QLabel(tr("win.note"))
+        note.setObjectName("cardDesc")
+        note.setWordWrap(True)
+        layout.addWidget(note)
+        tools = QHBoxLayout()
+        self.only_problems_check = QCheckBox(tr("win.only_problems"))
+        self.only_problems_check.setChecked(self.only_problems)
+        self.only_problems_check.toggled.connect(self._set_only_problems)
+        tools.addWidget(self.only_problems_check)
+        tools.addStretch()
+        self.refresh_button = QPushButton(tr("win.refresh"))
+        self.refresh_button.setToolTip(tr("win.refresh_tip"))
+        self.refresh_button.setVisible(self._can_refresh)
+        self.refresh_button.clicked.connect(self._request_refresh)
+        tools.addWidget(self.refresh_button)
+        layout.addLayout(tools)
+
+        # Rows grouped by section, in CHECKS order; problems first inside a section.
+        self._section_widgets: list[tuple[QLabel, list[tuple[QFrame, CheckResult]]]] = []
+        order = {check_id: i for i, check_id in enumerate(CHECKS)}
+        for section in Section:
+            in_section = sorted(
+                (c for c in checks if CHECKS[c.id][0] is section),
+                key=lambda c: (c.sort_key[0], order[c.id]),
+            )
+            if not in_section:
+                continue
+            header = QLabel(tr(f"win.section.{section.value}").upper())
+            header.setObjectName("subgroupTitle")
+            layout.addWidget(header)
+            rows = []
+            for check in in_section:
+                row = self._check_row(check, CHECKS[check.id][1])
+                self.check_rows[check.id] = row
+                layout.addWidget(row)
+                rows.append((row, check))
+            self._section_widgets.append((header, rows))
+
+        self.myths_box = self._text_section(
+            tr("win.myths_title"), tr("win.myths_note"),
+            [(tr(f"myths.{m}.title"), tr(f"myths.{m}.why")) for m in MYTHS],
+        )  # fmt: skip
+        layout.addWidget(self.myths_box)
+        self.bios_box = self._text_section(
+            tr("win.bios_title"), tr("win.bios_note"),
+            [(tr(f"win.bios.{b}.title"), tr(f"win.bios.{b}.text")) for b in BIOS_ITEMS],
+        )  # fmt: skip
+        layout.addWidget(self.bios_box)
+        layout.addStretch()
+        self._apply_filter()
+        return self._scroll(host)
+
+    def _text_section(self, title: str, note: str, items: list[tuple[str, str]]) -> QWidget:
+        box = QWidget()
+        layout = QVBoxLayout(box)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
+        header = QLabel(title.upper())
+        header.setObjectName("subgroupTitle")
+        layout.addWidget(header)
+        intro = QLabel(note)
+        intro.setObjectName("cardDesc")
+        intro.setWordWrap(True)
+        layout.addWidget(intro)
+        for item_title, text in items:
+            frame = QFrame()
+            frame.setObjectName("checkRow")
+            frame.setProperty("status", "")
+            inner = QVBoxLayout(frame)
+            inner.setContentsMargins(12, 8, 12, 8)
+            inner.setSpacing(2)
+            name = QLabel(item_title)
+            name.setObjectName("cardTitle")
+            inner.addWidget(name)
+            body = QLabel(text)
+            body.setObjectName("cardDesc")
+            body.setWordWrap(True)
+            inner.addWidget(body)
+            layout.addWidget(frame)
+        return box
+
+    def _set_only_problems(self, only: bool) -> None:
+        self.only_problems = only
+        self._apply_filter()
+
+    def _apply_filter(self) -> None:
+        for header, rows in self._section_widgets:
+            visible = 0
+            for row, check in rows:
+                show = not self.only_problems or check.status in (Status.WARN, Status.INFO)
+                row.setVisible(show)
+                visible += show
+            header.setVisible(visible > 0)
+        self.myths_box.setVisible(not self.only_problems)
+        self.bios_box.setVisible(not self.only_problems)
+
+    def _request_refresh(self) -> None:
+        self.refresh_button.setEnabled(False)
+        self.refresh_button.setText(self._tr("win.refreshing"))
+        self.refresh_requested.emit()
+
     @staticmethod
     def _scroll(widget: QWidget) -> QScrollArea:
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(widget)
         return scroll
+
+
+# Manual BIOS checklist (texts: win.bios.<id>.title/text); statuses that Windows can
+# see indirectly are in the check rows above.
+BIOS_ITEMS = ("expo", "rebar", "secure_boot", "tpm", "svm", "pbo", "intel_profile")
+
+
+def default_checks_tab(checks: list[CheckResult]) -> str:
+    """Where the "System check: N" button lands: the tab with the warnings."""
+    hardware_warn = any(c.status is Status.WARN and not is_windows_check(c.id) for c in checks)
+    windows_warn = any(c.status is Status.WARN and is_windows_check(c.id) for c in checks)
+    return "windows" if windows_warn and not hardware_warn else "checks"
+
+
+def windows_summary(checks: list[CheckResult], tr: Translator) -> str:
+    required = [c for c in checks if CHECKS[c.id][0] is Section.REQUIREMENTS]
+    missing = sum(1 for c in required if c.status is Status.WARN)
+    if missing:
+        requirements = tr("win.requirements_missing", count=missing)
+    elif any(c.status is Status.UNKNOWN for c in required):
+        requirements = tr("win.requirements_unknown")
+    else:
+        requirements = tr("win.requirements_ok")
+    warn = sum(1 for c in checks if c.status is Status.WARN)
+    info = sum(1 for c in checks if c.status is Status.INFO)
+    return tr("win.summary", requirements=requirements, warnings=warn, info=info)
 
 
 def check_title(check: CheckResult, tr: Translator) -> str:

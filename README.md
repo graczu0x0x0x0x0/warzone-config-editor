@@ -45,6 +45,13 @@ pilnuje poprawności wartości i bezpiecznie je zapisuje — z kopią zapasową 
   wyłączone EXPO/XMP, pamięć jednokanałowa, gra na HDD, monitor na niższym odświeżaniu, stary
   sterownik, złe złącze PCIe, wyłączony Resizable BAR, plan zasilania i inne.
   „Kopiuj specyfikację” przygotowuje tekst na Discord lub forum.
+- **Optymalizacja Windows 11** (*Narzędzia* → *Optymalizacja Windows…*) — ok. 30 ustawień Windows
+  ważnych dla gry, pogrupowanych w sekcje: wymagania anty-cheatu (Secure Boot, UEFI/GPT, TPM 2.0),
+  wirtualizacja i zabezpieczenia, grafika (Auto HDR, MPO, karta dla gry), tryb gry i Xbox Game Bar,
+  zasilanie (z regułami dla Ryzenów X3D i Intela 13./14. gen.), aktualizacje, plik stronicowania,
+  nakładki w tle, mysz i sieć. Każda pozycja ma znaczek siły dowodów (wymagane / zmierzony wpływ /
+  zależy od PC / bez wpływu na CoD), instrukcję i przycisk do właściwej strony Windows. Do tego
+  lista mitów („tweaki”, które nic nie dają albo szkodzą) i lista kontrolna BIOS. Tylko odczyt.
 - **Udostępnianie ustawień** — czytelne podsumowanie (Markdown na Discord/Reddit albo JSON)
   wybranych kategorii, opcjonalnie z krótkim opisem sprzętu; bez danych identyfikujących.
 - Ciemny motyw, przełączanie **PL / EN** w locie.
@@ -55,6 +62,7 @@ pilnuje poprawności wartości i bezpiecznie je zapisuje — z kopią zapasową 
 | ![Zmiany gry](docs/img/game-change.png) | ![Plik konta](docs/img/account.png) |
 | ![Twój sprzęt](docs/img/hardware-bar.png) | ![Kontrola systemu](docs/img/system-check.png) |
 | ![Udostępnianie ustawień](docs/img/share.png) | ![Historia](docs/img/history.png) |
+| ![Optymalizacja Windows](docs/img/windows.png) | |
 
 ### Pobranie i uruchomienie
 
@@ -113,15 +121,17 @@ zrobionych w jej własnym menu.
 
 ```
 uv sync
-uv run pytest                       # ~340 testów (rdzeń + GUI offscreen)
+uv run pytest                       # ~430 testów (rdzeń + GUI offscreen)
 uv run ruff check . && uv run ruff format .
 uv run wzce --report                # raport z wykrytych plików (tylko odczyt)
+uv run wzce --system-report         # sonda sprzętu i ustawień Windows jako JSON (tylko odczyt)
 uv run python scripts/build_exe.py  # budowa .exe + samotest (--onedir: wersja folderowa)
 ```
 
 Dokumentacja: [architektura i rozwój](docs/ARCHITECTURE.md) · [plan](docs/PLAN.md) ·
 [format plików](docs/FILE_FORMAT.md) · [baza wiedzy](docs/KNOWLEDGE_BASE.md) ·
 [raport z researchu](docs/RAPORT.md) · [raport: sprzęt](docs/RAPORT_SPRZET.md) ·
+[raport: Windows 11](docs/RAPORT_WINDOWS.md) ·
 [zmiany](CHANGELOG.md). Wytyczne dla asystenta AI i twarde zasady zapisu: [CLAUDE.md](CLAUDE.md). Kod: Python 3.12 + PySide6; `src/wzce/core` (bez Qt) i `src/wzce/ui`.
 
 ---
@@ -155,6 +165,13 @@ validates every value and saves safely — with backups and a change history.
   state, GPU, monitor, game drive) and 15 checks with fixes: EXPO/XMP off, single-channel RAM,
   game on HDD, monitor below its refresh rate, outdated driver, wrong PCIe slot, Resizable BAR off,
   power plan and more. "Copy specification" prepares text for Discord or forums.
+- **Windows 11 optimization** (*Tools* → *Windows optimization…*) — about 30 Windows settings that
+  matter for the game, grouped into sections: anti-cheat requirements (Secure Boot, UEFI/GPT,
+  TPM 2.0), virtualization and security, graphics (Auto HDR, MPO, GPU for the game), Game Mode and
+  Xbox Game Bar, power (with rules for Ryzen X3D and Intel 13th/14th gen), updates, page file,
+  background overlays, mouse and network. Every row shows how strong the evidence is (required /
+  measured effect / depends on the PC / no effect on CoD), a fix and a button to the right Windows
+  page. Plus a list of myths (tweaks that do nothing or harm) and a BIOS checklist. Read-only.
 - **Share settings** — a readable summary (Markdown for Discord/Reddit, or JSON) of the chosen
   categories, optionally with a short hardware summary; no identifying data.
 - Dark theme, live **EN / PL** language switch.

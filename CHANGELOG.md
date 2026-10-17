@@ -14,8 +14,12 @@ miejscu: `src/wzce/__init__.py`.
   antywirus), opcje DirectX (Auto HDR, VRR, preferencja GPU dla gry), MPO, Game DVR, tryb
   zasilania i parametry procesora, plik stronicowania, TRIM, akceleracja myszy, łącze sieciowe
   i programy działające w tle. Wszystko tylko do odczytu, bez uprawnień administratora.
-- **Kontrola ustawień Windows** (etap 10b) — w oknie „Sprzęt i system” → „Kontrola systemu”
-  doszło ok. 30 sprawdzeń z wyjaśnieniem i instrukcją: wymagania anty-cheatu (Secure Boot,
+- **Optymalizacja Windows 11** (etap 10c) — nowa zakładka w oknie „Sprzęt i system”, także
+  w menu *Narzędzia* → *Optymalizacja Windows…*. Podsumowanie wymagań gry, pozycje pogrupowane
+  w sekcje ze znaczkiem siły dowodów (wymagane przez grę / zmierzony wpływ / zależy od komputera /
+  bez wpływu na CoD), filtr „Pokaż tylko to, co wymaga uwagi”, lista mitów, lista kontrolna BIOS
+  i przycisk „Odśwież” po zmianach w Windows.
+- **Kontrola ustawień Windows** (etap 10b) — ok. 30 sprawdzeń z wyjaśnieniem i instrukcją: wymagania anty-cheatu (Secure Boot,
   UEFI/GPT, TPM 2.0 i jego firmware, UAC, programy do przemapowania sterowania), wirtualizacja
   (WSL/Hyper-V przy wyłączonym SVM), antywirus, sterownik WinRing0, karta graficzna dla gry,
   Auto HDR, wyłączone MPO, Xbox Game Bar, limity procesora, sterownik AMD 3D V-Cache
@@ -29,6 +33,8 @@ miejscu: `src/wzce/__init__.py`.
 - Plan zasilania: na Ryzenach X3D z dwoma CCD zalecany jest plan zrównoważony (wymóg sterownika
   AMD), a przy planie zrównoważonym ważny jest tryb zasilania „Najlepsza wydajność”.
 - Wskazówki naprawy są pokazywane także przy pozycjach informacyjnych.
+- Zakładka „Kontrola systemu” nazywa się teraz „Kontrola sprzętu” i pokazuje tylko sprzęt;
+  przycisk „Kontrola systemu: N” na pasku otwiera zakładkę, w której są ostrzeżenia.
 - Raport [`docs/RAPORT_WINDOWS.md`](docs/RAPORT_WINDOWS.md): research optymalizacji Windows 11
   pod gry (co działa, co jest mitem) i plan zakładki „Optymalizacja Windows”.
 

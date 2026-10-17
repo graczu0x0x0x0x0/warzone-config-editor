@@ -4,7 +4,7 @@ GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
 (`%LOCALAPPDATA%\Activision\Call of Duty\players\s.1.0.cod25.txt0` / `.txt1`).
 
 ## Status
-Released and working: **v1.2.0**, stages 0–9 of `docs/PLAN.md` done, ~420 tests green.
+Released and working: **v1.2.0**, stages 0–9 of `docs/PLAN.md` done, ~430 tests green.
 Current version: `src/wzce/__init__.py`; what changed recently: `CHANGELOG.md` + `git log`.
 Remaining ideas are the unchecked `[ ]` items in `docs/PLAN.md` - nothing is in progress unless
 the user says so.

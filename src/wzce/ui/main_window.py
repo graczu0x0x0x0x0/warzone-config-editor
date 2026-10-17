@@ -111,9 +111,11 @@ class MainWindow(QMainWindow):
         self.template_store = template_store if template_store is not None else TemplateStore()
         self._hardware_provider = hardware_provider
         self._hardware: HardwareInfo | None = None  # detected lazily, once
-        # Detailed spec + checks arrive later from a background probe (2-4 s).
+        # Detailed spec + checks arrive later from a background probe (3-5 s).
         self.system_info: SystemInfo | None = None
         self.system_checks: list[CheckResult] = []
+        self._system_info_provider = system_info_provider
+        self._system_dialog: SystemDialog | None = None  # open dialog, refreshed in place
         self._system_probe = SystemProbe(self)
         self._system_probe.ready.connect(self._on_system_info)
         self._game_running_check = game_running
@@ -312,6 +314,10 @@ class MainWindow(QMainWindow):
         self.share_action = QAction(self)
         self.share_action.triggered.connect(self.open_share_dialog)
         self.tools_menu.addAction(self.share_action)
+        self.windows_action = QAction(self)
+        self.windows_action.setEnabled(False)  # until the system probe has finished
+        self.windows_action.triggered.connect(lambda: self.open_system_dialog(tab="windows"))
+        self.tools_menu.addAction(self.windows_action)
         self.tools_menu.addSeparator()
         self.tools_menu.addAction(self.reload_action)
         self.tools_menu.addSeparator()
@@ -344,6 +350,7 @@ class MainWindow(QMainWindow):
         self.optimize_button.setText(tr("toolbar.optimize"))
         self.reload_action.setText(tr("toolbar.reload"))
         self.share_action.setText(tr("tools.share"))
+        self.windows_action.setText(tr("tools.windows"))
         self.game_reset_action.setText(tr("tools.game_reset"))
         self.read_only_action.setText(tr("readonly.toggle"))
         self.read_only_action.setToolTip(tr("readonly.explain"))
@@ -908,6 +915,9 @@ class MainWindow(QMainWindow):
         self.hw_bar.set_data(
             bar_items(self.system_info, self.hardware, self.tr), len(warnings(self.system_checks))
         )
+        self.windows_action.setEnabled(True)
+        if self._system_dialog is not None:  # "Refresh" in the open dialog
+            self._system_dialog.set_data(self.system_info, self.hardware, self.system_checks)
 
     def _on_hw_bar_collapsed(self, collapsed: bool) -> None:
         self.settings.hardware_bar_collapsed = collapsed
@@ -920,7 +930,8 @@ class MainWindow(QMainWindow):
             if check.status is Status.WARN and check.severity is Severity.HIGH
         ]
 
-    def open_system_dialog(self, show_checks: bool = False) -> None:
+    def open_system_dialog(self, show_checks: bool = False, tab: str | None = None) -> None:
+        """Hardware & system window; ``tab`` = "spec" / "checks" / "windows"."""
         if self.system_info is None:
             return
         dialog = SystemDialog(
@@ -929,8 +940,11 @@ class MainWindow(QMainWindow):
             self.system_checks,
             self.tr,
             show_checks=show_checks,
+            tab=tab,
+            can_refresh=self._system_info_provider is not None,
             parent=self,
         )
+        dialog.refresh_requested.connect(self.refresh_system_info)
         chosen: list[str] = []
 
         def on_action(action: str) -> None:
@@ -941,9 +955,18 @@ class MainWindow(QMainWindow):
                 self._open_external(action)
 
         dialog.action_requested.connect(on_action)
-        self._exec_dialog(dialog)
+        self._system_dialog = dialog
+        try:
+            self._exec_dialog(dialog)
+        finally:
+            self._system_dialog = None
         if chosen:
             self.navigate_to(chosen[0])
+
+    def refresh_system_info(self) -> None:
+        """Probe the system again (after the user changed something in Windows)."""
+        if self._system_info_provider is not None:
+            self._system_probe.start(self._system_info_provider)
 
     def _open_external(self, target: str) -> None:
         """Open a Windows settings page (ms-settings:...) or a web page."""

@@ -69,7 +69,7 @@ the game-file logic reviewable on its own.
 | `templates_dialog.py` | built-in presets, user templates, import/export, template from another file |
 | `plan_table.py` | shared preview table for template/optimizer plans (choose which changes to apply) |
 | `optimizer_dialog.py` | optimizer wizard (goal, bottleneck, system hints) |
-| `system_panel.py` | `SystemProbe` (daemon thread), `HardwareBar`, `SystemDialog` (spec + checks) |
+| `system_panel.py` | `SystemProbe` (daemon thread), `HardwareBar`, `SystemDialog` (spec, hardware checks, "Windows optimization" tab with sections, evidence chips, filter, myths, BIOS checklist; `set_data()` rebuilds it after "Refresh") |
 | `share_dialog.py` | "Share settings" dialog: groups, language, format, live preview, copy/save |
 
 ### Other

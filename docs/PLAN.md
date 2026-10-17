@@ -192,8 +192,12 @@ Research, stan PC autora i propozycja: [`RAPORT_WINDOWS.md`](RAPORT_WINDOWS.md).
       KB5066835 + NVIDIA, 11 mitów (teksty `myths.*`). Plan zasilania: X3D z dwoma CCD wymaga
       „Zrównoważonego”, plan zrównoważony bez trybu „Najlepsza wydajność” = uwaga. Do czasu 10c
       sprawdzenia są w zakładce „Kontrola systemu”. Typy wyników w `core/check_types.py`
-- [ ] 10c Zakładka „Windows” w oknie „Sprzęt i system” (sekcje, wartości obecne/zalecane, linki,
-      instrukcje BIOS, filtr, PL/EN)
+- [x] 10c Zakładka „Optymalizacja Windows” w oknie „Sprzęt i system” (+ *Narzędzia* →
+      *Optymalizacja Windows…*): podsumowanie wymagań gry, sekcje, znaczek siły dowodów przy
+      każdej pozycji, instrukcje i przyciski, filtr „tylko to, co wymaga uwagi”, mity, lista
+      kontrolna BIOS, „Odśwież” (ponowny odczyt w tle, okno aktualizuje się na miejscu).
+      Zakładka „Kontrola sprzętu” pokazuje już tylko sprzęt; przycisk na pasku otwiera zakładkę
+      z ostrzeżeniami. Testy GUI (6)
 - [ ] 10d Zmiany bez administratora (HKCU, `powercfg`) z kopią i przywracaniem — po teście u autora
 - [ ] 10e (opcjonalnie) Zmiany przez UAC: HAGS, przywrócenie MPO, wyłączenie nieużywanych funkcji VM
 
