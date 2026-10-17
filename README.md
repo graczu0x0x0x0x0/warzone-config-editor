@@ -137,6 +137,11 @@ Dokumentacja: [architektura i rozwój](docs/ARCHITECTURE.md) · [plan](docs/PLAN
 [raport: Windows 11](docs/RAPORT_WINDOWS.md) ·
 [zmiany](CHANGELOG.md). Wytyczne dla asystenta AI i twarde zasady zapisu: [CLAUDE.md](CLAUDE.md). Kod: Python 3.12 + PySide6; `src/wzce/core` (bez Qt) i `src/wzce/ui`.
 
+### Licencja
+
+[MIT](LICENSE). Projekt nie jest powiązany z Activision; Call of Duty i Warzone to znaki towarowe
+ich właścicieli.
+
 ---
 
 <a id="english"></a>
@@ -215,3 +220,8 @@ Start with [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (module map, data flow
 release checklist), then [`docs/FILE_FORMAT.md`](docs/FILE_FORMAT.md) and the rules in
 [`CLAUDE.md`](CLAUDE.md). Code: Python 3.12 + PySide6, Qt-free core in
 `src/wzce/core`, UI in `src/wzce/ui`.
+
+### License
+
+[MIT](LICENSE). Not affiliated with Activision; Call of Duty and Warzone are trademarks of their
+respective owners.

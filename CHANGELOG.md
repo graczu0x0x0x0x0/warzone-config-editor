@@ -17,6 +17,12 @@ miejscu: `src/wzce/__init__.py`.
   sekcja „Zmiany wprowadzone przez program” pozwala ją przywrócić (pojedynczo lub wszystkie).
   Zmiany są zablokowane, gdy gra działa. Zabezpieczeń (HVCI, Defender, Secure Boot), BIOS
   i ustawień wymagających administratora program nie zmienia.
+- **Licencja MIT** (plik `LICENSE`) — przygotowanie do publikacji kodu na GitHubie.
+
+### Zmieniono
+
+- Zrzuty ekranu w README nie zawierają już danych osobowych (prawdziwego SteamID, nazwy
+  użytkownika Windows w ścieżce).
 
 ## [1.3.0] — 2026-10-17
 
