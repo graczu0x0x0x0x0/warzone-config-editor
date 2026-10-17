@@ -3,16 +3,38 @@
 GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
 (`%LOCALAPPDATA%\Activision\Call of Duty\players\s.1.0.cod25.txt0` / `.txt1`).
 
-## Read first
-- `docs/FILE_FORMAT.md` — file grammar, A/B slot mechanism, special keys. **Source of truth for parsing.**
-- `docs/PLAN.md` — phased plan with checkboxes. Update checkboxes when finishing work.
-- `docs/KNOWLEDGE_BASE.md` — schema/conventions of the settings knowledge base (labels, descriptions, presets).
-- `docs/ARCHITECTURE.md` — module map, data flows, app data folders, testing and release checklist.
-- `docs/RAPORT.md` — research report for the user (Polish), optimization recommendations + sources.
-- `docs/RAPORT_SPRZET.md` — hardware/system detection report (Polish), basis of stage 9.
+## Status
+Released and working: **v1.2.0**, stages 0–9 of `docs/PLAN.md` done, ~340 tests green.
+Current version: `src/wzce/__init__.py`; what changed recently: `CHANGELOG.md` + `git log`.
+Remaining ideas are the unchecked `[ ]` items in `docs/PLAN.md` - nothing is in progress unless
+the user says so.
+
+## Getting oriented in a new session
+1. This file (rules + API), then `docs/ARCHITECTURE.md` (module map, data flows, release checklist).
+2. `docs/PLAN.md` for status/open items, top of `CHANGELOG.md` for the latest release.
+3. Before touching parsing/saving: `docs/FILE_FORMAT.md`. Before touching settings texts:
+   `docs/KNOWLEDGE_BASE.md`.
+4. Run `uv run pytest` once to confirm the environment works.
+
+Docs: `FILE_FORMAT.md` is the **source of truth for parsing**; `PLAN.md` has checkboxes - tick them
+when finishing work; `RAPORT.md` (research, Polish) and `RAPORT_SPRZET.md` (hardware/system
+detection, Polish) are historical reports with recommendations and sources.
+
+## Working with the user
+- Bigger features: first a short report/plan in Polish (what, how, risks), wait for approval,
+  then implement. The user approves stages one at a time ("Tak, zaczynaj etap N").
+- Anything only the game can confirm (does the game accept an edit?) is tested **by the user**
+  in game - ask for a concrete test, wait for the result, record it in `FILE_FORMAT.md`.
+- Finishing a change: pytest + ruff, update `PLAN.md` checkboxes, `CHANGELOG.md` entry (Polish),
+  README if user-visible, version bump for releases (see ARCHITECTURE.md §7).
+- Git: work directly on `main` (no remote, nothing to push); one commit per feature/fix;
+  release commits are tagged `vX.Y.Z`.
+- The user's own PC is the test machine (Steam, CoD on drive G:, NVIDIA GPU) - the live game
+  folder may be **read** (e.g. `uv run wzce --report`), never written without explicit consent.
 
 ## Communication
-- The user writes in **Polish** → answer in Polish. User-facing docs (`RAPORT.md`, `PLAN.md`, README) in Polish.
+- The user writes in **Polish** → answer in Polish. User-facing docs (`RAPORT.md`, `PLAN.md`,
+  `CHANGELOG.md`) in Polish; README is bilingual (PL first, then EN).
 - **Code, comments, docstrings, commit messages, dev docs: English.**
 - Comments: explain *why* and game-file quirks, not the obvious. Every module starts with a docstring
   describing its responsibility.
@@ -23,8 +45,16 @@ PyInstaller (`scripts/build_exe.py`). Package `src/wzce/`. `core/` must never im
 unit-testable); the UI lives in `ui/`. Use PySide6-**Essentials**, not `PySide6` (avoids WebEngine bloat;
 switching between them breaks the install - fix with `uv sync --reinstall-package pyside6-essentials --reinstall-package shiboken6`).
 
-Environment quirk: this machine intercepts TLS, so uv needs system certs - already set via
-`[tool.uv] native-tls = true` in `pyproject.toml`.
+Environment quirks (Windows 11, repo inside a Syncthing folder):
+- This machine intercepts TLS, so uv needs system certs - already set via
+  `[tool.uv] native-tls = true` in `pyproject.toml`.
+- Python's `Path.write_text()` on Windows writes **CRLF**. When a script edits repo files use
+  `write_bytes()` or `newline="\n"` (`.gitattributes` normalizes source to LF, but the working
+  copy and diffs get noisy).
+- `examples/**` and `*.txt0/1` are `-text` in `.gitattributes`: never re-save fixtures with an
+  editor or script - the round-trip tests compare bytes.
+- Shell heredocs mangle backticks/`\n`; for multi-line patches use the Edit tool or a script in
+  the scratchpad. `*.sync-conflict-*` files (Syncthing) are git-ignored - delete, never commit.
 
 ## Core API cheat sheet (`from wzce.core import ...`)
 - `discover()` -> `list[ConfigLocation]` (`.fileset`, `.scope`, `.kind`, `.title_code`, `.account_id`)
@@ -130,6 +160,7 @@ also set `QT_QPA_FONTDIR=C:/Windows/Fonts`, otherwise text renders as boxes.
 - UI strings: `src/wzce/data/i18n/{en,pl}.json` (flat keys, `{placeholder}` format). Every new key goes
   into **both** files with the same placeholders - `tests/test_i18n.py` enforces it.
 - Setting labels/descriptions/recommendations: `src/wzce/data/settings_db/<group>.json` for the
-  machine file and `account_<group>.json` for account files (+ `_meta.json`). Polish must be a real translation, enum values in
-  `recommend` must use the game's exact spelling - `tests/test_knowledge.py` enforces it.
+  machine file and `account_<group>.json` for account files (+ `_meta.json`). Polish must be a
+  real translation, enum values in `recommend` must use the game's exact spelling -
+  `tests/test_knowledge.py` enforces it.
 - New game setting -> add a sample file to `examples/`, run the knowledge tests, they list missing ids.
