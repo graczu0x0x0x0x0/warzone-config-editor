@@ -2,6 +2,7 @@
   "_language": {"code": "en", "name": "English"},
 
   "about.disclaimer": "This tool only edits text settings files and never touches the game or its process. Not affiliated with Activision.",
+  "about.text": "Warzone Config Editor {version}\n\nYour backups, history and templates are stored in:\n{data_dir}",
 
   "app.title": "Warzone Config Editor",
   "app.subtitle": "Settings editor for Call of Duty: Black Ops 7 / Warzone",
@@ -251,6 +252,7 @@
 
   "tools.game_reset": "Let the game reset all settings…",
   "tools.open_game_folder": "Open game settings folder",
+  "tools.about": "About Warzone Config Editor",
 
   "undo.tooltip": "Undo: {what} (Ctrl+Z)",
   "undo.many": "{count} settings",

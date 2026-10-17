@@ -39,9 +39,9 @@ FONT_SIZE_PT = 10
 MONO_FAMILY = "Cascadia Mono, Consolas, monospace"
 
 
-def icon_path(name: str) -> str:
-    """Absolute, forward-slash path of a bundled SVG icon (Qt stylesheets need that form)."""
-    return str(resources.files("wzce.data") / "icons" / f"{name}.svg").replace("\\", "/")
+def icon_path(name: str, suffix: str = "svg") -> str:
+    """Absolute, forward-slash path of a bundled icon (Qt stylesheets need that form)."""
+    return str(resources.files("wzce.data") / "icons" / f"{name}.{suffix}").replace("\\", "/")
 
 
 def apply_theme(app: QApplication) -> None:

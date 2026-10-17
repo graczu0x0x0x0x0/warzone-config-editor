@@ -2,6 +2,7 @@
   "_language": {"code": "pl", "name": "Polski"},
 
   "about.disclaimer": "Narzędzie edytuje wyłącznie tekstowe pliki ustawień i nigdy nie dotyka gry ani jej procesu. Nie jest powiązane z Activision.",
+  "about.text": "Warzone Config Editor {version}\n\nKopie zapasowe, historia i szablony są zapisywane w:\n{data_dir}",
 
   "app.title": "Warzone Config Editor",
   "app.subtitle": "Edytor ustawień Call of Duty: Black Ops 7 / Warzone",
@@ -251,6 +252,7 @@
 
   "tools.game_reset": "Przywróć ustawienia zalecane przez grę…",
   "tools.open_game_folder": "Otwórz folder ustawień gry",
+  "tools.about": "O programie",
 
   "undo.tooltip": "Cofnij: {what} (Ctrl+Z)",
   "undo.many": "ustawienia: {count}",

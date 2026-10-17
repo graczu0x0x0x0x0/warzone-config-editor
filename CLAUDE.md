@@ -100,7 +100,11 @@ uv run pytest
 uv run ruff check . && uv run ruff format .
 uv run wzce                   # start the GUI
 uv run wzce --report          # read-only text report of the real files
+uv run wzce --smoke-test      # build the UI headless and exit (0 = OK)
+uv run python scripts/build_exe.py [--onedir]   # PyInstaller build + smoke test -> dist/
+uv run python scripts/build_icon.py             # after editing data/icons/app.svg
 ```
+Version lives only in `src/wzce/__init__.py`; bump it and add a CHANGELOG.md entry per release.
 Run pytest + ruff before every commit. Tests import helpers with `from conftest import ...`.
 GUI tests run offscreen (`QT_QPA_PLATFORM` set in `tests/conftest.py`). For screenshots offscreen
 also set `QT_QPA_FONTDIR=C:/Windows/Fonts`, otherwise text renders as boxes.

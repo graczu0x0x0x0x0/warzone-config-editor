@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–7 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **wszystkie etapy 0–8 ukończone — wersja 1.0.0** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -141,9 +141,15 @@ tests/             # pytest, fixtures z examples/
       edycja plików konta potwierdzona
 
 ### Etap 8 — Dystrybucja
-- [ ] Ikona, nazwa, wersjonowanie
-- [ ] Build `.exe` (PyInstaller; ewentualnie Nuitka przy problemach z antywirusem)
-- [ ] README PL/EN z instrukcją, CHANGELOG
+- [x] Ikona (`data/icons/app.svg` → `app.png` + wielorozmiarowe `app.ico`, `scripts/build_icon.py`),
+      ikona okna i paska zadań (AppUserModelID)
+- [x] Wersjonowanie: jedno źródło `src/wzce/__init__.py` (1.0.0) → `pyproject.toml` (hatch),
+      metadane .exe, `--version`, okno „O programie”
+- [x] Build `.exe`: `scripts/build_exe.py` (PyInstaller, jeden plik 37 MB lub `--onedir` + zip),
+      automatyczny samotest `--smoke-test` zbudowanego pliku, suma SHA-256
+- [x] README PL/EN ze zrzutami (`docs/img/`), CHANGELOG
+- [ ] Pomysły na później: podpis cyfrowy .exe (mniej ostrzeżeń SmartScreen), lista urządzeń audio
+      Windows zamiast identyfikatorów, licencja projektu
 
 ## Otwarte pytania / ryzyka
 - Czy gra czyta slot z `.m`, czy zawsze oba? (zapis obu identycznie omija problem)

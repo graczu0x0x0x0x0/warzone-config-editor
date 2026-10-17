@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Warzone Config Editor app icon: amber crosshair (aim) over three setting sliders. -->
+  <rect x="8" y="8" width="240" height="240" rx="52" fill="#161a21" stroke="#3a4352" stroke-width="6"/>
+  <g stroke="#2a313d" stroke-width="10" stroke-linecap="round">
+    <path d="M52 84H204M52 128H204M52 172H204"/>
+  </g>
+  <g fill="#97a0b0">
+    <circle cx="58" cy="84" r="13"/>
+    <circle cx="198" cy="172" r="13"/>
+  </g>
+  <circle cx="128" cy="128" r="58" fill="none" stroke="#f0a034" stroke-width="16"/>
+  <g stroke="#f0a034" stroke-width="16" stroke-linecap="round">
+    <path d="M128 40V82M128 174V216M40 128H82M174 128H216"/>
+  </g>
+  <circle cx="128" cy="128" r="13" fill="#e7e9ee"/>
+</svg>

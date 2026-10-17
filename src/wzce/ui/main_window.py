@@ -43,6 +43,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from .. import __version__
 from ..core.backup import BackupManager
 from ..core.discovery import ConfigLocation, FileKind, Scope, classify_stem, discover
 from ..core.document import ConfigDocument
@@ -53,6 +54,7 @@ from ..core.i18n import Translator, language_name
 from ..core.knowledge import SUPPORTED_LANGUAGES, KnowledgeBase, KnowledgeEntry, localized
 from ..core.model import Setting
 from ..core.optimizer import Goal
+from ..core.paths import app_data_dir
 from ..core.process import GameRunningCheck, is_game_running
 from ..core.session import EditorSession
 from ..core.storage import SettingsFileSet
@@ -285,6 +287,10 @@ class MainWindow(QMainWindow):
         self.tools_menu.addSeparator()
         self.tools_menu.addAction(self.open_folder_action)
         self.tools_menu.addAction(self.open_backups_action)
+        self.tools_menu.addSeparator()
+        self.about_action = QAction(self)
+        self.about_action.triggered.connect(self.show_about)
+        self.tools_menu.addAction(self.about_action)
         self.tools_button.setMenu(self.tools_menu)
         row2.addWidget(self.tools_button)
         outer.addLayout(row2)
@@ -308,6 +314,7 @@ class MainWindow(QMainWindow):
         self.read_only_action.setToolTip(tr("readonly.explain"))
         self.open_folder_action.setText(tr("tools.open_game_folder"))
         self.open_backups_action.setText(tr("backup.open_folder"))
+        self.about_action.setText(tr("tools.about"))
         self.discard_button.setText(tr("toolbar.discard"))
         self.history_button.setText(tr("toolbar.history"))
         self.templates_button.setText(tr("toolbar.templates"))
@@ -833,6 +840,15 @@ class MainWindow(QMainWindow):
         self._update_status()
         key = "status.readonly_on" if session.fileset.is_read_only() else "status.readonly_off"
         self.statusBar().showMessage(self.tr(key), STATUS_TIMEOUT_MS)
+
+    def show_about(self) -> None:
+        text = "\n\n".join(
+            [
+                self.tr("about.text", version=__version__, data_dir=str(app_data_dir())),
+                self.tr("about.disclaimer"),
+            ]
+        )
+        self._show_message("info", self.tr("tools.about"), text)
 
     def _open_game_folder(self) -> None:
         if self.session is not None:

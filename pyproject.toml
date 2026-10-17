@@ -1,6 +1,6 @@
 [project]
 name = "warzone-config-editor"
-version = "0.1.0"
+dynamic = ["version"]
 description = "GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -14,6 +14,7 @@ wzce = "wzce.__main__:main"
 
 [dependency-groups]
 dev = [
+    "pyinstaller>=6.22.3",
     "pytest>=8.3",
     "pytest-qt>=4.5.0",
     "ruff>=0.8",
@@ -22,6 +23,9 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/wzce/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/wzce"]

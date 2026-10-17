@@ -3,6 +3,8 @@
 * no arguments  -> start the GUI
 * ``--report``  -> print a read-only report of the settings files found on this
                    machine (handy to check discovery and parsing on real data)
+* ``--smoke-test`` -> build the whole UI headless and exit (used to verify the
+                   frozen .exe: bundled data, Qt plugins, imports). Exit code 0 = OK.
 """
 
 from __future__ import annotations
@@ -10,6 +12,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+from . import __version__
 from .core import WzceError, discover, is_game_running
 
 
@@ -47,9 +50,15 @@ def report() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(prog="wzce", description="Warzone Config Editor")
     parser.add_argument("--report", action="store_true", help="print a read-only file report")
+    parser.add_argument("--smoke-test", action="store_true", help="build the UI headless and exit")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     args = parser.parse_args()
     if args.report:
         return report()
+    if args.smoke_test:
+        from .ui.app import smoke_test
+
+        return smoke_test()
     from .ui.app import run  # imported lazily so --report works without Qt
 
     return run()
