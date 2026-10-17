@@ -17,8 +17,10 @@ Data flow
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QCloseEvent, QKeySequence, QShortcut
+from collections.abc import Callable
+
+from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtGui import QAction, QCloseEvent, QDesktopServices, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QButtonGroup,
     QCheckBox,
@@ -32,6 +34,7 @@ from PySide6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPushButton,
     QScrollArea,
@@ -42,11 +45,14 @@ from PySide6.QtWidgets import (
 
 from ..core.backup import BackupManager
 from ..core.discovery import ConfigLocation, FileKind, Scope, discover
+from ..core.document import ConfigDocument
 from ..core.errors import GameRunningError, ValidationError, WzceError
+from ..core.hardware import HardwareInfo, detect_hardware
 from ..core.history import HistoryEntry
 from ..core.i18n import Translator, language_name
 from ..core.knowledge import SUPPORTED_LANGUAGES, KnowledgeBase, KnowledgeEntry, localized
 from ..core.model import Setting
+from ..core.optimizer import Goal
 from ..core.process import GameRunningCheck, is_game_running
 from ..core.session import EditorSession
 from ..core.storage import SettingsFileSet
@@ -55,6 +61,7 @@ from ..core.undo import CommandKind
 from .app_settings import AppSettings
 from .changes_panel import ChangesPanel
 from .history_dialog import HistoryDialog
+from .optimizer_dialog import OptimizerDialog
 from .setting_card import SettingCard
 from .templates_dialog import TemplatesDialog
 from .theme import repolish
@@ -77,6 +84,7 @@ class MainWindow(QMainWindow):
         backup_manager: BackupManager | None = None,
         game_running: GameRunningCheck = is_game_running,
         template_store: TemplateStore | None = None,
+        hardware_provider: Callable[[ConfigDocument | None], HardwareInfo] = detect_hardware,
         poll: bool = True,
     ) -> None:
         super().__init__()
@@ -85,6 +93,8 @@ class MainWindow(QMainWindow):
         self.settings = settings
         self._backup_manager = backup_manager
         self.template_store = template_store if template_store is not None else TemplateStore()
+        self._hardware_provider = hardware_provider
+        self._hardware: HardwareInfo | None = None  # detected lazily, once
         self._game_running_check = game_running
         self._game_running = False
         self.session: EditorSession | None = None
@@ -180,6 +190,9 @@ class MainWindow(QMainWindow):
         outer.setContentsMargins(16, 10, 16, 10)
         outer.setSpacing(8)
 
+        # Row 1: file + game state + editing actions (undo/redo/discard/save) + language.
+        # Row 2: finding settings (search, filters, recommendations) + dialogs/tools.
+        # Keep both rows roughly the same width: the wider one sets the window minimum.
         row1 = QHBoxLayout()
         row1.setSpacing(10)
         self.title_label = QLabel()
@@ -189,13 +202,27 @@ class MainWindow(QMainWindow):
         self.file_label = QLabel()
         row1.addWidget(self.file_label)
         self.file_combo = QComboBox()
-        self.file_combo.setMinimumWidth(340)
+        self.file_combo.setMinimumWidth(300)
         self.file_combo.activated.connect(self._on_file_activated)
         row1.addWidget(self.file_combo)
         self.game_pill = QLabel()
         self.game_pill.setObjectName("gamePill")
         row1.addWidget(self.game_pill)
         row1.addStretch()
+        # Plain text labels: the arrow glyphs are missing from many Windows UI fonts.
+        self.undo_button = QPushButton()
+        self.undo_button.clicked.connect(self.undo)
+        self.redo_button = QPushButton()
+        self.redo_button.clicked.connect(self.redo)
+        self.discard_button = QPushButton()
+        self.discard_button.clicked.connect(self._discard_all)
+        self.save_button = QPushButton()
+        self.save_button.setProperty("variant", "primary")
+        self.save_button.setMinimumWidth(120)
+        self.save_button.clicked.connect(self.save)
+        for button in (self.undo_button, self.redo_button, self.discard_button, self.save_button):
+            row1.addWidget(button)
+        row1.addSpacing(12)
         self.language_group = QButtonGroup(self)
         for index, code in enumerate(SUPPORTED_LANGUAGES):
             button = QPushButton(code.upper())
@@ -233,30 +260,37 @@ class MainWindow(QMainWindow):
         self.preset_combo.activated.connect(self._on_preset_changed)
         row2.addWidget(self.preset_combo)
         row2.addStretch()
-        # Plain text labels: the arrow glyphs are missing from many Windows UI fonts.
-        self.undo_button = QPushButton()
-        self.undo_button.clicked.connect(self.undo)
-        self.redo_button = QPushButton()
-        self.redo_button.clicked.connect(self.redo)
-        row2.addWidget(self.undo_button)
-        row2.addWidget(self.redo_button)
+        self.optimize_button = QPushButton()
+        self.optimize_button.clicked.connect(self.open_optimizer)
+        row2.addWidget(self.optimize_button)
         self.templates_button = QPushButton()
         self.templates_button.clicked.connect(self.open_templates)
         row2.addWidget(self.templates_button)
         self.history_button = QPushButton()
         self.history_button.clicked.connect(lambda: self.open_history())
         row2.addWidget(self.history_button)
-        self.reload_button = QPushButton()
-        self.reload_button.clicked.connect(self._reload)
-        row2.addWidget(self.reload_button)
-        self.discard_button = QPushButton()
-        self.discard_button.clicked.connect(self._discard_all)
-        row2.addWidget(self.discard_button)
-        self.save_button = QPushButton()
-        self.save_button.setProperty("variant", "primary")
-        self.save_button.setMinimumWidth(120)
-        self.save_button.clicked.connect(self.save)
-        row2.addWidget(self.save_button)
+        self.tools_button = QPushButton()
+        self.tools_menu = QMenu(self)
+        self.reload_action = QAction(self)
+        self.reload_action.triggered.connect(self._reload)
+        self.game_reset_action = QAction(self)
+        self.game_reset_action.triggered.connect(self.request_game_reset)
+        self.read_only_action = QAction(self)
+        self.read_only_action.setCheckable(True)
+        self.read_only_action.triggered.connect(self.set_files_read_only)
+        self.open_folder_action = QAction(self)
+        self.open_folder_action.triggered.connect(self._open_game_folder)
+        self.open_backups_action = QAction(self)
+        self.open_backups_action.triggered.connect(self._open_backup_folder)
+        self.tools_menu.addAction(self.reload_action)
+        self.tools_menu.addSeparator()
+        self.tools_menu.addAction(self.game_reset_action)
+        self.tools_menu.addAction(self.read_only_action)
+        self.tools_menu.addSeparator()
+        self.tools_menu.addAction(self.open_folder_action)
+        self.tools_menu.addAction(self.open_backups_action)
+        self.tools_button.setMenu(self.tools_menu)
+        row2.addWidget(self.tools_button)
         outer.addLayout(row2)
         return header
 
@@ -270,7 +304,14 @@ class MainWindow(QMainWindow):
         self.advanced_check.setText(tr("filter.advanced_mode"))
         self.vendor_check.setText(tr("filter.hide_other_vendors"))
         self.preset_label.setText(tr("toolbar.recommend_for"))
-        self.reload_button.setText(tr("toolbar.reload"))
+        self.tools_button.setText(tr("toolbar.tools"))
+        self.optimize_button.setText(tr("toolbar.optimize"))
+        self.reload_action.setText(tr("toolbar.reload"))
+        self.game_reset_action.setText(tr("tools.game_reset"))
+        self.read_only_action.setText(tr("readonly.toggle"))
+        self.read_only_action.setToolTip(tr("readonly.explain"))
+        self.open_folder_action.setText(tr("tools.open_game_folder"))
+        self.open_backups_action.setText(tr("backup.open_folder"))
         self.discard_button.setText(tr("toolbar.discard"))
         self.history_button.setText(tr("toolbar.history"))
         self.templates_button.setText(tr("toolbar.templates"))
@@ -722,6 +763,75 @@ class MainWindow(QMainWindow):
         if self._exec_dialog(dialog) and dialog.result_values:
             self._apply_restored_values(dialog.result_values)
 
+    # ========================================================== optimizer
+    @property
+    def hardware(self) -> HardwareInfo:
+        """Detected once per window (takes a few ms); GPU name comes from the file."""
+        if self._hardware is None:
+            self._hardware = self._hardware_provider(
+                self.session.original if self.session else None
+            )
+        return self._hardware
+
+    def open_optimizer(self) -> None:
+        if self.session is None:
+            return
+        preset = self.preset_combo.currentData() or Goal.COMPETITIVE.value
+        dialog = OptimizerDialog(
+            self.session, self.knowledge, self.tr, self.hardware, goal=Goal(preset), parent=self
+        )
+        if not self._exec_dialog(dialog) or not dialog.result_values:
+            return
+        touched = self.session.apply_raw_values(dialog.result_values, kind=CommandKind.BULK)
+        if touched:
+            self._after_changes(touched)
+        self.statusBar().showMessage(
+            self.tr("optimizer.applied", count=len(touched)), STATUS_TIMEOUT_MS
+        )
+
+    # ============================================================== tools
+    def request_game_reset(self) -> None:
+        """Set RecommendedSet=false: the game re-applies its own recommendations on start."""
+        session = self.session
+        if session is None:
+            return
+        if "RecommendedSet@0" not in session.document:
+            self._show_message("warning", self.tr("error.title"), self.tr("reset.not_available"))
+            return
+        if not self._ask(self.tr("reset.recommended_title"), self.tr("reset.recommended_text")):
+            return
+        session.set_value("RecommendedSet@0", False)
+        self._after_changes(["RecommendedSet@0"])
+        self.statusBar().showMessage(self.tr("status.game_reset"), STATUS_TIMEOUT_MS)
+
+    def set_files_read_only(self, read_only: bool) -> None:
+        session = self.session
+        if session is None:
+            return
+        if read_only and not self._ask(self.tr("readonly.toggle"), self.tr("readonly.explain")):
+            self.read_only_action.setChecked(False)
+            return
+        try:
+            session.fileset.set_read_only(read_only)
+        except OSError as exc:
+            self._show_message(
+                "error", self.tr("error.title"), self.tr("error.readonly", error=exc)
+            )
+        self.read_only_action.setChecked(session.fileset.is_read_only())
+        self._update_status()
+        key = "status.readonly_on" if session.fileset.is_read_only() else "status.readonly_off"
+        self.statusBar().showMessage(self.tr(key), STATUS_TIMEOUT_MS)
+
+    def _open_game_folder(self) -> None:
+        if self.session is not None:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.session.fileset.directory)))
+
+    def _open_backup_folder(self) -> None:
+        folder = self.session.backup_manager.root if self.session else None
+        if folder is not None:
+            folder.mkdir(parents=True, exist_ok=True)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
+
     # ========================================================== templates
     def open_templates(self) -> None:
         if self.session is None:
@@ -958,7 +1068,15 @@ class MainWindow(QMainWindow):
         self.save_button.setEnabled((count > 0 or needs_sync) and not self._game_running)
         self.save_button.setToolTip(tr("save.game_running_text") if self._game_running else "")
         self.discard_button.setEnabled(count > 0)
-        self.reload_button.setEnabled(session is not None)
+        for action in (
+            self.reload_action,
+            self.game_reset_action,
+            self.read_only_action,
+            self.open_folder_action,
+        ):
+            action.setEnabled(session is not None)
+        self.optimize_button.setEnabled(session is not None)
+        self.read_only_action.setChecked(bool(session) and session.fileset.is_read_only())
         self.history_button.setEnabled(session is not None)
         self.templates_button.setEnabled(session is not None)
         stack = session.undo_stack if session else None

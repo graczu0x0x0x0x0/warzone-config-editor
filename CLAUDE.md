@@ -40,6 +40,11 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   (changes/unchanged/skipped+reason); apply with `session.apply_raw_values(plan.values(...), kind=BULK)`.
   `exclusion_reason()` is THE rule for what may never be copied (hardware_specific, game_managed, read-only).
   `TemplateStore` keeps user templates as JSON (`format: wzce-template`).
+- Hardware (`core/hardware.py`): `detect_hardware(doc)` -> `HardwareInfo` (never raises; `None` =
+  unknown). Win32 calls are wrapped; parsing helpers are pure and unit-tested.
+  `MainWindow.hardware` detects lazily once (`hardware_provider` is injectable for tests).
+- Optimizer (`core/optimizer.py`): `recommend(kb, doc, hw, Goal, Bottleneck)` -> values + `Reason`
+  (i18n key + params); always feed the values through `plan_template` before applying.
 - `HistoryStore` (`core/history.py`): SAVE / GAME_CHANGE entries with diff + snapshot after;
   `last_seen.snapshot` drives `check_external_change`; `session.external_change` holds the latest
   GAME_CHANGE until the UI calls `acknowledge_external_change()`.

@@ -20,14 +20,12 @@ from pathlib import Path
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QAbstractItemView,
     QCheckBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
     QFormLayout,
     QHBoxLayout,
-    QHeaderView,
     QLabel,
     QLineEdit,
     QListWidget,
@@ -35,8 +33,6 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QSplitter,
-    QTableWidget,
-    QTableWidgetItem,
     QVBoxLayout,
     QWidget,
 )
@@ -47,7 +43,6 @@ from ..core.i18n import Translator
 from ..core.knowledge import KnowledgeBase, localized
 from ..core.session import EditorSession
 from ..core.templates import (
-    SkipReason,
     Template,
     TemplatePlan,
     TemplateSource,
@@ -57,7 +52,7 @@ from ..core.templates import (
     plan_template,
     template_from_document,
 )
-from .editors import display_value
+from .plan_table import PlanTable
 
 SETTINGS_SUFFIXES = (".txt0", ".txt1", ".txt")
 _TITLE_RE = re.compile(r"\b(cod\d+)\b")
@@ -188,35 +183,12 @@ class TemplatesDialog(QDialog):
         self.summary_label.setWordWrap(True)
         right_layout.addWidget(self.summary_label)
 
-        select_row = QHBoxLayout()
-        self.select_all = QPushButton(tr("templates.select_all"))
-        self.select_all.setProperty("variant", "link")
-        self.select_all.clicked.connect(lambda: self._set_all_checked(True))
-        self.select_none = QPushButton(tr("templates.select_none"))
-        self.select_none.setProperty("variant", "link")
-        self.select_none.clicked.connect(lambda: self._set_all_checked(False))
-        select_row.addWidget(self.select_all)
-        select_row.addWidget(self.select_none)
-        select_row.addStretch()
-        right_layout.addLayout(select_row)
-
-        self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(
-            [tr("history.col_setting"), tr("templates.col_current"), tr("templates.col_template")]
-        )
-        self.table.verticalHeader().setVisible(False)
-        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.table.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-        self.table.itemChanged.connect(lambda *_: self._update_apply_button())
-        right_layout.addWidget(self.table, 1)
-        self.skipped_label = QLabel()
-        self.skipped_label.setObjectName("cardRecommend")
-        self.skipped_label.setWordWrap(True)
-        right_layout.addWidget(self.skipped_label)
+        self.plan_table = PlanTable(tr, knowledge)
+        self.plan_table.selection_changed.connect(lambda _n: self._update_apply_button())
+        right_layout.addWidget(self.plan_table, 1)
+        # Short aliases kept for callers/tests.
+        self.table = self.plan_table.table
+        self.skipped_label = self.plan_table.skipped_label
         splitter.addWidget(right)
         splitter.setSizes([300, 800])
         root.addWidget(splitter, 1)
@@ -307,8 +279,6 @@ class TemplatesDialog(QDialog):
     def _show_selected(self) -> None:
         tr = self._tr
         template = self.current_template
-        self.table.blockSignals(True)
-        self.table.setRowCount(0)
         self.plan = None
         is_user = template is not None and template.source is TemplateSource.USER
         self.delete_button.setEnabled(is_user)
@@ -317,8 +287,7 @@ class TemplatesDialog(QDialog):
             for label in (self.name_label, self.description_label, self.meta_label):
                 label.setText("")
             self.summary_label.setText("")
-            self.skipped_label.setText("")
-            self.table.blockSignals(False)
+            self.plan_table.set_plan(None, self._session.document)
             self._update_apply_button()
             return
 
@@ -342,7 +311,6 @@ class TemplatesDialog(QDialog):
             document, self._kb, template.values, gpu_vendor=self._session.gpu_vendor
         )
         self.plan = plan
-        plan.changes.sort(key=lambda c: self._display_order(document.get(c.setting_id)))
         self.summary_label.setText(
             tr(
                 "templates.summary",
@@ -353,69 +321,14 @@ class TemplatesDialog(QDialog):
             if plan.changes
             else tr("templates.nothing_to_change")
         )
-        self.table.setRowCount(len(plan.changes))
-        for row, change in enumerate(plan.changes):
-            setting = document.get(change.setting_id)
-            entry = self._kb.entry_for(setting)
-            name = QTableWidgetItem(localized(entry.label, tr.language))
-            name.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable)
-            name.setCheckState(Qt.CheckState.Checked)
-            name.setData(Qt.ItemDataRole.UserRole, change.setting_id)
-            name.setToolTip(change.setting_id)
-            self.table.setItem(row, 0, name)
-            self.table.setItem(
-                row, 1, QTableWidgetItem(display_value(change.old_raw, setting, entry, tr))
-            )
-            self.table.setItem(
-                row, 2, QTableWidgetItem(display_value(change.new_raw, setting, entry, tr))
-            )
-        self.skipped_label.setText(self._skipped_text(plan))
-        self.skipped_label.setVisible(bool(plan.skipped))
-        self.table.blockSignals(False)
+        self.plan_table.set_plan(plan, document)
         self._update_apply_button()
-
-    def _display_order(self, setting) -> tuple[int, int, int]:
-        """Same order as the main window: category, subcategory, knowledge-base order."""
-        entry = self._kb.entry_for(setting)
-        group_ids = [g.id for g in self._kb.groups]
-        group_index = group_ids.index(entry.group) if entry.group in group_ids else len(group_ids)
-        subgroups = (
-            [s.id for s in self._kb.group(entry.group).subgroups]
-            if entry.group in group_ids
-            else []
-        )
-        sub_index = (
-            subgroups.index(entry.subgroup) if entry.subgroup in subgroups else len(subgroups)
-        )
-        entry_ids = list(self._kb.entries)
-        entry_index = entry_ids.index(setting.id) if setting.id in entry_ids else len(entry_ids)
-        return group_index, sub_index, entry_index
-
-    def _skipped_text(self, plan: TemplatePlan) -> str:
-        if not plan.skipped:
-            return ""
-        tr = self._tr
-        counts: dict[SkipReason, int] = {}
-        for reason in plan.skipped.values():
-            counts[reason] = counts.get(reason, 0) + 1
-        parts = [f"{tr(f'templates.skip_{reason.value}')}: {n}" for reason, n in counts.items()]
-        return f"{tr('templates.skipped_title')} " + " · ".join(parts)
 
     def checked_ids(self) -> list[str]:
-        ids = []
-        for row in range(self.table.rowCount()):
-            item = self.table.item(row, 0)
-            if item is not None and item.checkState() == Qt.CheckState.Checked:
-                ids.append(item.data(Qt.ItemDataRole.UserRole))
-        return ids
+        return self.plan_table.checked_ids()
 
     def _set_all_checked(self, checked: bool) -> None:
-        state = Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
-        self.table.blockSignals(True)
-        for row in range(self.table.rowCount()):
-            self.table.item(row, 0).setCheckState(state)
-        self.table.blockSignals(False)
-        self._update_apply_button()
+        self.plan_table.set_all_checked(checked)
 
     def _update_apply_button(self) -> None:
         count = len(self.checked_ids())

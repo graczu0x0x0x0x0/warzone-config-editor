@@ -29,7 +29,7 @@ One file per group keeps edits small and reviewable. The group of an entry is th
   "vendor": "nvidia",                          // nvidia | amd | intel: only relevant on that GPU
   "widget": "percent",                         // percent | spin | device | text (UI hint)
   "unit": "ms",                                // display unit (free text)
-  "rule": "physical_cores",                    // physical_cores | vram_fraction | refresh_rate_cap (stage 6)
+  "rule": "physical_cores",                    // physical_cores | vram_fraction | refresh_rate_cap (core/optimizer.py)
   "related": ["GPUUploadHeaps@0"]              // must reference existing entries
 }
 ```

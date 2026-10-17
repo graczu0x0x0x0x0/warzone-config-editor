@@ -505,3 +505,144 @@ def test_import_invalid_file_shows_error(window: MainWindow, tmp_path: Path) -> 
     dialog = _templates_dialog(window)
     assert dialog.import_path(bad) is None
     assert dialog.errors and "not a Warzone Config Editor template" in dialog.errors[0]
+
+
+# ------------------------------------------------------- stage 6: optimizer
+
+
+def _fake_hardware():
+    from wzce.core.hardware import HardwareInfo
+
+    return HardwareInfo(
+        cpu_name="AMD Ryzen 7 9800X3D 8-Core Processor",
+        physical_cores=8,
+        logical_cores=16,
+        ram_mb=65536,
+        gpu_name="NVIDIA GeForce RTX 5090",
+        gpu_vendor="nvidia",
+        vram_mb=32607,
+        refresh_hz=240,
+        max_refresh_hz=240,
+    )
+
+
+def _optimizer_dialog(window: MainWindow, hardware=None):
+    from wzce.ui.optimizer_dialog import OptimizerDialog
+
+    return OptimizerDialog(
+        window.session, window.knowledge, window.tr, hardware or _fake_hardware(), parent=window
+    )
+
+
+def _row_for(dialog, setting_id: str) -> int:
+    for row in range(dialog.plan_table.table.rowCount()):
+        if dialog.plan_table.table.item(row, 0).data(Qt.ItemDataRole.UserRole) == setting_id:
+            return row
+    raise AssertionError(f"{setting_id} not in plan")
+
+
+def test_optimizer_shows_hardware_and_reasons(window: MainWindow) -> None:
+    dialog = _optimizer_dialog(window)
+    labels = {k: v.text() for k, v in dialog.hardware_labels.items()}
+    assert labels["Processor"].startswith("AMD Ryzen 7 9800X3D")
+    assert labels["Cores"] == "8 physical / 16 threads"
+    assert labels["VRAM"] == "32 GB"
+    assert labels["Monitor"] == "240 Hz (max 240 Hz)"
+
+    table = dialog.plan_table.table
+    row = _row_for(dialog, "RendererWorkerCount@0")  # sample file has 9
+    assert (table.item(row, 1).text(), table.item(row, 2).text()) == ("9", "8")
+    assert table.item(row, 3).text() == "8 physical cores"
+    row = _row_for(dialog, "MaxFpsInGame@0")
+    assert table.item(row, 2).text() == "237 fps"
+    assert "240 Hz" in table.item(row, 3).text()
+    row = _row_for(dialog, "ShaderQuality@0")
+    assert table.item(row, 3).text() == "Competitive preset"
+
+
+def test_optimizer_bottleneck_changes_plan(window: MainWindow) -> None:
+    from wzce.core.optimizer import Bottleneck, Goal
+
+    dialog = _optimizer_dialog(window)
+    dialog.set_choice(Goal.BALANCED, Bottleneck.CPU)
+    row = _row_for(dialog, "GPUUploadHeaps@0")  # sample: true -> CPU-bound wants false
+    assert dialog.plan_table.table.item(row, 3).text() == "CPU-bound"
+    dialog.set_choice(Goal.BALANCED, Bottleneck.GPU)
+    ids = {
+        dialog.plan_table.table.item(r, 0).data(Qt.ItemDataRole.UserRole)
+        for r in range(dialog.plan_table.table.rowCount())
+    }
+    assert "GPUUploadHeaps@0" not in ids  # already true: nothing to change
+
+
+def test_optimizer_with_unknown_hardware(window: MainWindow) -> None:
+    from wzce.core.hardware import HardwareInfo
+
+    dialog = _optimizer_dialog(window, HardwareInfo())
+    assert dialog.hardware_labels["VRAM"].text() == "not detected"
+    ids = {
+        dialog.plan_table.table.item(r, 0).data(Qt.ItemDataRole.UserRole)
+        for r in range(dialog.plan_table.table.rowCount())
+    }
+    assert "RendererWorkerCount@0" not in ids  # needs a core count
+
+
+def test_open_optimizer_applies_one_undo_step(window: MainWindow) -> None:
+    window._hardware = _fake_hardware()
+
+    def run(dialog) -> bool:
+        dialog.apply_selected()
+        return True
+
+    window._exec_dialog = run
+    window.open_optimizer()
+    assert window.session.document.get("RendererWorkerCount@0").raw_value == "8"
+    assert window.session.document.get("MaxFpsInGame@0").raw_value == "237"
+    assert "optimized" in window.statusBar().currentMessage()
+    window.undo()
+    assert not window.session.is_dirty
+
+
+def test_hardware_is_detected_once(window: MainWindow) -> None:
+    calls = []
+    window._hardware = None
+    window._hardware_provider = lambda doc: calls.append(doc) or _fake_hardware()
+    assert window.hardware.vram_mb == 32607
+    assert window.hardware.vram_mb == 32607
+    assert len(calls) == 1 and calls[0] is window.session.original
+
+
+# ------------------------------------------------------------ stage 6: tools
+
+
+def test_game_reset_sets_recommended_flag(window: MainWindow) -> None:
+    window.request_game_reset()
+    assert window.session.document.get("RecommendedSet@0").raw_value == "false"
+    assert window.session.changed_ids() == {"RecommendedSet@0"}
+    window._ask = lambda *_a: False
+    window.undo()
+    window.request_game_reset()  # declined
+    assert not window.session.is_dirty
+
+
+def test_read_only_lock_toggle(window: MainWindow) -> None:
+    fileset = window.session.fileset
+    window.set_files_read_only(True)
+    assert fileset.is_read_only()
+    assert window.read_only_action.isChecked()
+    assert "read-only" in window.status_file.text()
+
+    _edit(window, "MaxFpsInGame@0", 144)
+    assert window.save() is True  # saving keeps working and keeps the lock
+    assert fileset.is_read_only()
+
+    window.set_files_read_only(False)
+    assert not fileset.is_read_only()
+    assert not window.read_only_action.isChecked()
+
+
+def test_read_only_lock_needs_confirmation(window: MainWindow) -> None:
+    window._ask = lambda *_a: False
+    window.set_files_read_only(True)
+    assert not window.session.fileset.is_read_only()
+    assert not window.read_only_action.isChecked()

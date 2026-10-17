@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–5 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–6 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -24,7 +24,8 @@ src/wzce/
     knowledge.py   # knowledge base loader + unknown-key fallback                [done]
     i18n.py        # UI translations with EN fallback, language listeners        [done]
     session.py     # EditorSession: original vs working copy, revert, save, disk change [done]
-    hardware.py    # GPU vendor from the file [done]; CPU/VRAM/monitor -> stage 6
+    hardware.py    # CPU cores/P-cores, VRAM, GPU, refresh rate, RAM (Win32)   [done]
+    optimizer.py   # goal + bottleneck + hardware -> values with reasons      [done]
   data/
     settings_db/       # baza wiedzy: _meta.json (grupy, presety) + plik na grupę  [done]
     i18n/en.json, pl.json                                                      [done]
@@ -33,7 +34,7 @@ src/wzce/
     main_window.py, setting_card.py, editors.py, changes_panel.py             [done]
     history_dialog.py                                                          [done]
     templates_dialog.py                                                        [done]
-    optimizer_wizard.py                                                        (stage 6)
+    optimizer_dialog.py, plan_table.py (shared preview table)                  [done]
 tests/             # pytest, fixtures z examples/
 ```
 
@@ -106,10 +107,20 @@ tests/             # pytest, fixtures z examples/
 - [x] Szablony w `%APPDATA%\WarzoneConfigEditor\templates`; testy: 22 rdzenia + 5 GUI
 
 ### Etap 6 — Optymalizator
-- [ ] Odczyt sprzętu (rdzenie fizyczne/P-cores, VRAM, producent GPU, odświeżanie)
-- [ ] Kreator: cel (FPS / balans / jakość), wąskie gardło CPU/GPU → propozycja zmian
-- [ ] Ukrywanie opcji innych producentów GPU
-- [ ] Przyciski: „Zalecane przez grę” (`RecommendedSet`), atrybut „tylko do odczytu”
+- [x] Wykrywanie sprzętu bez uprawnień administratora: procesor i rdzenie (P/E na hybrydowych
+      Intelach przez `GetLogicalProcessorInformationEx`), RAM, karta i VRAM (rejestr, dokładnie > 4 GB),
+      odświeżanie monitora (bieżące i maksymalne); każda sonda w razie błędu zwraca „nie wykryto”
+- [x] Reguły: `RendererWorkerCount` = rdzenie P lub fizyczne; `VideoMemoryScaleMP` z tabeli VRAM i celu;
+      `MaxFpsInGame` = odświeżanie − 3 (30–300); upscaler pasujący do producenta karty;
+      wąskie gardło CPU/GPU → Reflex boost i GPU Upload Heaps
+- [x] Kreator „Optymalizuj”: wykryty sprzęt, cel (4 presety), „co ogranicza FPS?” z podpowiedzią
+      o telemetrii, podgląd z kolumną „Dlaczego”, zastosowanie jako jeden krok Cofnij
+- [x] Ukrywanie opcji innych producentów GPU (od etapu 3) + pomijanie ich przez optymalizator
+- [x] Menu „Narzędzia”: wczytaj ponownie, „Przywróć ustawienia zalecane przez grę” (`RecommendedSet`),
+      blokada plików „tylko do odczytu” (z wyjaśnieniem skutków), foldery gry i kopii zapasowych
+- [x] Nagłówek przebudowany: minimalna szerokość okna 1278 px zamiast 1743 px (laptopy 1366 px)
+- [x] Wspólny widget podglądu zmian (`PlanTable`) dla szablonów i optymalizatora
+- [x] Testy: 25 rdzenia (parsowanie CPU, wybór karty, reguły) + 8 GUI
 
 ### Etap 7 — Plik konta (czułość, FOV)
 - [ ] Obsługa `players\<ID>\g.cod25.1.0.l.txt0/1` i `g.cod25.pm.1.0.l.txt0/1` (ten sam parser)

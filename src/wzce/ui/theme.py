@@ -147,7 +147,7 @@ def stylesheet() -> str:
         color: {c["text_faint"]}; background: {c["surface"]};
     }}
     QLineEdit[invalid="true"] {{ border-color: {c["danger"]}; }}
-    #searchBox {{ padding: 6px 10px; min-width: 260px; }}
+    #searchBox {{ padding: 6px 10px; min-width: 220px; }}
     QComboBox::drop-down {{ border: none; width: 24px; }}
     QComboBox::down-arrow {{ image: url("{down}"); width: 12px; height: 12px; }}
     QComboBox QAbstractItemView {{
