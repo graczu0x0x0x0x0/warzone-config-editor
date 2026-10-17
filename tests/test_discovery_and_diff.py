@@ -5,6 +5,8 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import pytest
+
 from conftest import COD25_TXT0
 from wzce.core import (
     ChangeKind,
@@ -15,6 +17,7 @@ from wzce.core import (
     diff_values,
     discover,
 )
+from wzce.core.diff import same_value
 from wzce.core.discovery import classify_stem
 
 
@@ -80,3 +83,26 @@ def test_classify_stem() -> None:
     assert classify_stem("g.cod26.1.0.l") == (Scope.ACCOUNT, FileKind.PROFILE, "cod26")
     assert classify_stem("g.cod25.pm.1.0.l") == (Scope.ACCOUNT, FileKind.PROFILE_PM, "cod25")
     assert classify_stem("s.1.0.cod25_bu") is None
+
+
+# Float round-off written back by the game (observed in the FOV test, 2026-10-17).
+@pytest.mark.parametrize(
+    ("a", "b", "same"),
+    [
+        ("119.900000", "119.900002", True),  # float32 round-trip by the game
+        ("0.031623", "0.031623", True),
+        ("119.900000", "119.000000", False),
+        ("0.850000", "0.860000", False),
+        ("250", "251", False),  # integers compare exactly
+        ("617.42", "617.420000", True),
+        ("true", "false", False),
+        ("Low", "Low", True),
+        ("Auto", "1.0", False),
+    ],
+)
+def test_same_value(a: str, b: str, same: bool) -> None:
+    assert same_value(a, b) is same
+
+
+def test_diff_ignores_float_round_off() -> None:
+    assert diff_values({"Fov@1": "119.900000"}, {"Fov@1": "119.900002"}) == []

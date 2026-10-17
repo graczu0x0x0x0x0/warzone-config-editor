@@ -37,10 +37,21 @@ in the same A/B slot, sharing the marker `g.cod25.1.0.l.m`. Findings:
   but those floats are common and the matches are not specific.
 
 Conclusion: nothing local binds the text to a checksum, so editing it is consistent with how
-the game writes it. **Still unverified:** whether the game overwrites it from the account's
-cloud profile at login. The editor marks account files as experimental and explains a
-one-value test (change FOV by 1, launch, compare); a revert by the game would show up as a
-GAME_CHANGE in History. Record the outcome here once tested.
+the game writes it.
+
+**In-game test #1 (2026-10-17, BO7 / cod25, Steam):**
+- Editor wrote `Fov@1 = 119.900000` to both slots (a spin-box bug made one arrow click 0.1° -
+  fixed: FOV now steps by whole degrees via the knowledge-base `step` hint).
+- The game's menu showed **120** - it displays FOV rounded to an integer.
+- On exit the game wrote **`119.900002`** into the other slot (13:22:51, marker flipped to 00).
+  That is 119.9 after a float32 round-trip: the game loaded *our* value and saved it back. A cloud
+  value would have come back as `120.000000`.
+- => **The game reads the account text file and does not replace it from the cloud** (at least for
+  FOV, on this account). A visible whole-degree change (e.g. 120 -> 115) would confirm it fully.
+
+Consequence for diffs: the game re-serializes floats through float32, so `0.750000` may come
+back as `0.750001`. `diff.same_value()` treats decimal values equal within 1e-6 relative /
+1e-5 absolute, so such round-off never shows up as a game change or pending edit.
 
 Other account-file facts:
 - `g.codNN.pm.1.0.l` holds a **second, independent FOV** (`Fov@0`, e.g. 90/95) next to the main

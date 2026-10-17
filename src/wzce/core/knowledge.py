@@ -136,6 +136,7 @@ class KnowledgeEntry:
     widget: str | None = None
     unit: str | None = None
     rule: str | None = None
+    step: float | None = None  # spin/slider increment, e.g. 1 for FOV degrees
     options: Mapping[str, LocalizedText] = field(default_factory=dict)  # enum option labels
     related: tuple[str, ...] = ()
 
@@ -238,7 +239,7 @@ class KnowledgeBase:
             raise KnowledgeError(f"{where}: id must be Key@Variant")
         allowed = {
             "subgroup", "label", "desc", "impact", "recommend", "tip", "flags", "vendor",
-            "widget", "unit", "rule", "options", "related",
+            "widget", "unit", "rule", "options", "related", "step",
         }  # fmt: skip
         unknown = set(raw) - allowed
         if unknown:
@@ -264,6 +265,11 @@ class KnowledgeBase:
             (raw.get("vendor") in (None, *VENDORS), f"bad vendor {raw.get('vendor')!r}"),
             (raw.get("widget") in (None, *WIDGETS), f"bad widget {raw.get('widget')!r}"),
             (raw.get("rule") in (None, *RULES), f"bad rule {raw.get('rule')!r}"),
+            (
+                raw.get("step") is None
+                or (isinstance(raw.get("step"), int | float) and raw["step"] > 0),
+                f"bad step {raw.get('step')!r}",
+            ),
         ]
         for ok, message in checks:
             if not ok:
@@ -287,6 +293,7 @@ class KnowledgeBase:
             widget=raw.get("widget"),
             unit=raw.get("unit"),
             rule=raw.get("rule"),
+            step=raw.get("step"),
             options=options,
             related=tuple(raw.get("related", [])),
         )

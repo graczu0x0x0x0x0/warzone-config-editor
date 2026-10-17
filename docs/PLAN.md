@@ -133,8 +133,12 @@ tests/             # pytest, fixtures z examples/
       pojazdy, akceleracja/wygładzanie), miks dźwięku, czat głosowy, jasność/HDR, HUD, auto-sprint
 - [x] Baner „edycja pliku konta jest eksperymentalna” + instrukcja testu w grze
 - [x] Testy: pokrycie bazy dla plików konta cod25/cod26 + 4 GUI (zapis FOV i czułości do obu slotów)
-- [ ] **Test w grze (Ty):** zmiana FOV o 1 → uruchomienie gry → czy wartość została (wynik dopisać
-      do `FILE_FORMAT.md`; jeśli gra nadpisuje z chmury — zablokować zapis plików konta)
+- [x] Test w grze #1: gra wczytała wartość z pliku tekstowego (zapisała ją z powrotem jako 119.900002),
+      nie nadpisała jej z chmury; menu gry zaokrągla FOV do liczby całkowitej
+- [x] Poprawki po teście: FOV zmienia się o pełne stopnie (pole `step` w bazie wiedzy); różnice
+      zaokrągleń float32 (119.900000 vs 119.900002) nie są już zgłaszane jako zmiana gry
+- [ ] Test w grze #2 (opcjonalny): wyraźna zmiana FOV (np. 120 → 115) → potwierdzenie w menu gry;
+      potem można zdjąć oznaczenie „eksperymentalne” z plików konta
 
 ### Etap 8 — Dystrybucja
 - [ ] Ikona, nazwa, wersjonowanie

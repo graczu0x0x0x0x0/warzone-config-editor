@@ -706,3 +706,17 @@ def test_template_from_account_file_keeps_aim_settings(window: MainWindow) -> No
         window.session.document, window.knowledge, "My aim", groups=["aim"]
     )
     assert {"Fov@1", "MouseHorizontalSensibility@0", "ADSSensitivity@1"} <= set(template.values)
+
+
+def test_fov_changes_by_whole_degrees(window: MainWindow) -> None:
+    """Regression: one arrow click used to set FOV to 119.9, shown in game as 120."""
+    _open_by_stem(window, "g.cod25.1.0.l")
+    window.navigate_to("Fov@1")
+    editor = window.cards["Fov@1"].editor
+    assert editor.spin.decimals() == 0
+    assert editor.spin.singleStep() == 1
+    editor.spin.stepBy(-1)
+    assert window.session.document.get("Fov@1").raw_value == "119.000000"
+    editor.slider.setValue(editor.slider.value() - 7)  # keyboard-like move snaps to degrees
+    value = float(window.session.document.get("Fov@1").raw_value)
+    assert value == int(value)

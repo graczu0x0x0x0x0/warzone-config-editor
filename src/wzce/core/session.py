@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .backup import BackupManager
-from .diff import SettingChange, diff_documents
+from .diff import SettingChange, diff_documents, same_value
 from .document import ConfigDocument, ValueChange
 from .errors import WzceError
 from .hardware import detect_gpu_vendor
@@ -170,7 +170,9 @@ class EditorSession:
         return {c.setting_id for c in self.pending_changes()}
 
     def is_changed(self, setting_id: str) -> bool:
-        return self.document.get(setting_id).raw_value != self.original.get(setting_id).raw_value
+        return not same_value(
+            self.document.get(setting_id).raw_value, self.original.get(setting_id).raw_value
+        )
 
     @property
     def is_dirty(self) -> bool:

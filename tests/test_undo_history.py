@@ -225,3 +225,16 @@ def test_corrupted_last_seen_behaves_like_first_run(session: EditorSession) -> N
     marker.write_bytes(b"garbage")
     assert session.history.check_external_change(session.fileset, session.original) is None
     assert ConfigDocument.from_bytes(marker.read_bytes()).values() == session.original.values()
+
+
+def test_game_float_round_off_is_not_a_change(session: EditorSession) -> None:
+    """The game rewrites 119.900000 as 119.900002 - not a game change, not a pending edit."""
+    session.set_value("VoiceVolume@0", 0.75)
+    session.save()
+    path = session.fileset.slots[0]
+    for slot in session.fileset.slots:
+        slot.write_bytes(slot.read_bytes().replace(b"= 0.750000 //", b"= 0.750001 //"))
+    assert b"0.750001" in path.read_bytes()
+    session.reload()
+    assert session.external_change is None
+    assert not session.is_changed("VoiceVolume@0")

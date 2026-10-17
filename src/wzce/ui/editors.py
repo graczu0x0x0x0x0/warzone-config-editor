@@ -255,22 +255,29 @@ class NumberEditor(ValueEditor):
         with_slider: bool,
         percent: bool = False,
         unit: str | None = None,
+        step: float | None = None,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
         self._is_float = is_float
         self._percent = percent
+        # Values snap to this increment (in file units), e.g. 1 for FOV degrees.
+        self._step = step
         self._factor = 100.0 if percent else 1.0
         self._min, self._max = minimum, maximum
 
         if is_float:
             spin: QSpinBox | QDoubleSpinBox = GuardedDoubleSpinBox(self)
             span = (maximum - minimum) * self._factor
-            spin.setDecimals(1 if percent else (3 if span <= 2 else 2))
+            shown_step = step * self._factor if step else None
+            if shown_step and float(shown_step).is_integer():
+                spin.setDecimals(0)
+            else:
+                spin.setDecimals(1 if percent else (3 if span <= 2 else 2))
             lo = max(minimum * self._factor, -SPIN_ABS_LIMIT)
             hi = min(maximum * self._factor, SPIN_ABS_LIMIT)
             spin.setRange(lo, hi)
-            spin.setSingleStep(1.0 if percent else (0.01 if span <= 2 else 0.1))
+            spin.setSingleStep(shown_step or (1.0 if percent else (0.01 if span <= 2 else 0.1)))
         else:
             spin = GuardedSpinBox(self)
             spin.setRange(int(max(minimum, INT32_MIN)), int(min(maximum, INT32_MAX)))
@@ -309,7 +316,11 @@ class NumberEditor(ValueEditor):
     def _value_from_slider(self, position: int) -> float:
         if not self._is_float:
             return float(position)
-        return self._min + (self._max - self._min) * position / FLOAT_SLIDER_STEPS
+        value = self._min + (self._max - self._min) * position / FLOAT_SLIDER_STEPS
+        if self._step:
+            value = round(value / self._step) * self._step
+            value = min(self._max, max(self._min, value))
+        return value
 
     def _current_value(self) -> int | float:
         shown = self.spin.value()
@@ -415,6 +426,7 @@ def create_editor(setting: Setting, entry: KnowledgeEntry, tr: Translator) -> Va
                 with_slider=constraint.is_slider_friendly and entry.widget != "spin",
                 percent=entry.widget == "percent" and setting.value_type is ValueType.FLOAT,
                 unit=entry.unit,
+                step=entry.step,
             )
         case _:
             editor = TextEditor(monospace=entry.widget == "device")

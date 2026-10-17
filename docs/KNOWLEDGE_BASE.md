@@ -30,7 +30,8 @@ One file per group keeps edits small and reviewable. The group of an entry is th
   "widget": "percent",                         // percent | spin | device | text (UI hint)
   "unit": "ms",                                // display unit (free text)
   "rule": "physical_cores",                    // physical_cores | vram_fraction | refresh_rate_cap (core/optimizer.py)
-  "related": ["GPUUploadHeaps@0"]              // must reference existing entries
+  "related": ["GPUUploadHeaps@0"],             // must reference existing entries
+  "step": 1                                    // spin/slider increment in file units (FOV: whole degrees)
 }
 ```
 

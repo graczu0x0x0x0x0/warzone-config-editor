@@ -242,6 +242,8 @@ def test_copy_loads(db_copy: Path) -> None:
         {"widget": "knob"},
         {"rule": "magic"},
         {"related": ["DoesNotExist@0"]},
+        {"step": 0},
+        {"step": "1"},
         {"colour": "red"},
     ],
     ids=lambda c: next(iter(c)),

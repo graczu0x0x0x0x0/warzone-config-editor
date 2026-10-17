@@ -11,6 +11,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
+from ..core.diff import same_value
 from ..core.errors import ValidationError
 from ..core.i18n import Translator
 from ..core.knowledge import IMPACT_DIMENSIONS, IMPACT_MAX, KnowledgeEntry, localized
@@ -197,7 +198,7 @@ class SettingCard(QFrame):
 
         if self._recommended_raw is not None:
             shown = display_value(self._recommended_raw, setting, self.entry, tr)
-            matches = self._recommended_raw == setting.raw_value
+            matches = same_value(self._recommended_raw, setting.raw_value)
             prefix = "✓ " if matches else ""
             self.recommend_label.setText(
                 prefix + tr("card.recommended", preset=self._preset_label, value=shown)

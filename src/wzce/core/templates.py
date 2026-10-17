@@ -33,6 +33,7 @@ from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
 
+from .diff import same_value
 from .document import ConfigDocument
 from .errors import ValidationError, WzceError
 from .knowledge import KnowledgeBase, KnowledgeEntry, localized
@@ -262,7 +263,7 @@ def plan_template(
             plan.skipped[setting_id] = SkipReason.INVALID
             plan.errors[setting_id] = str(exc)
             continue
-        if new_raw == setting.raw_value:
+        if same_value(new_raw, setting.raw_value):
             plan.unchanged.append(setting_id)
         else:
             plan.changes.append(PlannedChange(setting_id, setting.raw_value, new_raw))

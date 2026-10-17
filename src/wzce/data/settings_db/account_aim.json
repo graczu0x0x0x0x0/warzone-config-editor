@@ -9,6 +9,7 @@
         "pl": "Pole widzenia z perspektywy pierwszej osoby w stopniach, zapisane w profilu konta. Szersze FOV pokazuje więcej pola walki na brzegach ekranu (więcej wrogów w zasięgu wzroku), ale odległe cele są mniejsze, a wydajność odrobinę spada. 100–110 to popularny wybór w grze rankingowej; 120 daje efekt „rybiego oka”."
       },
       "unit": "°",
+      "step": 1,
       "impact": {"visibility": 3, "fps": 1},
       "recommend": {"competitive": 110, "balanced": 105, "quality": 100, "low_end": 100},
       "tip": {
@@ -25,6 +26,7 @@
         "pl": "Druga wartość FOV z perspektywy pierwszej osoby. Znajduje się w małym pliku konta „pm” i może różnić się od głównego FOV (np. 90 i 120). Nie wiadomo dokładnie, które tryby jej używają — w razie wątpliwości ustaw tak samo jak główne FOV."
       },
       "unit": "°",
+      "step": 1,
       "impact": {"visibility": 2},
       "recommend": {"competitive": 110, "balanced": 105, "quality": 100, "low_end": 100},
       "related": ["Fov@1"]
@@ -37,6 +39,7 @@
         "pl": "Pole widzenia w trybach i widokach z trzeciej osoby. Wyższe pokazuje więcej wokół postaci."
       },
       "unit": "°",
+      "step": 1,
       "impact": {"visibility": 2},
       "recommend": {"competitive": 90, "balanced": 90},
       "related": ["ThirdPersonFov@0"]
@@ -49,6 +52,7 @@
         "pl": "Druga wartość FOV z trzeciej osoby (pliki cod26 i „pm”); przeznaczenie nieudokumentowane."
       },
       "unit": "°",
+      "step": 1,
       "flags": ["advanced"],
       "related": ["ThirdPersonFov@1"]
     },
@@ -60,6 +64,7 @@
         "pl": "FOV używane na przenośnych PC (Steam Deck, ROG Ally itp.). Na komputerze stacjonarnym bez znaczenia."
       },
       "unit": "°",
+      "step": 1,
       "flags": ["advanced"]
     },
     "ADSFovScaling@0": {
