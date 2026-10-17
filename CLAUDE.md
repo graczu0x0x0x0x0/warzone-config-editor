@@ -27,9 +27,10 @@ detection, Polish) are historical reports with recommendations and sources.
   in game - ask for a concrete test, wait for the result, record it in `FILE_FORMAT.md`.
 - Finishing a change: pytest + ruff, update `PLAN.md` checkboxes, `CHANGELOG.md` entry (Polish),
   README if user-visible, version bump for releases (see ARCHITECTURE.md §7).
-- Git: work directly on `main` (no remote, nothing to push); one commit per feature/fix;
-  release commits are tagged `vX.Y.Z`.
-- The user's own PC is the test machine (Steam, CoD on drive G:, NVIDIA GPU) - the live game
+- Git: work directly on `main`; one commit per feature/fix; release commits are tagged `vX.Y.Z`.
+  Remote `origin` = GitHub (`graczu0x0x0x0x0/warzone-config-editor`): push and create releases
+  only when the user asks. Commit email is the GitHub noreply address (repo-local config).
+- The user's own PC is the test machine (Steam, CoD on drive H: NVMe, NVIDIA GPU) - the live game
   folder may be **read** (e.g. `uv run wzce --report`), never written without explicit consent.
 
 ## Communication

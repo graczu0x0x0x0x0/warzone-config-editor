@@ -6,6 +6,12 @@
 *Data: 2026-10-17 · Wszystkie dane poniżej odczytałem z Twojego PC bez uprawnień administratora
 (WMI/CIM, rejestr, `nvidia-smi`, EDID monitora, manifesty Steam). Nic nie zostało zmienione.*
 
+> **Aktualizacja (2026-10-17, ponowny odczyt `wzce --system-report`):** oba zalecenia z punktu 1
+> są zrobione — profil pamięci w BIOS jest włączony (RAM pracuje na **6200 MT/s** zamiast 4800),
+> a gra została przeniesiona na dysk **NVMe (H: — Samsung SSD 980 1 TB)**. Przy okazji: VBS już
+> nie działa (wirtualizacja SVM jest wyłączona w BIOS, więc nie startuje hypervisor).
+> Tabela poniżej pokazuje stan aktualny.
+
 ---
 
 ## 1. Najważniejsze: co już znalazłem na Twoim komputerze
@@ -13,31 +19,33 @@
 | Obszar | Wykryto | Ocena |
 |---|---|---|
 | Procesor | AMD Ryzen 7 9800X3D, 8 rdzeni / 16 wątków, L3 96 MB (3D V-Cache), AM5 | ✅ |
-| **RAM** | **2 × 32 GB DDR5 Patriot „6400 Series”, kanały A+B (dual channel), pracuje na 4800 MT/s przy 1,10 V** | ⚠️ **EXPO wyłączone** |
+| RAM | 2 × 32 GB DDR5 Patriot „6400 Series”, kanały A+B (dual channel), pracuje na **6200 MT/s** (wcześniej 4800 MT/s) | ✅ profil EXPO/XMP działa |
 | Płyta / BIOS | Gigabyte X870E AORUS ELITE WIFI7, BIOS F12 (21.05.2026) | ✅ |
 | Karta | NVIDIA GeForce RTX 5090, 32 GB, sterownik 617.42, limit mocy 600 W | ✅ |
 | Złącze karty | PCIe 5.0 x16 (maksimum dla tej karty) | ✅ |
 | Resizable BAR | włączony (BAR1 = 32 768 MB = cały VRAM) | ✅ |
 | Druga karta | zintegrowane AMD Radeon Graphics (w procesorze) | ℹ️ |
 | Monitor | MSI MAG 321U X24 (2024), 3840×2160 @ 240 Hz — maksimum | ✅ |
-| **Dysk z grą** | **G: — WD SATA SSD 1 TB**; w komputerze są też 2 dyski NVMe (Samsung 980, Lexar NM800 PRO) | ⚠️ |
+| Dysk z grą | **H: — Samsung SSD 980 1 TB (NVMe)**, wolne ~797 GB (wcześniej G: — WD SATA SSD 1 TB) | ✅ |
 | Windows | 11 Pro 25H2 (build 26200), plan zasilania „Wysoka wydajność”, HAGS włączony | ✅ |
-| Zabezpieczenia | VBS (wirtualizacja zabezpieczeń) działa, integralność pamięci (HVCI) wyłączona | ℹ️ |
+| Zabezpieczenia | VBS (wirtualizacja zabezpieczeń) nie działa — SVM wyłączone w BIOS; integralność pamięci (HVCI) wyłączona | ℹ️ |
 | Sterownik vs gra | 617.42, a gra zaleca minimum 591.59 (z pliku ustawień gry) | ✅ |
 
 ### Co z tego wynika
 
-1. **Włącz EXPO w BIOS — to najważniejsza rzecz w tym raporcie.** Kości 6400 MT/s pracują jako
-   4800 MT/s z napięciem bazowym 1,10 V. Ryzen 9800X3D ma 96 MB pamięci podręcznej, więc mniej
-   zależy od RAM niż inne procesory. Warzone jest jednak mocno ograniczany przez procesor, a szybszy
-   RAM poprawia zwłaszcza 1% low (płynność w walkach). W BIOS Gigabyte szukaj pozycji
-   *Extreme Memory Profile (X.M.P.) / EXPO* → *Profile1*. Dla 9800X3D typowy „złoty środek” to
-   6000 MT/s z UCLK=MEMCLK (1:1). Profil 6400 może wymusić tryb 1:2 — wtedy warto ręcznie ustawić 6000.
-2. **Przenieś grę na NVMe (opcjonalne).** SATA SSD wystarcza do grania, ale Warzone dużo doczytuje
-   (strumieniowanie świata i tekstur, kompilacja shaderów). NVMe skraca wczytywanie i ogranicza
-   doczytywanie tekstur. Battle.net/Steam mają funkcję przeniesienia gry.
-3. VBS: integralność pamięci jest wyłączona, więc koszt jest niewielki. Nie ruszałbym tego bez potrzeby,
-   to kompromis bezpieczeństwa.
+1. ✅ **Profil pamięci włączony — zrobione.** Pierwotnie kości 6400 MT/s pracowały jako 4800 MT/s
+   (prędkość JEDEC), teraz pracują na 6200 MT/s. Warzone jest mocno ograniczany przez procesor,
+   a szybszy RAM poprawia zwłaszcza 1% low (płynność w walkach), nawet przy 96 MB pamięci
+   podręcznej 9800X3D. Jedna rzecz do sprawdzenia w BIOS: czy przy 6200 kontroler pamięci pracuje
+   w trybie **UCLK=MEMCLK (1:1)**. Windows tego nie pokazuje. Przy 6200 tryb 1:1 nie zawsze jest
+   stabilny i płyta może przełączyć się na 1:2, który jest wolniejszy niż 6000 w 1:1 — wtedy
+   lepiej ustawić 6000 MT/s ręcznie. Napięcie podawane przez Windows (1,10 V) pochodzi z SMBIOS
+   i przy profilu EXPO/XMP często nie odpowiada rzeczywistemu.
+2. ✅ **Gra przeniesiona na NVMe — zrobione.** Wcześniej była na SATA SSD (G:). Teraz jest na
+   Samsungu 980 (H:), co skraca wczytywanie i ogranicza doczytywanie tekstur w trakcie gry.
+3. VBS nie działa (SVM wyłączone w BIOS), a integralność pamięci jest wyłączona, więc nie ma
+   tu kosztu dla FPS. Szczegóły i konsekwencje (WSL, maszyny wirtualne) są w
+   [`RAPORT_WINDOWS.md`](RAPORT_WINDOWS.md).
 
 ---
 
@@ -68,7 +76,7 @@ heurystyka · ❌ niemożliwe bez sterownika jądra (tego robić nie będziemy)
 | Prędkość pracy (MT/s) | `ConfiguredClockSpeed` | ✅ |
 | Napięcie | `ConfiguredVoltage` | ✅ |
 | Dual / single channel, zajęte sloty | `BankLabel` (CHANNEL A/B) + `Win32_PhysicalMemoryArray` | ✅ |
-| **EXPO / XMP włączone?** | brak bezpośredniej flagi; **heurystyka**: prędkość na poziomie JEDEC (DDR5 ≤ 5600, DDR4 ≤ 3200) i napięcie bazowe (DDR5 1,1 V / DDR4 1,2 V), a kości mają wyższą znamionową prędkość (z numeru części) | 🟡 wysoka trafność — u Ciebie jednoznaczne |
+| **EXPO / XMP włączone?** | brak bezpośredniej flagi; **heurystyka**: prędkość na poziomie JEDEC (DDR5 ≤ 5600, DDR4 ≤ 3200) i napięcie bazowe (DDR5 1,1 V / DDR4 1,2 V), a kości mają wyższą znamionową prędkość (z numeru części) | 🟡 wysoka trafność — u Ciebie poprawnie wykryło i stan wyłączony (4800), i włączony (6200) |
 | **Opóźnienie CL** | dokładne timingi są tylko w SPD, a ich odczyt wymaga sterownika SMBus | ❌ |
 | CL **znamionowe** z numeru części | dekodowanie oznaczeń popularnych marek, np. G.Skill `F5-6000J3038F16G` → 6000 CL30, Kingston `KF560C30…` → 6000 CL30, Corsair `…6000C30` → 6000 CL30 | 🟡 (dla znanych marek; u Ciebie numer nie zawiera CL) |
 
@@ -137,7 +145,8 @@ Edytor nie powinien tego robić — to ryzyko i potencjalny konflikt z anty-chea
 
 ### A. Pasek „Twój sprzęt” na górze strony
 
-Jedna zwarta linia pod nagłówkiem, z ikonami i krótkimi etykietami:
+Jedna zwarta linia pod nagłówkiem, z ikonami i krótkimi etykietami (przykład na danych z pierwszego
+odczytu, przed włączeniem EXPO i przeniesieniem gry):
 
 ```
 🖥 Ryzen 7 9800X3D · 8C/16T · 96 MB L3   ▸ 64 GB DDR5 · 4800 MT/s ⚠ EXPO   ▸ RTX 5090 · 32 GB · 617.42
@@ -162,7 +171,7 @@ Specyfikacja jest kopiowana do schowka tylko na Twoje kliknięcie — nic nie wy
 | **Single channel RAM** | 1 kość albo obie w tym samym kanale | 🔴 wysoka | przełóż kości do slotów A2/B2 |
 | Za mało RAM | < 16 GB | 🟠 | Warzone zaleca 16 GB+ |
 | **Gra na HDD** | dysk z grą to HDD | 🔴 | przenieś na SSD |
-| Gra na SATA, a jest NVMe | tak jak u Ciebie | 🟡 niska | przeniesienie opcjonalne |
+| Gra na SATA, a jest NVMe | tak było u Ciebie przed przeniesieniem gry | 🟡 niska | przeniesienie opcjonalne |
 | Mało miejsca na dysku z grą | < 50 GB wolnego | 🟠 | aktualizacje mogą się nie zmieścić |
 | **Monitor poniżej maks. odświeżania** | np. 60 Hz na monitorze 144 Hz | 🔴 | ustaw w Windows → Ekran → Zaawansowane |
 | Sterownik starszy niż zalecany przez grę | porównanie z plikiem gry | 🟠 | zaktualizuj sterownik |
