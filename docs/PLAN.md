@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–2 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–3 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -22,14 +22,15 @@ src/wzce/
     templates.py   # szablony: zapis/odczyt/nakładanie częściowe, import/export
     knowledge.py   # knowledge base loader + unknown-key fallback                [done]
     i18n.py        # UI translations with EN fallback, language listeners        [done]
-    hardware.py    # CPU/VRAM/GPU/monitor → rekomendacje
+    session.py     # EditorSession: original vs working copy, revert, save, disk change [done]
+    hardware.py    # GPU vendor from the file [done]; CPU/VRAM/monitor -> stage 6
   data/
     settings_db/       # baza wiedzy: _meta.json (grupy, presety) + plik na grupę  [done]
     i18n/en.json, pl.json                                                      [done]
   ui/              # PySide6
-    main_window.py, category_nav.py, setting_card.py, widgets/ (toggle, slider, segmented…)
-    changes_panel.py, history_dialog.py, templates_dialog.py, optimizer_wizard.py
-    theme.qss
+    app.py, app_settings.py, theme.py                                         [done]
+    main_window.py, setting_card.py, editors.py, changes_panel.py             [done]
+    history_dialog.py, templates_dialog.py, optimizer_wizard.py               (stages 4-6)
 tests/             # pytest, fixtures z examples/
 ```
 
@@ -64,12 +65,16 @@ tests/             # pytest, fixtures z examples/
 - [ ] Baza wiedzy dla pliku konta (czułość, FOV — 67 ustawień) → razem z etapem 7
 
 ### Etap 3 — Interfejs MVP
-- [ ] Okno główne: pasek narzędzi, nawigacja kategorii, lista kart, pasek statusu
-- [ ] Kontrolki: toggle, suwak+pole, przyciski segmentowe, lista rozwijana, pole tekstowe, pole tylko-do-odczytu
-- [ ] Panel „Oczekujące zmiany” (było → będzie), Zapisz / Odrzuć
-- [ ] Wyszukiwarka, filtr „tylko zmienione”, tryb Prosty/Zaawansowany
-- [ ] Ciemny motyw, przełącznik PL/EN, zapamiętywanie ustawień okna
-- [ ] Wskaźnik „gra uruchomiona” i stan plików (txt0/txt1 zgodne?)
+- [x] Okno główne: nagłówek (plik, filtry, akcje), nawigacja kategorii z licznikami zmian, karty, pasek statusu
+- [x] Kontrolki: przełącznik, suwak+pole (także %), przyciski segmentowe, lista rozwijana, pole tekstowe; blokada kółka myszy
+- [x] Karta: opis PL/EN, odznaki wpływu / producenta GPU / „Nowe” / kłódka, zalecenie wybranego presetu + „Użyj zalecanej”, „Przed zmianą”, cofnięcie
+- [x] Panel „Oczekujące zmiany” (było → będzie, przejście do ustawienia, cofnięcie), Zapisz / Odrzuć / Wczytaj ponownie
+- [x] Wyszukiwarka (PL/EN/klucz), widok „Zmienione”, tryb Zaawansowany, ukrywanie opcji innych producentów GPU
+- [x] Ciemny motyw, przełącznik PL/EN bez restartu, zapamiętywanie języka, filtrów, presetu, ostatniego pliku i układu okna
+- [x] Wskaźnik „gra uruchomiona” (blokuje zapis), ostrzeżenie o różnicy txt0/txt1, automatyczne przeładowanie, gdy gra zmieni plik
+- [x] Pytanie o niezapisane zmiany przy zmianie pliku i zamykaniu; Ctrl+S, Ctrl+F
+- [x] Testy GUI (pytest-qt, offscreen) — 18 scenariuszy
+- [ ] Opisy w bazie wiedzy dla 6 ustawień tylko z BO6 (cod24) — dziś pokazują się jako „Nowe”
 
 ### Etap 4 — Historia i cofanie
 - [ ] Cofnij/Ponów w sesji (`QUndoStack`, Ctrl+Z / Ctrl+Y)

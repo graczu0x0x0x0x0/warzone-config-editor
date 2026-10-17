@@ -268,6 +268,20 @@ class ConfigDocument:
         self.lines[setting.line_index] = setting.line
         return change
 
+    def restore_raw(self, setting_id: str, raw_value: str) -> ValueChange:
+        """Put back an exact raw value taken from this file earlier (revert / undo).
+
+        Skips validation and normalization on purpose: the raw text came from the
+        game file itself, so re-formatting it could turn e.g. ``"1"`` into
+        ``"1.000000"`` and leave a phantom diff behind.
+        """
+        setting = self.get(setting_id)
+        change = ValueChange(setting_id, setting.raw_value, raw_value)
+        if not change.is_noop:
+            setting.raw_value = raw_value
+            self.lines[setting.line_index] = setting.line
+        return change
+
     def apply_values(
         self,
         values: Mapping[str, object],

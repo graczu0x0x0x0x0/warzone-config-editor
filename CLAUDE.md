@@ -37,6 +37,21 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
 - `Translator(lang)`: `tr("key", **params)`, `.set_language()`, `.add_listener(cb)` for live re-labelling
 - Inject `game_running=lambda: False` in tests; `WZCE_DATA_DIR` redirects app data (autouse fixture does it).
 
+## UI architecture (`src/wzce/ui/`)
+- `EditorSession` (core) is the single source of truth; widgets read it, edits flow
+  card `value_edited` -> `MainWindow._on_value_edited` -> session -> refresh card/nav/changes panel.
+- The card page is rebuilt on category/search/filter/language change (`_render_page`).
+  Never rebuild synchronously inside a card's own signal: use `QTimer.singleShot(0, self, ...)`.
+  Delayed callbacks touching cards must use the context-object form `singleShot(ms, widget, fn)`
+  so Qt cancels them when the widget dies (a captured card caused "C++ object already deleted").
+- Styling only via `theme.py` tokens + dynamic properties (`changed`, `variant`, `kind`); call
+  `repolish(widget)` after changing a property. Icons: `data/icons/*.svg`.
+- Editors: `editors.create_editor()`; sliders/spins/combos are wheel-guarded (no value change
+  while scrolling the page). `set_raw()` must never emit `edited`.
+- All dialogs go through `MainWindow._ask/_prompt_unsaved/_show_message` - tests replace them;
+  a real modal `exec()` hangs the headless test run.
+- MVP edits machine-scope files only (`s.1.0.codNN`); account files come in stage 7.
+
 ## Hard rules for touching game files
 1. Never write while `cod.exe` is running.
 2. Always back up `txt0`, `txt1` and `.m` before writing.
@@ -62,9 +77,12 @@ tests/       pytest
 uv sync
 uv run pytest
 uv run ruff check . && uv run ruff format .
-uv run python -m wzce        # read-only report of real files (GUI comes in stage 3)
+uv run wzce                   # start the GUI
+uv run wzce --report          # read-only text report of the real files
 ```
 Run pytest + ruff before every commit. Tests import helpers with `from conftest import ...`.
+GUI tests run offscreen (`QT_QPA_PLATFORM` set in `tests/conftest.py`). For screenshots offscreen
+also set `QT_QPA_FONTDIR=C:/Windows/Fonts`, otherwise text renders as boxes.
 
 ## i18n and knowledge base
 - UI strings: `src/wzce/data/i18n/{en,pl}.json` (flat keys, `{placeholder}` format). Every new key goes

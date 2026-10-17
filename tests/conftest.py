@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 
 import pytest
+
+# GUI tests run headless; must be set before pytest-qt creates the QApplication.
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from wzce.core import ConfigDocument, SettingsFileSet
 

@@ -1,0 +1,827 @@
+"""Main window: header (file, filters, actions), category navigation, cards, changes panel.
+
+Data flow
+---------
+* ``EditorSession`` (core) is the only state. Widgets read from it; edits go
+  through ``_on_value_edited`` / ``_on_revert`` which update the session and then
+  refresh the affected card, the navigation counters and the changes panel.
+* The card page is rebuilt from scratch when the category, search, filters or
+  language change (~170 cards max, fast enough). Rebuilds triggered from inside a
+  card's own signal are deferred with ``QTimer.singleShot(0, ...)`` so the card is
+  never deleted while its handler is still running.
+* Every dialog goes through ``_ask`` / ``_prompt_unsaved`` / ``_show_message`` so tests can
+  replace them.
+"""
+
+from __future__ import annotations
+
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QCloseEvent, QKeySequence, QShortcut
+from PySide6.QtWidgets import (
+    QButtonGroup,
+    QCheckBox,
+    QComboBox,
+    QFileDialog,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QSplitter,
+    QVBoxLayout,
+    QWidget,
+)
+
+from ..core.backup import BackupManager
+from ..core.discovery import ConfigLocation, FileKind, Scope, discover
+from ..core.errors import GameRunningError, ValidationError, WzceError
+from ..core.i18n import Translator, language_name
+from ..core.knowledge import SUPPORTED_LANGUAGES, KnowledgeBase, KnowledgeEntry, localized
+from ..core.model import Setting
+from ..core.process import GameRunningCheck, is_game_running
+from ..core.session import EditorSession
+from ..core.storage import SettingsFileSet
+from .app_settings import AppSettings
+from .changes_panel import ChangesPanel
+from .setting_card import SettingCard
+from .theme import repolish
+
+NAV_ALL = "__all__"
+NAV_CHANGED = "__changed__"
+OPEN_OTHER = "__open__"
+GAME_POLL_MS = 2000
+STATUS_TIMEOUT_MS = 8000
+
+
+class MainWindow(QMainWindow):
+    def __init__(
+        self,
+        knowledge: KnowledgeBase,
+        tr: Translator,
+        settings: AppSettings,
+        *,
+        locations: list[ConfigLocation] | None = None,
+        backup_manager: BackupManager | None = None,
+        game_running: GameRunningCheck = is_game_running,
+        poll: bool = True,
+    ) -> None:
+        super().__init__()
+        self.knowledge = knowledge
+        self.tr = tr
+        self.settings = settings
+        self._backup_manager = backup_manager
+        self._game_running_check = game_running
+        self._game_running = False
+        self.session: EditorSession | None = None
+        self.cards: dict[str, SettingCard] = {}
+        self._nav_key = "display"
+        self._disk_warning_shown = False
+
+        # Only machine-level settings are editable in the MVP (account files: stage 7).
+        all_locations = discover() if locations is None else locations
+        self._locations = [
+            loc
+            for loc in all_locations
+            if loc.scope is Scope.MACHINE and loc.kind is FileKind.SETTINGS
+        ]
+        self._extra_files: list[SettingsFileSet] = []
+        self._entry_order = {sid: i for i, sid in enumerate(knowledge.entries)}
+
+        self.resize(1440, 900)
+        self._build_ui()
+        self._restore_window_state()
+        self._apply_texts()
+        self._populate_file_combo()
+        self._open_initial_file()
+        tr.add_listener(self._on_language_changed)
+
+        self._timer = QTimer(self)
+        self._timer.setInterval(GAME_POLL_MS)
+        self._timer.timeout.connect(self._poll)
+        self._poll()
+        if poll:
+            self._timer.start()
+
+    # =================================================================== UI
+    def _build_ui(self) -> None:
+        central = QWidget()
+        root = QVBoxLayout(central)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+        root.addWidget(self._build_header())
+
+        self.splitter = QSplitter(Qt.Orientation.Horizontal)
+        self.splitter.setChildrenCollapsible(False)
+        self.splitter.setHandleWidth(1)
+
+        nav_host = QFrame()
+        nav_host.setObjectName("sidePanel")
+        nav_layout = QVBoxLayout(nav_host)
+        nav_layout.setContentsMargins(0, 12, 0, 12)
+        self.nav = QListWidget()
+        self.nav.setObjectName("navList")
+        self.nav.currentItemChanged.connect(self._on_nav_changed)
+        nav_layout.addWidget(self.nav)
+        nav_host.setMinimumWidth(210)
+
+        self.scroll = QScrollArea()
+        self.scroll.setObjectName("content")
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(QWidget())
+
+        self.changes_panel = ChangesPanel(self.tr, self.knowledge)
+        self.changes_panel.setMinimumWidth(260)
+        self.changes_panel.revert_requested.connect(self._on_revert)
+        self.changes_panel.jump_requested.connect(self.navigate_to)
+        self.changes_panel.discard_all_requested.connect(self._discard_all)
+
+        self.splitter.addWidget(nav_host)
+        self.splitter.addWidget(self.scroll)
+        self.splitter.addWidget(self.changes_panel)
+        self.splitter.setStretchFactor(1, 1)
+        self.splitter.setSizes([230, 900, 310])
+        root.addWidget(self.splitter, 1)
+        self.setCentralWidget(central)
+
+        bar = self.statusBar()
+        self.status_file = QLabel()
+        self.status_count = QLabel()
+        self.status_gpu = QLabel()
+        bar.addPermanentWidget(self.status_count)
+        bar.addPermanentWidget(self.status_gpu)
+        bar.addPermanentWidget(self.status_file)
+
+        QShortcut(QKeySequence.StandardKey.Save, self, activated=self.save)
+        QShortcut(QKeySequence.StandardKey.Find, self, activated=self.search.setFocus)
+
+    def _build_header(self) -> QWidget:
+        header = QFrame()
+        header.setObjectName("header")
+        outer = QVBoxLayout(header)
+        outer.setContentsMargins(16, 10, 16, 10)
+        outer.setSpacing(8)
+
+        row1 = QHBoxLayout()
+        row1.setSpacing(10)
+        self.title_label = QLabel()
+        self.title_label.setObjectName("appTitle")
+        row1.addWidget(self.title_label)
+        row1.addSpacing(12)
+        self.file_label = QLabel()
+        row1.addWidget(self.file_label)
+        self.file_combo = QComboBox()
+        self.file_combo.setMinimumWidth(340)
+        self.file_combo.activated.connect(self._on_file_activated)
+        row1.addWidget(self.file_combo)
+        self.game_pill = QLabel()
+        self.game_pill.setObjectName("gamePill")
+        row1.addWidget(self.game_pill)
+        row1.addStretch()
+        self.language_group = QButtonGroup(self)
+        for index, code in enumerate(SUPPORTED_LANGUAGES):
+            button = QPushButton(code.upper())
+            button.setCheckable(True)
+            button.setProperty("segment", True)
+            button.setProperty("first", index == 0)
+            button.setProperty("last", index == len(SUPPORTED_LANGUAGES) - 1)
+            button.setToolTip(language_name(code))
+            button.setChecked(code == self.tr.language)
+            button.clicked.connect(lambda _=False, c=code: self.set_language(c))
+            self.language_group.addButton(button)
+            row1.addWidget(button)
+        outer.addLayout(row1)
+
+        row2 = QHBoxLayout()
+        row2.setSpacing(10)
+        self.search = QLineEdit()
+        self.search.setObjectName("searchBox")
+        self.search.setClearButtonEnabled(True)
+        self.search.textChanged.connect(lambda _t: self._render_page())
+        row2.addWidget(self.search)
+        self.advanced_check = QCheckBox()
+        self.advanced_check.setChecked(self.settings.advanced)
+        self.advanced_check.toggled.connect(self._on_filter_changed)
+        row2.addWidget(self.advanced_check)
+        self.vendor_check = QCheckBox()
+        self.vendor_check.setChecked(self.settings.hide_other_vendors)
+        self.vendor_check.toggled.connect(self._on_filter_changed)
+        row2.addWidget(self.vendor_check)
+        row2.addSpacing(12)
+        self.preset_label = QLabel()
+        row2.addWidget(self.preset_label)
+        self.preset_combo = QComboBox()
+        self.preset_combo.setMinimumWidth(170)
+        self.preset_combo.activated.connect(self._on_preset_changed)
+        row2.addWidget(self.preset_combo)
+        row2.addStretch()
+        self.reload_button = QPushButton()
+        self.reload_button.clicked.connect(self._reload)
+        row2.addWidget(self.reload_button)
+        self.discard_button = QPushButton()
+        self.discard_button.clicked.connect(self._discard_all)
+        row2.addWidget(self.discard_button)
+        self.save_button = QPushButton()
+        self.save_button.setProperty("variant", "primary")
+        self.save_button.setMinimumWidth(120)
+        self.save_button.clicked.connect(self.save)
+        row2.addWidget(self.save_button)
+        outer.addLayout(row2)
+        return header
+
+    # ============================================================== texts
+    def _apply_texts(self) -> None:
+        """Set every static text; called at start and after a language change."""
+        tr = self.tr
+        self.title_label.setText(tr("app.title"))
+        self.file_label.setText(tr("file.picker_label"))
+        self.search.setPlaceholderText(tr("toolbar.search_placeholder"))
+        self.advanced_check.setText(tr("filter.advanced_mode"))
+        self.vendor_check.setText(tr("filter.hide_other_vendors"))
+        self.preset_label.setText(tr("toolbar.recommend_for"))
+        self.reload_button.setText(tr("toolbar.reload"))
+        self.discard_button.setText(tr("toolbar.discard"))
+
+        self.preset_combo.clear()
+        self.preset_combo.addItem(tr("toolbar.preset_none"), "")
+        for preset in self.knowledge.presets:
+            self.preset_combo.addItem(localized(preset.label, tr.language), preset.id)
+            self.preset_combo.setItemData(
+                self.preset_combo.count() - 1,
+                localized(preset.desc, tr.language),
+                Qt.ItemDataRole.ToolTipRole,
+            )
+        index = self.preset_combo.findData(self.settings.preset)
+        self.preset_combo.setCurrentIndex(max(index, 0))
+        self._update_game_pill()
+        self._update_dirty_state()
+
+    def set_language(self, language: str) -> None:
+        self.settings.language = language
+        self.tr.set_language(language)
+
+    def _on_language_changed(self, language: str) -> None:
+        for button in self.language_group.buttons():
+            button.setChecked(button.text().lower() == language)
+        self._apply_texts()
+        self._populate_file_combo()
+        self._render_all()
+
+    # ============================================================== files
+    def _file_items(self) -> list[tuple[str, SettingsFileSet, str]]:
+        """(label, fileset, tooltip) for the file combo."""
+        items = []
+        for loc in self._locations:
+            fs = loc.fileset
+            label = f"{loc.title_name} · {self.tr('file.machine')}"
+            items.append((label, fs, str(fs.directory / fs.stem)))
+        for fs in self._extra_files:
+            items.append((fs.stem, fs, str(fs.directory / fs.stem)))
+        return items
+
+    def _populate_file_combo(self) -> None:
+        self.file_combo.blockSignals(True)
+        self.file_combo.clear()
+        for label, fileset, tooltip in self._file_items():
+            self.file_combo.addItem(label, fileset)
+            self.file_combo.setItemData(
+                self.file_combo.count() - 1, tooltip, Qt.ItemDataRole.ToolTipRole
+            )
+        self.file_combo.addItem(self.tr("file.open_other"), OPEN_OTHER)
+        self._select_current_file_in_combo()
+        self.file_combo.blockSignals(False)
+
+    def _select_current_file_in_combo(self) -> None:
+        if self.session is None:
+            self.file_combo.setCurrentIndex(-1)
+            return
+        for i in range(self.file_combo.count()):
+            if self.file_combo.itemData(i) == self.session.fileset:
+                self.file_combo.setCurrentIndex(i)
+                return
+
+    def _open_initial_file(self) -> None:
+        candidates = [fs for _, fs, _ in self._file_items()]
+        last = self.settings.last_file
+        if last:
+            try:
+                last_set = SettingsFileSet.from_path(last)
+                if last_set.exists():
+                    if last_set not in candidates:
+                        self._extra_files.append(last_set)
+                        self._populate_file_combo()
+                    candidates.insert(0, last_set)
+            except WzceError:
+                pass
+        for fileset in candidates:
+            if self.open_fileset(fileset):
+                return
+        self._render_all()
+
+    def open_fileset(self, fileset: SettingsFileSet) -> bool:
+        try:
+            session = EditorSession(
+                fileset, backup_manager=self._backup_manager, game_running=self._game_running_check
+            )
+        except (WzceError, OSError) as exc:
+            self._show_message("error", self.tr("error.title"), self.tr("error.parse", error=exc))
+            return False
+        self.session = session
+        self._disk_warning_shown = False
+        self.settings.last_file = str(fileset.slots[0])
+        self._select_current_file_in_combo()
+        self._render_all()
+        self.statusBar().showMessage(self.tr("status.loaded", file=fileset.stem), STATUS_TIMEOUT_MS)
+        return True
+
+    def _on_file_activated(self, index: int) -> None:
+        data = self.file_combo.itemData(index)
+        if self.session is not None and data == self.session.fileset:
+            return
+        if not self._confirm_leave():
+            self._select_current_file_in_combo()
+            return
+        if data == OPEN_OTHER:
+            path, _ = QFileDialog.getOpenFileName(
+                self,
+                self.tr("file.open_dialog_title"),
+                str(self.session.fileset.directory) if self.session else "",
+                self.tr("file.open_filter"),
+            )
+            if not path:
+                self._select_current_file_in_combo()
+                return
+            try:
+                fileset = SettingsFileSet.from_path(path)
+            except WzceError as exc:
+                self._show_message(
+                    "error", self.tr("error.title"), self.tr("error.parse", error=exc)
+                )
+                self._select_current_file_in_combo()
+                return
+            if fileset not in [fs for _, fs, _ in self._file_items()]:
+                self._extra_files.append(fileset)
+            self.open_fileset(fileset)
+            self._populate_file_combo()
+            return
+        if isinstance(data, SettingsFileSet) and not self.open_fileset(data):
+            self._select_current_file_in_combo()
+
+    def _confirm_leave(self) -> bool:
+        """Before switching files / closing: handle unsaved changes. False = cancel."""
+        if self.session is None or not self.session.is_dirty:
+            return True
+        choice = self._prompt_unsaved(len(self.session.pending_changes()))
+        if choice == "save":
+            return self.save(confirm=False)
+        return choice == "discard"
+
+    # ========================================================= navigation
+    def _refresh_nav(self) -> None:
+        tr = self.tr
+        changed_by_group: dict[str, int] = {}
+        groups_present: set[str] = set()
+        if self.session is not None:
+            changed = self.session.changed_ids()
+            for setting in self.session.document:
+                entry = self.knowledge.entry_for(setting)
+                groups_present.add(entry.group)
+                if setting.id in changed:
+                    changed_by_group[entry.group] = changed_by_group.get(entry.group, 0) + 1
+
+        def label(text: str, count: int) -> str:
+            return f"{text}   ● {count}" if count else text
+
+        self.nav.blockSignals(True)
+        self.nav.clear()
+        total_changed = sum(changed_by_group.values())
+        entries = [
+            (NAV_ALL, label(tr("nav.all"), 0)),
+            (NAV_CHANGED, label(tr("nav.changed"), total_changed)),
+        ]
+        for group in self.knowledge.groups:
+            if group.id in groups_present:
+                entries.append(
+                    (
+                        group.id,
+                        label(
+                            localized(group.label, tr.language), changed_by_group.get(group.id, 0)
+                        ),
+                    )
+                )
+        for key, text in entries:
+            item = QListWidgetItem(text)
+            item.setData(Qt.ItemDataRole.UserRole, key)
+            self.nav.addItem(item)
+            if key == self._nav_key:
+                self.nav.setCurrentItem(item)
+        if self.nav.currentItem() is None and self.nav.count():
+            self.nav.setCurrentRow(0)
+            self._nav_key = self.nav.currentItem().data(Qt.ItemDataRole.UserRole)
+        self.nav.blockSignals(False)
+
+    def _on_nav_changed(self, current: QListWidgetItem | None, _previous: object) -> None:
+        if current is None:
+            return
+        self._nav_key = current.data(Qt.ItemDataRole.UserRole)
+        if self.search.text():
+            self.search.blockSignals(True)
+            self.search.clear()
+            self.search.blockSignals(False)
+        self._render_page()
+
+    def _on_filter_changed(self) -> None:
+        self.settings.advanced = self.advanced_check.isChecked()
+        self.settings.hide_other_vendors = self.vendor_check.isChecked()
+        self._render_page()
+
+    def _on_preset_changed(self, _index: int) -> None:
+        self.settings.preset = self.preset_combo.currentData() or ""
+        self._render_page()
+
+    # ============================================================== page
+    def _visible_items(self) -> list[tuple[Setting, KnowledgeEntry]]:
+        session = self.session
+        assert session is not None
+        changed = session.changed_ids()
+        query = self.search.text().strip().lower()
+        vendor = session.gpu_vendor if self.vendor_check.isChecked() else None
+        advanced = self.advanced_check.isChecked()
+        items: list[tuple[Setting, KnowledgeEntry]] = []
+        for setting in session.document:
+            entry = self.knowledge.entry_for(setting)
+            if query:  # search looks everywhere, ignoring mode and vendor filters
+                if self._matches(setting, entry, query):
+                    items.append((setting, entry))
+                continue
+            if self._nav_key == NAV_CHANGED:
+                if setting.id in changed:
+                    items.append((setting, entry))
+                continue
+            if self._nav_key != NAV_ALL and entry.group != self._nav_key:
+                continue
+            hidden_by_mode = not advanced and (entry.advanced or "game_managed" in entry.flags)
+            hidden_by_vendor = vendor is not None and entry.vendor not in (None, vendor)
+            if (hidden_by_mode or hidden_by_vendor) and setting.id not in changed:
+                continue
+            items.append((setting, entry))
+        items.sort(key=lambda it: self._sort_key(*it))
+        return items
+
+    def _matches(self, setting: Setting, entry: KnowledgeEntry, query: str) -> bool:
+        haystack = " ".join(
+            [setting.id, setting.description, *entry.label.values(), *entry.desc.values()]
+        ).lower()
+        return all(word in haystack for word in query.split())
+
+    def _sort_key(self, setting: Setting, entry: KnowledgeEntry) -> tuple[int, int, int, int]:
+        group_ids = [g.id for g in self.knowledge.groups]
+        group_index = group_ids.index(entry.group) if entry.group in group_ids else len(group_ids)
+        group = self.knowledge.group(entry.group) if entry.group in group_ids else None
+        sub_ids = [s.id for s in group.subgroups] if group else []
+        sub_index = sub_ids.index(entry.subgroup) if entry.subgroup in sub_ids else len(sub_ids)
+        return (
+            group_index,
+            sub_index,
+            self._entry_order.get(setting.id, 10**6),
+            setting.line_index,
+        )
+
+    def _render_all(self) -> None:
+        self._refresh_nav()
+        self._render_page()
+        self.changes_panel.refresh(self.session)
+        self._update_status()
+        self._update_dirty_state()
+
+    def _render_page(self) -> None:
+        tr = self.tr
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(28, 20, 28, 28)
+        layout.setSpacing(10)
+        self.cards = {}
+
+        if self.session is None:
+            empty = QLabel(tr("file.none_found"))
+            empty.setObjectName("emptyState")
+            empty.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            layout.addWidget(empty)
+            open_button = QPushButton(tr("file.open_other"))
+            open_button.clicked.connect(
+                lambda: self._on_file_activated(self.file_combo.count() - 1)
+            )
+            layout.addWidget(open_button, 0, Qt.AlignmentFlag.AlignCenter)
+            layout.addStretch()
+            self._set_page(page)
+            return
+
+        query = self.search.text().strip()
+        items = self._visible_items()
+        if query:
+            title_text = f"{tr('search.results')}: “{query}”"
+        elif self._nav_key == NAV_ALL:
+            title_text = tr("nav.all")
+        elif self._nav_key == NAV_CHANGED:
+            title_text = tr("nav.changed")
+        else:
+            title_text = localized(self.knowledge.group(self._nav_key).label, tr.language)
+        title = QLabel(title_text)
+        title.setObjectName("pageTitle")
+        layout.addWidget(title)
+        subtitle = QLabel(tr("status.settings_count", count=len(items)))
+        subtitle.setObjectName("pageSubtitle")
+        layout.addWidget(subtitle)
+
+        if not items:
+            message = tr("filter.no_results", query=query) if query else tr("page.empty_filtered")
+            empty = QLabel(message)
+            empty.setObjectName("emptyState")
+            layout.addWidget(empty)
+
+        show_group_in_header = bool(query) or self._nav_key in (NAV_ALL, NAV_CHANGED)
+        preset_id = self.preset_combo.currentData() or None
+        preset_label = self.preset_combo.currentText() if preset_id else ""
+        current_section: tuple[str, str | None] | None = None
+        for setting, entry in items:
+            section = (entry.group, entry.subgroup)
+            if section != current_section:
+                current_section = section
+                layout.addWidget(self._section_header(entry, show_group_in_header))
+            card = SettingCard(setting, entry, self.session, tr, preset_id, preset_label)
+            card.value_edited.connect(self._on_value_edited)
+            card.revert_requested.connect(self._on_revert)
+            self.cards[setting.id] = card
+            layout.addWidget(card)
+        layout.addStretch()
+        self._set_page(page)
+
+    def _section_header(self, entry: KnowledgeEntry, with_group: bool) -> QLabel:
+        lang = self.tr.language
+        group = self.knowledge.group(entry.group)
+        sub = group.subgroup(entry.subgroup) if entry.subgroup else None
+        sub_text = localized(sub.label, lang) if sub else self.tr("nav.other")
+        text = f"{localized(group.label, lang)} · {sub_text}" if with_group else sub_text
+        header = QLabel(text.upper())
+        header.setObjectName("subgroupTitle")
+        return header
+
+    def _set_page(self, page: QWidget) -> None:
+        old = self.scroll.takeWidget()
+        self.scroll.setWidget(page)
+        if old is not None:
+            old.deleteLater()
+
+    # ============================================================ editing
+    def _on_value_edited(self, setting_id: str, value: object) -> None:
+        if self.session is None:
+            return
+        card = self.cards.get(setting_id)
+        try:
+            self.session.set_value(
+                setting_id, value, allow_read_only=card.unlocked if card else False
+            )
+        except ValidationError as exc:
+            if card is not None:
+                card.refresh()
+                card.show_error(str(exc))
+            self.statusBar().showMessage(self.tr("error.validation", error=exc), STATUS_TIMEOUT_MS)
+            return
+        self._after_change(setting_id)
+
+    def _on_revert(self, setting_id: str) -> None:
+        if self.session is None:
+            return
+        self.session.revert(setting_id)
+        self._after_change(setting_id)
+
+    def _after_change(self, setting_id: str) -> None:
+        assert self.session is not None
+        card = self.cards.get(setting_id)
+        if card is not None:
+            card.refresh()
+        self._refresh_nav()
+        self.changes_panel.refresh(self.session)
+        self._update_dirty_state()
+        if self._nav_key == NAV_CHANGED and not self.search.text():
+            # A reverted setting must leave the "Changed" view; defer the rebuild
+            # because we may be inside the card's own signal handler.
+            QTimer.singleShot(0, self, self._render_page)
+
+    def _discard_all(self) -> None:
+        if self.session is None or not self.session.is_dirty:
+            return
+        count = len(self.session.pending_changes())
+        if not self._ask(
+            self.tr("toolbar.discard"), self.tr("unsaved.discard_confirm", count=count)
+        ):
+            return
+        self.session.discard_all()
+        QTimer.singleShot(0, self, self._render_all)
+
+    def _reload(self) -> None:
+        if self.session is None or not self._confirm_leave():
+            return
+        try:
+            self.session.reload()
+        except (WzceError, OSError) as exc:
+            self._show_message("error", self.tr("error.title"), self.tr("error.parse", error=exc))
+            return
+        self._disk_warning_shown = False
+        self._render_all()
+        self.statusBar().showMessage(self.tr("status.reloaded"), STATUS_TIMEOUT_MS)
+
+    def navigate_to(self, setting_id: str) -> None:
+        """Show the category containing ``setting_id`` and scroll its card into view."""
+        if self.session is None or setting_id not in self.session.document:
+            return
+        entry = self.knowledge.entry_for(self.session.document.get(setting_id))
+        self.search.blockSignals(True)
+        self.search.clear()
+        self.search.blockSignals(False)
+        self._nav_key = entry.group
+        # The user explicitly asked for this setting: lift filters that would hide it.
+        for check, hides, wanted in (
+            (self.advanced_check, entry.advanced or "game_managed" in entry.flags, True),
+            (self.vendor_check, entry.vendor not in (None, self.session.gpu_vendor), False),
+        ):
+            if hides and check.isChecked() != wanted:
+                check.blockSignals(True)
+                check.setChecked(wanted)
+                check.blockSignals(False)
+        self.settings.advanced = self.advanced_check.isChecked()
+        self.settings.hide_other_vendors = self.vendor_check.isChecked()
+        self._refresh_nav()
+        self._render_page()
+        # Look the card up again when the timer fires: the page may be rebuilt
+        # in between, and a captured card reference would point to a deleted widget.
+        QTimer.singleShot(30, self, lambda: self._flash(setting_id))
+
+    def _flash(self, setting_id: str) -> None:
+        card = self.cards.get(setting_id)
+        if card is None:
+            return
+        self.scroll.ensureWidgetVisible(card, 0, 120)
+        card.setProperty("flash", True)
+        repolish(card)
+
+        def clear() -> None:
+            card.setProperty("flash", False)
+            repolish(card)
+
+        # Context-object form: Qt cancels the timer if the card is destroyed first.
+        QTimer.singleShot(1200, card, clear)
+
+    # =============================================================== save
+    def save(self, confirm: bool = True) -> bool:
+        """Save pending changes. Returns True when the files were written."""
+        session = self.session
+        if session is None:
+            return False
+        tr = self.tr
+        count = len(session.pending_changes())
+        if count == 0 and session.loaded.slots_in_sync:
+            self.statusBar().showMessage(tr("save.nothing"), STATUS_TIMEOUT_MS)
+            return False
+        if session.game_running():
+            self._show_message(
+                "warning", tr("save.game_running_title"), tr("save.game_running_text")
+            )
+            return False
+        if confirm and not self._ask(
+            tr("save.confirm_title"), tr("save.confirm_text", count=count)
+        ):
+            return False
+        try:
+            result = session.save()
+        except GameRunningError:
+            self._show_message(
+                "warning", tr("save.game_running_title"), tr("save.game_running_text")
+            )
+            return False
+        except (WzceError, OSError) as exc:
+            self._show_message("error", tr("error.title"), tr("save.failed", error=exc))
+            return False
+        message = tr("status.saved", count=count)
+        if result.read_only_preserved:
+            message += " " + tr("save.read_only_note")
+        self._disk_warning_shown = False
+        self._render_all()
+        self.statusBar().showMessage(message, STATUS_TIMEOUT_MS)
+        return True
+
+    # ============================================================= status
+    def _poll(self) -> None:
+        """Periodic check: is the game running, did the file change on disk?"""
+        try:
+            running = bool(self._game_running_check())
+        except Exception:  # psutil hiccups must never break the UI
+            running = False
+        if running != self._game_running:
+            self._game_running = running
+            self._update_game_pill()
+            self._update_dirty_state()
+        session = self.session
+        if session is None or not session.disk_changed():
+            return
+        if not session.is_dirty:
+            try:
+                session.reload()
+            except (WzceError, OSError):
+                return  # the game may be mid-write; try again next tick
+            self._render_all()
+            self.statusBar().showMessage(self.tr("status.reloaded"), STATUS_TIMEOUT_MS)
+        elif not self._disk_warning_shown:
+            self._disk_warning_shown = True
+            self.statusBar().showMessage(self.tr("status.changed_on_disk_dirty"), 0)
+
+    def _update_game_pill(self) -> None:
+        running = self._game_running
+        self.game_pill.setText(self.tr("status.game_running" if running else "status.game_closed"))
+        self.game_pill.setProperty("running", running)
+        repolish(self.game_pill)
+
+    def _update_status(self) -> None:
+        session = self.session
+        if session is None:
+            for label in (self.status_file, self.status_count, self.status_gpu):
+                label.setText("")
+            return
+        fs = session.fileset
+        layout = self.tr("file.layout_ab" if fs.is_ab else "file.layout_single")
+        read_only = f" · {self.tr('file.read_only')}" if fs.is_read_only() else ""
+        self.status_file.setText(f"{fs.directory / fs.stem} · {layout}{read_only}")
+        self.status_count.setText(self.tr("status.settings_count", count=len(session.document)))
+        vendor = session.gpu_vendor
+        self.status_gpu.setText(self.tr("status.gpu", vendor=vendor.upper()) if vendor else "")
+
+    def _update_dirty_state(self) -> None:
+        tr = self.tr
+        session = self.session
+        count = len(session.pending_changes()) if session else 0
+        needs_sync = bool(session) and not session.loaded.slots_in_sync
+        self.save_button.setText(
+            tr("toolbar.save_count", count=count) if count else tr("toolbar.save")
+        )
+        self.save_button.setEnabled((count > 0 or needs_sync) and not self._game_running)
+        self.save_button.setToolTip(tr("save.game_running_text") if self._game_running else "")
+        self.discard_button.setEnabled(count > 0)
+        self.reload_button.setEnabled(session is not None)
+        self.title_label.setProperty("dirty", count > 0)
+        repolish(self.title_label)
+        name = session.fileset.stem if session else ""
+        self.setWindowTitle(
+            f"{'● ' if count else ''}{name} — {tr('app.title')}" if name else tr("app.title")
+        )
+
+    # ============================================================ dialogs
+    def _ask(self, title: str, text: str) -> bool:
+        buttons = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        box = QMessageBox(QMessageBox.Icon.Question, title, text, buttons, self)
+        box.button(QMessageBox.StandardButton.Yes).setText(self.tr("dialog.yes"))
+        box.button(QMessageBox.StandardButton.No).setText(self.tr("dialog.no"))
+        return box.exec() == QMessageBox.StandardButton.Yes
+
+    def _prompt_unsaved(self, count: int) -> str:
+        """Returns "save", "discard" or "cancel"."""
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Warning)
+        box.setWindowTitle(self.tr("unsaved.title"))
+        box.setText(self.tr("unsaved.text", count=count))
+        save = box.addButton(self.tr("dialog.save"), QMessageBox.ButtonRole.AcceptRole)
+        discard = box.addButton(self.tr("dialog.discard"), QMessageBox.ButtonRole.DestructiveRole)
+        box.addButton(self.tr("dialog.cancel"), QMessageBox.ButtonRole.RejectRole)
+        box.exec()
+        clicked = box.clickedButton()
+        return "save" if clicked is save else "discard" if clicked is discard else "cancel"
+
+    def _show_message(self, level: str, title: str, text: str) -> None:
+        icon = {
+            "error": QMessageBox.Icon.Critical,
+            "warning": QMessageBox.Icon.Warning,
+        }.get(level, QMessageBox.Icon.Information)
+        QMessageBox(icon, title, text, QMessageBox.StandardButton.Ok, self).exec()
+
+    # ======================================================= window state
+    def _restore_window_state(self) -> None:
+        geometry = self.settings.window_state("geometry")
+        if geometry is not None:
+            self.restoreGeometry(geometry)
+        splitter = self.settings.window_state("splitter")
+        if splitter is not None:
+            self.splitter.restoreState(splitter)
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        if not self._confirm_leave():
+            event.ignore()
+            return
+        self.settings.set_window_state("geometry", self.saveGeometry())
+        self.settings.set_window_state("splitter", self.splitter.saveState())
+        self.settings.sync()
+        self._timer.stop()
+        self.tr.remove_listener(self._on_language_changed)
+        event.accept()

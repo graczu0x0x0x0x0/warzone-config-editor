@@ -1,17 +1,19 @@
 """Entry point: ``python -m wzce`` / ``wzce``.
 
-Until the GUI exists (stage 3) this prints a read-only report of the settings
-files found on this machine - handy to check discovery and parsing on real data.
+* no arguments  -> start the GUI
+* ``--report``  -> print a read-only report of the settings files found on this
+                   machine (handy to check discovery and parsing on real data)
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 
 from .core import WzceError, discover, is_game_running
 
 
-def main() -> int:
+def report() -> int:
     locations = discover()
     if not locations:
         print("No Call of Duty settings files found.")
@@ -40,6 +42,17 @@ def main() -> int:
         for warning in doc.warnings:
             print(f"  warning: {warning}")
     return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(prog="wzce", description="Warzone Config Editor")
+    parser.add_argument("--report", action="store_true", help="print a read-only file report")
+    args = parser.parse_args()
+    if args.report:
+        return report()
+    from .ui.app import run  # imported lazily so --report works without Qt
+
+    return run()
 
 
 if __name__ == "__main__":

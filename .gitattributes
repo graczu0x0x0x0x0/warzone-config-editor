@@ -11,3 +11,7 @@ examples/** -text
 *.toml text eol=lf
 .gitattributes text eol=lf
 .gitignore text eol=lf
+*.svg text eol=lf
+*.lock text eol=lf
+.python-version text eol=lf
+*.ini text eol=lf

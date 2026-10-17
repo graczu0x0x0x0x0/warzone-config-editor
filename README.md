@@ -3,7 +3,17 @@
 Graficzny edytor plików ustawień **Call of Duty: Black Ops 7 / Warzone** (PC)
 · Graphical editor for **Call of Duty: Black Ops 7 / Warzone** PC settings files.
 
-> Status: faza projektowania · design phase.
+> Status: MVP z interfejsem graficznym · GUI MVP.
+
+## Uruchomienie · Running
+
+```
+uv sync
+uv run wzce
+```
+
+Wymaga [uv](https://docs.astral.sh/uv/) i Windows. Zamknij grę przed zapisem — program sam to sprawdza.
+Requires uv and Windows. Close the game before saving — the editor checks it.
 
 - [Raport z researchu i propozycje](docs/RAPORT.md) (PL)
 - [Plan realizacji](docs/PLAN.md) (PL)
