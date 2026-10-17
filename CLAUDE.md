@@ -86,6 +86,9 @@ Environment quirks (Windows 11, repo inside a Syncthing folder):
   absent registry value = Windows default, `None` = unknown. Plan: `docs/RAPORT_WINDOWS.md` §7.
   Rules: `core/windows_checks.py` (`CHECKS` id -> section/impact, `MYTHS`); niche rules return
   `None` when not applicable. `evaluate_checks()` merges them with the hardware checks.
+  Changes: `core/windows_tweaks.py` (`WindowsTweaks.apply/restore/entries`, journal in
+  `<app data>/windows/tweaks.json`). HKCU + power plan only, never HKLM/security. Tests MUST
+  use `FakeBackend` (`tests/test_windows_tweaks.py`); the `window` fixture injects one.
 - Display & sharing: `core/display.display_value(raw, setting, entry, tr)` renders values for every
   view (cards, panels, exports). `core/share_export.build_share(...)` -> `to_markdown/to_json`;
   it reuses `exclusion_reason()` and skips other GPU vendors - keep exports free of identifying data.

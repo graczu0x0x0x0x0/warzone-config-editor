@@ -70,6 +70,7 @@ from ..core.system_checks import CheckResult, Severity, Status, evaluate_checks,
 from ..core.system_info import SystemInfo, collect_system_info
 from ..core.templates import TemplateStore
 from ..core.undo import CommandKind
+from ..core.windows_tweaks import WindowsTweaks, tweak_for
 from .app_settings import AppSettings
 from .changes_panel import ChangesPanel
 from .history_dialog import HistoryDialog
@@ -101,6 +102,7 @@ class MainWindow(QMainWindow):
         hardware_provider: Callable[[ConfigDocument | None], HardwareInfo] = detect_hardware,
         system_info_provider: Callable[[], SystemInfo] | None = collect_system_info,
         async_system_info: bool = True,
+        windows_tweaks: WindowsTweaks | None = None,
         poll: bool = True,
     ) -> None:
         super().__init__()
@@ -116,6 +118,8 @@ class MainWindow(QMainWindow):
         self.system_checks: list[CheckResult] = []
         self._system_info_provider = system_info_provider
         self._system_dialog: SystemDialog | None = None  # open dialog, refreshed in place
+        # Reversible Windows changes (HKCU / power plan); tests inject a fake backend.
+        self.windows_tweaks = windows_tweaks or WindowsTweaks(game_running=game_running)
         self._system_probe = SystemProbe(self)
         self._system_probe.ready.connect(self._on_system_info)
         self._game_running_check = game_running
@@ -916,8 +920,29 @@ class MainWindow(QMainWindow):
             bar_items(self.system_info, self.hardware, self.tr), len(warnings(self.system_checks))
         )
         self.windows_action.setEnabled(True)
-        if self._system_dialog is not None:  # "Refresh" in the open dialog
-            self._system_dialog.set_data(self.system_info, self.hardware, self.system_checks)
+        self._update_system_dialog()
+
+    def _fixable_checks(self) -> dict[str, str]:
+        if self.system_info is None:
+            return {}
+        result = {}
+        for check in self.system_checks:
+            tweak = tweak_for(check, self.system_info)
+            if tweak:
+                result[check.id] = tweak
+        return result
+
+    def _update_system_dialog(self) -> None:
+        """Rebuild the open hardware & system dialog (after a refresh, fix or restore)."""
+        if self._system_dialog is None or self.system_info is None:
+            return
+        self._system_dialog.set_data(
+            self.system_info,
+            self.hardware,
+            self.system_checks,
+            self._fixable_checks(),
+            self.windows_tweaks.entries(),
+        )
 
     def _on_hw_bar_collapsed(self, collapsed: bool) -> None:
         self.settings.hardware_bar_collapsed = collapsed
@@ -942,9 +967,13 @@ class MainWindow(QMainWindow):
             show_checks=show_checks,
             tab=tab,
             can_refresh=self._system_info_provider is not None,
+            fixable=self._fixable_checks(),
+            applied=self.windows_tweaks.entries(),
             parent=self,
         )
         dialog.refresh_requested.connect(self.refresh_system_info)
+        dialog.tweak_requested.connect(self.apply_windows_tweak)
+        dialog.restore_requested.connect(self.restore_windows_tweak)
         chosen: list[str] = []
 
         def on_action(action: str) -> None:
@@ -962,6 +991,41 @@ class MainWindow(QMainWindow):
             self._system_dialog = None
         if chosen:
             self.navigate_to(chosen[0])
+
+    def apply_windows_tweak(self, tweak_id: str) -> None:
+        """Change one Windows setting after confirmation; it stays restorable."""
+        tr = self.tr
+        if self.system_info is None:
+            return
+        question = tr(f"tweaks.{tweak_id}.confirm") + "\n\n" + tr("tweaks.confirm_note")
+        if not self._ask(tr(f"tweaks.{tweak_id}.title"), question):
+            return
+        try:
+            self.windows_tweaks.apply(tweak_id, self.system_info)
+        except WzceError as exc:
+            self._show_message("error", tr("tweaks.failed_title"), str(exc))
+            return
+        self.statusBar().showMessage(
+            tr("tweaks.applied", name=tr(f"tweaks.{tweak_id}.title")), STATUS_TIMEOUT_MS
+        )
+        self._after_windows_change()
+
+    def restore_windows_tweak(self, entry_id: str) -> None:
+        """Put back what a tweak changed ("" = every recorded change)."""
+        try:
+            if entry_id:
+                self.windows_tweaks.restore(entry_id)
+            else:
+                self.windows_tweaks.restore_all()
+        except WzceError as exc:
+            self._show_message("error", self.tr("tweaks.failed_title"), str(exc))
+            return
+        self.statusBar().showMessage(self.tr("tweaks.restored"), STATUS_TIMEOUT_MS)
+        self._after_windows_change()
+
+    def _after_windows_change(self) -> None:
+        self._update_system_dialog()  # journal changed: list + buttons now
+        self.refresh_system_info()  # new state of the rows a moment later
 
     def refresh_system_info(self) -> None:
         """Probe the system again (after the user changed something in Windows)."""

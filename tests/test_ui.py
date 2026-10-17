@@ -9,7 +9,9 @@ from PySide6.QtCore import QPoint, QPointF, QSettings, Qt
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QApplication, QLabel
 
+from test_windows_tweaks import FakeBackend
 from wzce.core import ConfigDocument, KnowledgeBase, SettingsFileSet, Translator, discover
+from wzce.core.windows_tweaks import WindowsTweaks
 from wzce.ui.app_settings import AppSettings
 from wzce.ui.editors import NumberEditor
 from wzce.ui.main_window import NAV_CHANGED, MainWindow
@@ -47,6 +49,8 @@ def window(qtbot, players_dir: Path, tmp_path: Path, knowledge, game) -> MainWin
         locations=discover([players_dir]),
         game_running=game,
         system_info_provider=None,  # no real WMI/PowerShell probe in tests
+        # Windows tweaks only ever touch an in-memory registry in tests.
+        windows_tweaks=WindowsTweaks(FakeBackend(), tmp_path / "tweaks.json", game_running=game),
         poll=False,
     )
     win.messages = []  # type: ignore[attr-defined]
@@ -1104,3 +1108,64 @@ def test_windows_tab_in_polish(window: MainWindow) -> None:
     assert dialog.tabs.tabText(2) == "Optymalizacja Windows"
     assert dialog.windows_summary.text().startswith("Wymagania gry: spełnione ✓")
     assert window.windows_action.text() == "Optymalizacja Windows…"
+
+
+# ------------------------------------------- stage 10d: fix & restore from the Windows tab
+
+
+def test_fix_button_applies_and_restore_puts_back(window: MainWindow) -> None:
+    from wzce.core.windows_tweaks import DX_GLOBAL, DX_KEY
+
+    backend = window.windows_tweaks.backend
+    dialog = _windows_dialog(window)
+    window._system_dialog = dialog  # what open_system_dialog does while the dialog runs
+    assert {"auto_hdr", "fso", "gpu_preference"} <= set(dialog.fix_buttons)
+    assert "hvci" not in dialog.fix_buttons and "secure_boot" not in dialog.fix_buttons
+    assert "expo" not in dialog.fix_buttons  # hardware rows: BIOS, nothing to click
+
+    dialog.fix_buttons["auto_hdr"].click()
+    assert backend.reg[("HKCU", DX_KEY, DX_GLOBAL)][0] == (
+        "SwapEffectUpgradeEnable=1;AutoHDREnable=0;"
+    )
+    entries = window.windows_tweaks.entries()
+    assert [e.tweak for e in entries] == ["auto_hdr_off"]
+    assert list(dialog.restore_buttons) == [entries[0].id]  # dialog rebuilt in place
+    assert window.statusBar().currentMessage() == "Changed: Turn off Auto HDR."
+
+    dialog.restore_buttons[entries[0].id].click()
+    assert backend.reg[("HKCU", DX_KEY, DX_GLOBAL)][0] == (
+        "SwapEffectUpgradeEnable=1;AutoHDREnable=1;"
+    )
+    assert window.windows_tweaks.entries() == [] and dialog.restore_buttons == {}
+
+
+def test_fix_needs_confirmation(window: MainWindow) -> None:
+    window._ask = lambda *_a: False
+    dialog = _windows_dialog(window)
+    window._system_dialog = dialog
+    dialog.fix_buttons["fso"].click()
+    assert window.windows_tweaks.entries() == []
+
+
+def test_fix_refused_while_game_runs(window: MainWindow, game) -> None:
+    dialog = _windows_dialog(window)
+    window._system_dialog = dialog
+    game.running = True
+    dialog.fix_buttons["fso"].click()
+    assert window.windows_tweaks.entries() == []
+    assert window.messages[-1][0] == "error" and "Close the game" in window.messages[-1][1]
+
+
+def test_restore_all_from_the_dialog(window: MainWindow) -> None:
+    from test_windows_checks import _users_pc
+
+    info = _users_pc()
+    window._on_system_info(info)
+    window.windows_tweaks.apply("mouse_accel_off", info)
+    window.windows_tweaks.apply("recording_off", info)
+    dialog = _windows_dialog(window, info)
+    window._system_dialog = dialog
+    assert len(dialog.restore_buttons) == 2
+    dialog.restore_all_button.click()
+    assert window.windows_tweaks.entries() == []
+    assert window.windows_tweaks.backend.mouse == [6, 10, 1]

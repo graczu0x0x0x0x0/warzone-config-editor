@@ -9,7 +9,8 @@
   to the clipboard), the hardware check list, and "Windows optimization" - the
   Windows-settings checks grouped by section with an evidence chip per row, a
   "only what needs attention" filter, the myths list, a manual BIOS checklist and
-  "Refresh" (the main window re-runs the probe and calls ``set_data``).
+  "Refresh" (the main window re-runs the probe and calls ``set_data``). Rows the app
+  can change itself get a "Fix" button; changes it made are listed with "Restore".
 
 ``spec_rows`` builds the specification once for both the dialog and the clipboard
 text, so they never disagree.
@@ -42,6 +43,7 @@ from ..core.i18n import Translator
 from ..core.system_checks import CheckResult, Severity, Status
 from ..core.system_info import SystemInfo
 from ..core.windows_checks import CHECKS, MYTHS, Impact, Section, is_windows_check
+from ..core.windows_tweaks import AppliedTweak
 from .theme import repolish
 
 SpecRow = tuple[str, str, str]  # (section key, label, value)
@@ -335,6 +337,8 @@ class SystemDialog(QDialog):
 
     action_requested = Signal(str)  # check action: URI or "setting:Key@0"
     refresh_requested = Signal()  # run the system probe again (Windows tab)
+    tweak_requested = Signal(str)  # tweak id - the app changes a Windows setting
+    restore_requested = Signal(str)  # journal entry id; "" = restore everything
 
     TABS = ("spec", "checks", "windows")
 
@@ -348,6 +352,8 @@ class SystemDialog(QDialog):
         show_checks: bool = False,
         tab: str | None = None,
         can_refresh: bool = False,
+        fixable: dict[str, str] | None = None,
+        applied: list[AppliedTweak] | None = None,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
@@ -360,7 +366,7 @@ class SystemDialog(QDialog):
         root.setContentsMargins(16, 16, 16, 16)
         self.tabs = QTabWidget()
         root.addWidget(self.tabs, 1)
-        self.set_data(info, hardware, checks)
+        self.set_data(info, hardware, checks, fixable, applied)
         if tab is None and show_checks:
             tab = default_checks_tab(checks)
         if tab in self.TABS:
@@ -381,10 +387,21 @@ class SystemDialog(QDialog):
         root.addLayout(buttons)
 
     def set_data(
-        self, info: SystemInfo, hardware: HardwareInfo | None, checks: list[CheckResult]
+        self,
+        info: SystemInfo,
+        hardware: HardwareInfo | None,
+        checks: list[CheckResult],
+        fixable: dict[str, str] | None = None,
+        applied: list[AppliedTweak] | None = None,
     ) -> None:
-        """(Re)build every tab - also after "Refresh" delivered a new probe result."""
+        """(Re)build every tab - after "Refresh", a fix or a restore as well.
+
+        ``fixable`` maps check ids to the tweak the app can apply for them;
+        ``applied`` is the journal of changes the app made (restorable).
+        """
         self._info, self._hardware, self._checks = info, hardware, checks
+        self._fixable = fixable or {}
+        self._applied = applied or []
         current = self.tabs.currentIndex()
         while self.tabs.count():
             widget = self.tabs.widget(0)
@@ -392,6 +409,8 @@ class SystemDialog(QDialog):
             widget.deleteLater()
         tr = self._tr
         self.check_rows: dict[str, QFrame] = {}
+        self.fix_buttons: dict[str, QPushButton] = {}
+        self.restore_buttons: dict[str, QPushButton] = {}
         self.tabs.addTab(self._spec_tab(), tr("spec.tab_spec"))
         hardware_checks = [c for c in checks if not is_windows_check(c.id)]
         self.tabs.addTab(self._checks_tab(hardware_checks), tr("spec.tab_checks"))
@@ -492,6 +511,14 @@ class SystemDialog(QDialog):
             fix.setWordWrap(True)
             texts.addWidget(fix)
         layout.addLayout(texts, 1)
+        tweak = self._fixable.get(check.id) if impact is not None else None
+        if tweak and check.status in (Status.WARN, Status.INFO):
+            fix_button = QPushButton(tr("win.fix_button"))
+            fix_button.setProperty("variant", "primary")
+            fix_button.setToolTip(tr(f"tweaks.{tweak}.title"))
+            fix_button.clicked.connect(lambda _=False, t=tweak: self.tweak_requested.emit(t))
+            layout.addWidget(fix_button)
+            self.fix_buttons[check.id] = fix_button
         if check.action and check.status in (Status.WARN, Status.INFO):
             button = QPushButton(action_label(check.action, tr))
             button.clicked.connect(lambda _=False, a=check.action: self.action_requested.emit(a))
@@ -527,6 +554,8 @@ class SystemDialog(QDialog):
         self.refresh_button.clicked.connect(self._request_refresh)
         tools.addWidget(self.refresh_button)
         layout.addLayout(tools)
+        if self._applied:
+            layout.addWidget(self._applied_section())
 
         # Rows grouped by section, in CHECKS order; problems first inside a section.
         self._section_widgets: list[tuple[QLabel, list[tuple[QFrame, CheckResult]]]] = []
@@ -562,6 +591,45 @@ class SystemDialog(QDialog):
         layout.addStretch()
         self._apply_filter()
         return self._scroll(host)
+
+    def _applied_section(self) -> QWidget:
+        """Changes the app made in Windows, newest first, each with "Restore"."""
+        tr = self._tr
+        box = QWidget()
+        layout = QVBoxLayout(box)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
+        head = QHBoxLayout()
+        header = QLabel(tr("win.applied_title").upper())
+        header.setObjectName("subgroupTitle")
+        head.addWidget(header)
+        head.addStretch()
+        self.restore_all_button = QPushButton(tr("win.restore_all"))
+        self.restore_all_button.setProperty("variant", "ghost")
+        self.restore_all_button.clicked.connect(lambda: self.restore_requested.emit(""))
+        head.addWidget(self.restore_all_button)
+        layout.addLayout(head)
+        for entry in reversed(self._applied):
+            frame = QFrame()
+            frame.setObjectName("checkRow")
+            frame.setProperty("status", "info")
+            row = QHBoxLayout(frame)
+            row.setContentsMargins(12, 8, 12, 8)
+            texts = QVBoxLayout()
+            texts.setSpacing(2)
+            name = QLabel(tr(f"tweaks.{entry.tweak}.title"))
+            name.setObjectName("cardTitle")
+            texts.addWidget(name)
+            when = QLabel(tr("win.applied_when", when=entry.when.replace("T", " ")))
+            when.setObjectName("cardDesc")
+            texts.addWidget(when)
+            row.addLayout(texts, 1)
+            button = QPushButton(tr("win.restore"))
+            button.clicked.connect(lambda _=False, e=entry.id: self.restore_requested.emit(e))
+            row.addWidget(button)
+            self.restore_buttons[entry.id] = button
+            layout.addWidget(frame)
+        return box
 
     def _text_section(self, title: str, note: str, items: list[tuple[str, str]]) -> QWidget:
         box = QWidget()

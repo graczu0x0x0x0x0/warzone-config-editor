@@ -4,6 +4,20 @@ Format oparty na [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/), wersj
 [Semantic Versioning](https://semver.org/lang/pl/). Wersja programu jest zdefiniowana w jednym
 miejscu: `src/wzce/__init__.py`.
 
+## [Nieopublikowane]
+
+### Dodano
+
+- **„Napraw” w zakładce Optymalizacja Windows** — program może sam zmienić 8 ustawień Twojego
+  konta Windows (bez uprawnień administratora): włączyć tryb gry, wyłączyć nagrywanie w tle,
+  wyłączyć Auto HDR, ustawić wydajną kartę graficzną dla cod.exe, usunąć „Wyłącz optymalizacje
+  pełnoekranowe” z cod.exe, wyłączyć akcelerację myszy, przełączyć plan zasilania na
+  „Zrównoważony” (Ryzen X3D z dwoma CCD) lub na plan zrównoważony z trybem „Najlepsza
+  wydajność”. Każda zmiana wymaga potwierdzenia, a poprzednia wartość jest zapisywana —
+  sekcja „Zmiany wprowadzone przez program” pozwala ją przywrócić (pojedynczo lub wszystkie).
+  Zmiany są zablokowane, gdy gra działa. Zabezpieczeń (HVCI, Defender, Secure Boot), BIOS
+  i ustawień wymagających administratora program nie zmienia.
+
 ## [1.3.0] — 2026-10-17
 
 ### Dodano

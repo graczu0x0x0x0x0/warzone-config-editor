@@ -198,7 +198,15 @@ Research, stan PC autora i propozycja: [`RAPORT_WINDOWS.md`](RAPORT_WINDOWS.md).
       kontrolna BIOS, „Odśwież” (ponowny odczyt w tle, okno aktualizuje się na miejscu).
       Zakładka „Kontrola sprzętu” pokazuje już tylko sprzęt; przycisk na pasku otwiera zakładkę
       z ostrzeżeniami. Testy GUI (6)
-- [ ] 10d Zmiany bez administratora (HKCU, `powercfg`) z kopią i przywracaniem — po teście u autora
+- [x] 10d Zmiany bez administratora z kopią i przywracaniem: `core/windows_tweaks.py`
+      (8 zmian: tryb gry, nagrywanie w tle, Auto HDR, karta dla cod.exe, FSO cod.exe, akceleracja
+      myszy, plan „Zrównoważony”, plan zrównoważony + „Najlepsza wydajność”). Dziennik JSON
+      `<dane programu>/windows/tweaks.json` ze stanem „przed” każdej wartości (także „nie
+      istniała”), cofanie przy błędzie, blokada przy działającej grze, zapis tylko w HKCU.
+      UI: „Napraw” (z potwierdzeniem) przy pozycjach, „Zmiany wprowadzone przez program”
+      z „Przywróć” / „Przywróć wszystkie”. Testy na fałszywym backendzie (rejestr w pamięci)
+- [ ] 10d — test na żywo u autora (każda zmiana + przywrócenie; czy tryb zasilania i plan
+      zmieniają się bez administratora)
 - [ ] 10e (opcjonalnie) Zmiany przez UAC: HAGS, przywrócenie MPO, wyłączenie nieużywanych funkcji VM
 
 ### Poprawki i dodatki po 1.1.0

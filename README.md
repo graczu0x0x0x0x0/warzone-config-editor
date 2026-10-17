@@ -51,7 +51,10 @@ pilnuje poprawności wartości i bezpiecznie je zapisuje — z kopią zapasową 
   zasilanie (z regułami dla Ryzenów X3D i Intela 13./14. gen.), aktualizacje, plik stronicowania,
   nakładki w tle, mysz i sieć. Każda pozycja ma znaczek siły dowodów (wymagane / zmierzony wpływ /
   zależy od PC / bez wpływu na CoD), instrukcję i przycisk do właściwej strony Windows. Do tego
-  lista mitów („tweaki”, które nic nie dają albo szkodzą) i lista kontrolna BIOS. Tylko odczyt.
+  lista mitów („tweaki”, które nic nie dają albo szkodzą) i lista kontrolna BIOS. Część ustawień
+  (tryb gry, nagrywanie w tle, Auto HDR, karta dla gry, akceleracja myszy, plan zasilania)
+  program zmieni sam po kliknięciu „Napraw” — bez uprawnień administratora i z możliwością
+  przywrócenia.
 - **Udostępnianie ustawień** — czytelne podsumowanie (Markdown na Discord/Reddit albo JSON)
   wybranych kategorii, opcjonalnie z krótkim opisem sprzętu; bez danych identyfikujących.
 - Ciemny motyw, przełączanie **PL / EN** w locie.
@@ -171,7 +174,9 @@ validates every value and saves safely — with backups and a change history.
   Xbox Game Bar, power (with rules for Ryzen X3D and Intel 13th/14th gen), updates, page file,
   background overlays, mouse and network. Every row shows how strong the evidence is (required /
   measured effect / depends on the PC / no effect on CoD), a fix and a button to the right Windows
-  page. Plus a list of myths (tweaks that do nothing or harm) and a BIOS checklist. Read-only.
+  page. Plus a list of myths (tweaks that do nothing or harm) and a BIOS checklist. Some settings
+  (Game Mode, background recording, Auto HDR, GPU for the game, mouse acceleration, power plan)
+  the app can change itself with "Fix" - no admin rights, always restorable.
 - **Share settings** — a readable summary (Markdown for Discord/Reddit, or JSON) of the chosen
   categories, optionally with a short hardware summary; no identifying data.
 - Dark theme, live **EN / PL** language switch.

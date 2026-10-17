@@ -565,7 +565,7 @@ def probe_registry(win: WindowsInfo) -> None:
     win.game_bar_installed = any(n.startswith(GAMEBAR_PACKAGE) for n in _subkeys(hkcu, packages))
 
 
-def _guid_struct():
+def guid_struct():
     import ctypes
     from ctypes import wintypes
 
@@ -596,7 +596,7 @@ def probe_native(win: WindowsInfo) -> None:
     if ctypes.WinDLL("user32").SystemParametersInfoW(0x0003, 0, mouse, 0):  # SPI_GETMOUSE
         win.mouse_acceleration = mouse[2] != 0
 
-    guid_type = _guid_struct()
+    guid_type = guid_struct()
 
     def guid(text: str):
         value = guid_type()

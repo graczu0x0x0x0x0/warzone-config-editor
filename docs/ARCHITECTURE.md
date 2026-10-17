@@ -50,6 +50,7 @@ the game-file logic reviewable on its own.
 | `windows_info.py` | `WindowsInfo` (= `SystemInfo.windows`): gaming-relevant Windows settings - anti-cheat requirements, virtualization/security, DirectX, power, background apps; registry + ctypes + psutil probes, pure parsers |
 | `check_types.py` | `CheckResult`, `Status`, `Severity` (shared by both check modules) |
 | `system_checks.py` | `evaluate_checks()` → hardware `CheckResult`s (EXPO, channels, HDD, refresh, driver, PCIe, ReBAR, iGPU) + all Windows checks |
+| `windows_tweaks.py` | `WindowsTweaks`: reversible per-user changes (HKCU, mouse via SPI, power plan/mode) with a JSON journal of before/after states, rollback on failure, `tweak_for(check)`; OS access through `SystemBackend` (`WindowsBackend` refuses HKLM) |
 | `windows_checks.py` | `evaluate_windows_checks()` → Windows-settings checks; `CHECKS` (id → `Section`, `Impact`), `MYTHS`; CPU-specific rules (dual-CCD X3D, Intel 13/14, Arrow Lake, Zen 3+) |
 | `display.py` | `display_value()`: one human-readable rendering of a value for cards, panels and exports |
 | `share_export.py` | `build_share()` → `to_markdown()` / `to_json()` for "Share settings" |
