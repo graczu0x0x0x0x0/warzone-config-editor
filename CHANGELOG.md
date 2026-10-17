@@ -4,39 +4,45 @@ Format oparty na [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/), wersj
 [Semantic Versioning](https://semver.org/lang/pl/). Wersja programu jest zdefiniowana w jednym
 miejscu: `src/wzce/__init__.py`.
 
-## [Nieopublikowane]
+## [1.3.0] — 2026-10-17
 
 ### Dodano
 
-- Odczyt ustawień Windows ważnych dla gier (etap 10a, na razie bez interfejsu): wymagania
-  anty-cheatu Ricochet (UEFI, Secure Boot, dysk GPT, TPM 2.0 z wersją firmware, certyfikaty
-  Secure Boot 2023), wirtualizacja i zabezpieczenia (hypervisor, SVM/VT-x, VBS/HVCI, WSL/Hyper-V,
-  antywirus), opcje DirectX (Auto HDR, VRR, preferencja GPU dla gry), MPO, Game DVR, tryb
-  zasilania i parametry procesora, plik stronicowania, TRIM, akceleracja myszy, łącze sieciowe
-  i programy działające w tle. Wszystko tylko do odczytu, bez uprawnień administratora.
-- **Optymalizacja Windows 11** (etap 10c) — nowa zakładka w oknie „Sprzęt i system”, także
-  w menu *Narzędzia* → *Optymalizacja Windows…*. Podsumowanie wymagań gry, pozycje pogrupowane
-  w sekcje ze znaczkiem siły dowodów (wymagane przez grę / zmierzony wpływ / zależy od komputera /
-  bez wpływu na CoD), filtr „Pokaż tylko to, co wymaga uwagi”, lista mitów, lista kontrolna BIOS
-  i przycisk „Odśwież” po zmianach w Windows.
-- **Kontrola ustawień Windows** (etap 10b) — ok. 30 sprawdzeń z wyjaśnieniem i instrukcją: wymagania anty-cheatu (Secure Boot,
-  UEFI/GPT, TPM 2.0 i jego firmware, UAC, programy do przemapowania sterowania), wirtualizacja
-  (WSL/Hyper-V przy wyłączonym SVM), antywirus, sterownik WinRing0, karta graficzna dla gry,
-  Auto HDR, wyłączone MPO, Xbox Game Bar, limity procesora, sterownik AMD 3D V-Cache
-  i parkowanie rdzeni (X3D z dwoma CCD), mikrokod Intel 13./14. gen., wersja Windows (poprawki
-  dla Ryzenów i Core Ultra 200S), regresja sterownika NVIDIA po KB5066835, oczekujący restart,
-  plik stronicowania, miejsce na C:, TRIM, nakładki w tle, akceleracja myszy, Wi-Fi.
+- **Optymalizacja Windows 11** — nowa zakładka w oknie „Sprzęt i system”, także w menu
+  *Narzędzia* → *Optymalizacja Windows…*. Pokazuje stan ok. 30 ustawień Windows ważnych dla gry
+  i mówi, co z nimi zrobić:
+  - **wymagania anty-cheatu Ricochet**: Secure Boot, tryb UEFI i dysk GPT, TPM 2.0 (z wykrywaniem
+    firmware fTPM/PTT, które nie przechodzi weryfikacji), UAC, certyfikaty Secure Boot 2023,
+    programy do przemapowania sterowania (reWASD, Cronus Zen);
+  - **zabezpieczenia i wirtualizacja**: integralność pamięci (HVCI), WSL / Hyper-V / platforma
+    maszyny wirtualnej i SVM w BIOS, antywirus, lista blokowanych sterowników, sterownik WinRing0;
+  - **grafika**: karta graficzna dla gry, HAGS, Auto HDR, wyłączone MPO, optymalizacje pełnoekranowe;
+  - **tryb gry i Xbox**: tryb gry, nagrywanie w tle, Xbox Game Bar;
+  - **zasilanie i procesor**: plan i tryb zasilania, limity procesora, sterownik AMD 3D V-Cache
+    i parkowanie rdzeni (Ryzen X3D z dwoma CCD), mikrokod Intel 13./14. generacji;
+  - **aktualizacje**: wersja Windows (poprawki dla Ryzenów 5000–9000 i Core Ultra 200S), regresja
+    po KB5066835 ze sterownikami NVIDIA starszymi niż 581.94, oczekujący restart;
+  - **pamięć i dyski**: plik stronicowania, miejsce na dysku C:, TRIM;
+  - **programy w tle, mysz i sieć**: nakładki (Discord, Steam, NVIDIA, RTSS…), akceleracja
+    myszy, Wi-Fi zamiast kabla.
+
+  Każda pozycja ma znaczek siły dowodów (wymagane przez grę / zmierzony wpływ / zależy od
+  komputera / bez wpływu na CoD), instrukcję i przycisk do właściwej strony Windows. Do tego
+  filtr „Pokaż tylko to, co wymaga uwagi”, lista **mitów** (tweaki, które nic nie dają albo
+  szkodzą), **lista kontrolna BIOS** i przycisk „Odśwież” po zmianach w systemie. Wszystko tylko
+  do odczytu, bez uprawnień administratora — program niczego w Windows nie zmienia.
 - `wzce --system-report` — pełny wynik sondy sprzętu i systemu jako JSON (diagnostyka).
+- Raport [`docs/RAPORT_WINDOWS.md`](docs/RAPORT_WINDOWS.md): research optymalizacji Windows 11
+  pod gry (co działa, co jest mitem, źródła) i plan kolejnych etapów.
 
 ### Zmieniono
 
 - Plan zasilania: na Ryzenach X3D z dwoma CCD zalecany jest plan zrównoważony (wymóg sterownika
-  AMD), a przy planie zrównoważonym ważny jest tryb zasilania „Najlepsza wydajność”.
-- Wskazówki naprawy są pokazywane także przy pozycjach informacyjnych.
+  AMD — wcześniej program błędnie ostrzegał przed tym planem), a przy planie zrównoważonym
+  liczy się tryb zasilania „Najlepsza wydajność”.
 - Zakładka „Kontrola systemu” nazywa się teraz „Kontrola sprzętu” i pokazuje tylko sprzęt;
   przycisk „Kontrola systemu: N” na pasku otwiera zakładkę, w której są ostrzeżenia.
-- Raport [`docs/RAPORT_WINDOWS.md`](docs/RAPORT_WINDOWS.md): research optymalizacji Windows 11
-  pod gry (co działa, co jest mitem) i plan zakładki „Optymalizacja Windows”.
+- Wskazówki naprawy są pokazywane także przy pozycjach informacyjnych.
 
 ## [1.2.0] — 2026-10-17
 
