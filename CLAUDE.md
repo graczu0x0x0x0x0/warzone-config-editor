@@ -32,6 +32,12 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   `.apply_values(mapping)` -> `(applied, errors)`, `.copy()`, `.to_bytes()`
 - `Setting`: `.id` (`Key@Variant`), `.value_type`, `.value`, `.constraint`, `.description`, `.section`, `.read_only`
 - `BackupManager().create/list/restore/prune`; `diff_documents(a, b)`
+- `EditorSession` (`core/session.py`): `set_value/revert/discard_all/apply_raw_values/restore_snapshot`
+  all push onto `session.undo_stack` (`core/undo.py`); `undo()/redo()` return touched ids.
+  `reload()` clears undo unless `keep_undo=True` (used by `save`).
+- `HistoryStore` (`core/history.py`): SAVE / GAME_CHANGE entries with diff + snapshot after;
+  `last_seen.snapshot` drives `check_external_change`; `session.external_change` holds the latest
+  GAME_CHANGE until the UI calls `acknowledge_external_change()`.
 - `KnowledgeBase.load()`: `.groups`, `.presets`, `.entries[id]`, `.entry_for(setting)` (synthesizes unknown ids),
   `.preset_values(preset_id)`; `KnowledgeEntry.label/desc` are `{en, pl}` -> use `localized(text, lang)`
 - `Translator(lang)`: `tr("key", **params)`, `.set_language()`, `.add_listener(cb)` for live re-labelling
@@ -48,8 +54,10 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   `repolish(widget)` after changing a property. Icons: `data/icons/*.svg`.
 - Editors: `editors.create_editor()`; sliders/spins/combos are wheel-guarded (no value change
   while scrolling the page). `set_raw()` must never emit `edited`.
-- All dialogs go through `MainWindow._ask/_prompt_unsaved/_show_message` - tests replace them;
+- All dialogs go through `MainWindow._ask/_prompt_unsaved/_show_message/_exec_dialog` - tests replace them;
   a real modal `exec()` hangs the headless test run.
+- Any change to the working copy must end in `_after_changes(ids)` (cards, nav, panel, buttons).
+- History restores pass through `_user_values()`, which drops read-only and `game_managed` settings.
 - MVP edits machine-scope files only (`s.1.0.codNN`); account files come in stage 7.
 
 ## Hard rules for touching game files

@@ -262,3 +262,159 @@ def test_wheel_does_not_change_unfocused_slider(qtbot) -> None:
     )  # fmt: skip
     QApplication.sendEvent(slider, event)
     assert slider.value() == 50
+
+
+# ------------------------------------------------------- stage 4: undo/redo
+
+
+def _edit(window: MainWindow, setting_id: str, value: object) -> None:
+    window.navigate_to(setting_id)
+    window.cards[setting_id].editor.edited.emit(value)
+    # Make the next edit a separate undo step regardless of timing.
+    window.session.undo_stack.peek_undo().timestamp = -100
+
+
+def test_undo_redo_buttons_and_tooltips(window: MainWindow) -> None:
+    assert not window.undo_button.isEnabled()
+    _edit(window, "MaxFpsInGame@0", 144)
+    assert window.undo_button.isEnabled()
+    assert "Max FPS in match" in window.undo_button.toolTip()
+
+    window.undo()
+    assert not window.session.is_dirty
+    assert window.redo_button.isEnabled()
+    assert window.cards["MaxFpsInGame@0"].editor.spin.value() == 250
+    window.redo()
+    assert window.session.changed_ids() == {"MaxFpsInGame@0"}
+
+
+def test_undo_jumps_to_the_setting_on_another_page(window: MainWindow) -> None:
+    _edit(window, "MaxFpsInGame@0", 144)
+    window.navigate_to("Volume@0")  # audio page, the fps card is not shown
+    assert "MaxFpsInGame@0" not in window.cards
+    window.undo()
+    assert "MaxFpsInGame@0" in window.cards
+
+
+def test_discard_all_is_undoable_without_confirmation(window: MainWindow) -> None:
+    window._ask = lambda *_a: pytest.fail("discard must not ask any more")
+    _edit(window, "MaxFpsInGame@0", 144)
+    _edit(window, "ShaderQuality@0", "Medium")
+    window._discard_all()
+    assert not window.session.is_dirty
+    window.undo()
+    assert window.session.changed_ids() == {"MaxFpsInGame@0", "ShaderQuality@0"}
+
+
+# --------------------------------------------------------- stage 4: history
+
+
+def test_history_dialog_lists_saves_with_diff(window: MainWindow, knowledge) -> None:
+    from wzce.ui.history_dialog import HistoryDialog
+
+    _edit(window, "MaxFpsInGame@0", 144)
+    window.save()
+    _edit(window, "ShaderQuality@0", "Medium")
+    window.save()
+
+    dialog = HistoryDialog(window.session, knowledge, window.tr)
+    assert dialog.entry_list.count() == 2
+    assert "Saved in editor" in dialog.entry_list.item(0).text()
+    assert dialog.table.rowCount() == 1  # newest entry: ShaderQuality
+    assert dialog.table.item(0, 0).text() == "Shader quality"
+    assert (dialog.table.item(0, 1).text(), dialog.table.item(0, 2).text()) == ("Low", "Medium")
+    dialog.close()
+
+
+@pytest.mark.parametrize(("action", "expected_fps"), [("undo", "250"), ("restore", "144")])
+def test_history_restore_actions(window: MainWindow, action: str, expected_fps: str) -> None:
+    _edit(window, "MaxFpsInGame@0", 144)
+    window.save()
+    _edit(window, "MaxFpsInGame@0", 200)
+    window.save()
+
+    def run(dialog) -> bool:
+        dialog.entry_list.setCurrentRow(1)  # the older save (250 -> 144)
+        if action == "undo":
+            dialog._choose_undo_entry()
+        else:
+            dialog._choose_restore_state()
+        return True
+
+    window._exec_dialog = run
+    window.open_history()
+    # Restoring only touches the working copy; it is one undoable step.
+    assert window.session.document.get("MaxFpsInGame@0").raw_value == expected_fps
+    assert _disk_value(window, "MaxFpsInGame@0") == "200"
+    window.undo()
+    assert not window.session.is_dirty
+
+
+# ------------------------------------------------- stage 4: game changes
+
+
+def _game_writes(window: MainWindow, **values: object) -> None:
+    fileset = window.session.fileset
+    doc = fileset.load().document
+    for key, value in values.items():
+        doc.set_value(f"{key}@0", value, allow_read_only=True)
+    for path in fileset.slots:
+        path.write_bytes(doc.to_bytes())
+
+
+def test_game_change_shows_notice_and_can_be_undone(window: MainWindow) -> None:
+    _game_writes(window, MaxFpsInGame=60, ShowFPSCounter=True)
+    window._poll()  # clean session: reloads and detects the change
+    assert not window.notice.isHidden()
+    assert "Max FPS in match" in window.notice_text.text()
+
+    window._on_notice_undo()
+    assert window.notice.isHidden()
+    assert window.session.document.get("MaxFpsInGame@0").raw_value == "250"
+    assert window.session.document.get("ShowFPSCounter@0").raw_value == "false"
+    assert window.session.is_dirty  # needs saving to take effect
+
+
+def test_game_managed_changes_stay_quiet(window: MainWindow) -> None:
+    _game_writes(window, DisplayDriverVersion="999.99", WindowX=100)
+    window._poll()
+    assert window.notice.isHidden()
+    entries = window.session.history.list(window.session.fileset)
+    assert entries and entries[0].kind.value == "game_change"  # still recorded
+
+
+def test_notice_details_open_history_on_that_entry(window: MainWindow) -> None:
+    _game_writes(window, MaxFpsInGame=60)
+    window._poll()
+    seen = {}
+
+    def run(dialog) -> bool:
+        seen["entry"] = dialog.current_entry
+        return False
+
+    window._exec_dialog = run
+    window._on_notice_show()
+    assert seen["entry"].id == window.session.external_change.id
+
+
+def test_game_change_while_editing_only_warns(window: MainWindow) -> None:
+    _edit(window, "ShaderQuality@0", "Medium")
+    _game_writes(window, MaxFpsInGame=60)
+    window._poll()
+    assert window.session.is_dirty  # user's work is not thrown away
+    assert window.session.document.get("MaxFpsInGame@0").raw_value == "250"
+    assert window.notice.isHidden()
+
+
+def test_saving_over_game_changes_asks_and_keeps_them_in_history(window: MainWindow) -> None:
+    _edit(window, "ShaderQuality@0", "Medium")
+    _game_writes(window, MaxFpsInGame=60)
+    questions = []
+    window._ask = lambda title, text: questions.append(text) or False
+    assert window.save() is False  # declined
+    assert _disk_value(window, "MaxFpsInGame@0") == "60"
+
+    window._ask = lambda *_a: True
+    assert window.save() is True
+    kinds = [e.kind.value for e in window.session.history.list(window.session.fileset)]
+    assert kinds == ["save", "game_change"]  # the overwritten game change is recoverable

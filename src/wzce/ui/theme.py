@@ -236,6 +236,21 @@ def stylesheet() -> str:
     #changeValues {{ color: {c["text_muted"]}; font-size: 9pt; }}
     #slotWarning {{ color: {c["accent"]}; font-size: 9pt; }}
 
+    /* ---------- game-change notice ---------- */
+    #notice {{ background: #2a2216; border-bottom: 1px solid #4a3b22; }}
+    #notice QLabel {{ color: {c["accent_hover"]}; }}
+
+    /* ---------- tables (history) ---------- */
+    QTableWidget {{
+        background: {c["surface"]}; border: 1px solid {c["border"]}; border-radius: 6px;
+        gridline-color: {c["border"]}; alternate-background-color: {c["surface_alt"]};
+    }}
+    QTableWidget::item {{ padding: 4px 8px; }}
+    QHeaderView::section {{
+        background: {c["surface_alt"]}; color: {c["text_muted"]}; border: none;
+        border-bottom: 1px solid {c["border"]}; padding: 6px 8px; font-weight: 600;
+    }}
+
     /* toggle switch label */
     #toggleText {{ color: {c["text_muted"]}; }}
 

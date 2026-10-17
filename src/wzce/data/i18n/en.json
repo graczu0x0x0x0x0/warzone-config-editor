@@ -76,6 +76,22 @@
   "filter.hide_other_vendors": "Hide options for other GPU vendors",
   "filter.no_results": "No settings match \"{query}\".",
 
+  "history.title": "History",
+  "history.empty": "No history yet. Entries appear when you save or when the game changes the file.",
+  "history.kind_save": "Saved in editor",
+  "history.kind_game_change": "Changed by the game",
+  "history.entry": "{kind} · {count} change(s)",
+  "history.col_setting": "Setting",
+  "history.col_before": "Before",
+  "history.col_after": "After",
+  "history.undo_entry": "Undo these changes",
+  "history.undo_entry_tip": "Puts back the values from before this entry - only for the settings listed.",
+  "history.restore_state": "Restore this whole state",
+  "history.restore_state_tip": "Loads every setting exactly as it was right after this entry.",
+  "history.applied": "{count} setting(s) loaded into the editor - review them and save to apply.",
+  "history.nothing_to_apply": "Nothing to restore - the values already match.",
+  "history.missing_setting": "(not in this file)",
+
   "impact.title": "Impact",
   "impact.fps": "FPS",
   "impact.latency": "Input latency",
@@ -91,6 +107,12 @@
   "nav.other": "Other",
   "nav.new_settings": "New settings",
 
+  "notice.game_changed": "The game changed {count} setting(s) since the editor last saw this file: {names}.",
+  "notice.show": "Show details",
+  "notice.undo_game": "Undo the game's changes",
+  "notice.dismiss": "Dismiss",
+  "notice.undone": "Values from before the game's changes are back in the editor - save to apply them.",
+
   "page.empty_filtered": "Nothing to show with the current filters.",
 
   "preset.apply": "Apply preset",
@@ -99,6 +121,9 @@
 
   "readonly.toggle": "Lock files (read-only)",
   "readonly.explain": "Read-only files stop game updates from resetting your settings, but the game also cannot save changes made in its own menu. Unlock before changing settings in the game.",
+
+  "redo.tooltip": "Redo: {what} (Ctrl+Y)",
+  "redo.nothing": "Nothing to redo",
 
   "reset.recommended_title": "Let the game reset everything",
   "reset.recommended_text": "On next start the game will reset ALL settings to its recommended values. Continue?",
@@ -109,6 +134,7 @@
   "save.game_running_title": "Call of Duty is running",
   "save.game_running_text": "Close the game completely before saving - it rewrites the settings files when it exits and would undo your changes.",
   "save.read_only_note": "The files were read-only and stay read-only after saving.",
+  "save.disk_changed": "The file was changed on disk after you opened it (probably by the game). Saving overwrites those changes - they will stay available in History. Save anyway?",
   "save.failed": "Saving failed: {error}. The previous files were restored.",
   "save.nothing": "Nothing to save.",
 
@@ -126,6 +152,7 @@
   "status.reloaded": "Settings reloaded from disk.",
   "status.changed_on_disk_dirty": "The file changed on disk (probably the game). Use Reload to see it - your unsaved changes will be lost.",
   "status.gpu": "GPU: {vendor}",
+  "status.discarded": "All changes discarded - Ctrl+Z brings them back.",
 
   "toolbar.save": "Save",
   "toolbar.save_count": "Save ({count})",
@@ -143,9 +170,12 @@
   "toolbar.recommend_for": "Recommendations:",
   "toolbar.preset_none": "None",
 
+  "undo.tooltip": "Undo: {what} (Ctrl+Z)",
+  "undo.many": "{count} settings",
+  "undo.nothing": "Nothing to undo",
+
   "unsaved.title": "Unsaved changes",
   "unsaved.text": "You have {count} unsaved change(s). Save them first?",
-  "unsaved.discard_confirm": "Discard {count} unsaved change(s)?",
 
   "value.true": "On",
   "value.false": "Off",

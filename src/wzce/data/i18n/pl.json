@@ -76,6 +76,22 @@
   "filter.hide_other_vendors": "Ukryj opcje dla kart innych producentów",
   "filter.no_results": "Brak ustawień pasujących do „{query}”.",
 
+  "history.title": "Historia zmian",
+  "history.empty": "Historia jest pusta. Wpisy pojawiają się po zapisie lub gdy gra zmieni plik.",
+  "history.kind_save": "Zapis w edytorze",
+  "history.kind_game_change": "Zmienione przez grę",
+  "history.entry": "{kind} · zmian: {count}",
+  "history.col_setting": "Ustawienie",
+  "history.col_before": "Przed",
+  "history.col_after": "Po",
+  "history.undo_entry": "Cofnij te zmiany",
+  "history.undo_entry_tip": "Przywraca wartości sprzed tego wpisu — tylko dla wymienionych ustawień.",
+  "history.restore_state": "Przywróć cały ten stan",
+  "history.restore_state_tip": "Wczytuje wszystkie ustawienia dokładnie w stanie tuż po tym wpisie.",
+  "history.applied": "Wczytano do edytora ustawień: {count} — sprawdź je i zapisz, aby zastosować.",
+  "history.nothing_to_apply": "Nie ma czego przywracać — wartości już się zgadzają.",
+  "history.missing_setting": "(brak w tym pliku)",
+
   "impact.title": "Wpływ",
   "impact.fps": "FPS",
   "impact.latency": "Opóźnienie",
@@ -91,6 +107,12 @@
   "nav.other": "Inne",
   "nav.new_settings": "Nowe ustawienia",
 
+  "notice.game_changed": "Gra zmieniła ustawienia ({count}) od ostatniego razu, gdy edytor widział ten plik: {names}.",
+  "notice.show": "Pokaż szczegóły",
+  "notice.undo_game": "Cofnij zmiany gry",
+  "notice.dismiss": "Zamknij",
+  "notice.undone": "Wartości sprzed zmian gry wróciły do edytora — zapisz, aby je zastosować.",
+
   "page.empty_filtered": "Brak ustawień przy obecnych filtrach.",
 
   "preset.apply": "Zastosuj preset",
@@ -99,6 +121,9 @@
 
   "readonly.toggle": "Zablokuj pliki (tylko do odczytu)",
   "readonly.explain": "Pliki tylko do odczytu chronią ustawienia przed resetem przez aktualizacje gry, ale gra nie zapisze też zmian zrobionych w jej menu. Odblokuj je przed zmianą ustawień w grze.",
+
+  "redo.tooltip": "Ponów: {what} (Ctrl+Y)",
+  "redo.nothing": "Nie ma czego ponowić",
 
   "reset.recommended_title": "Niech gra zresetuje wszystko",
   "reset.recommended_text": "Przy następnym starcie gra przywróci WSZYSTKIE ustawienia do zalecanych. Kontynuować?",
@@ -109,6 +134,7 @@
   "save.game_running_title": "Call of Duty jest uruchomione",
   "save.game_running_text": "Zamknij całkowicie grę przed zapisem — przy wyjściu nadpisuje pliki ustawień i cofnęłaby Twoje zmiany.",
   "save.read_only_note": "Pliki były tylko do odczytu i pozostają takie po zapisie.",
+  "save.disk_changed": "Plik zmienił się na dysku po otwarciu (prawdopodobnie przez grę). Zapis nadpisze te zmiany — pozostaną dostępne w Historii. Zapisać mimo to?",
   "save.failed": "Zapis nie powiódł się: {error}. Przywrócono poprzednie pliki.",
   "save.nothing": "Brak zmian do zapisania.",
 
@@ -126,6 +152,7 @@
   "status.reloaded": "Wczytano ustawienia ponownie z dysku.",
   "status.changed_on_disk_dirty": "Plik zmienił się na dysku (prawdopodobnie przez grę). Użyj „Wczytaj ponownie”, aby go zobaczyć — niezapisane zmiany przepadną.",
   "status.gpu": "GPU: {vendor}",
+  "status.discarded": "Odrzucono wszystkie zmiany — Ctrl+Z je przywróci.",
 
   "toolbar.save": "Zapisz",
   "toolbar.save_count": "Zapisz ({count})",
@@ -143,9 +170,12 @@
   "toolbar.recommend_for": "Zalecenia:",
   "toolbar.preset_none": "Bez zaleceń",
 
+  "undo.tooltip": "Cofnij: {what} (Ctrl+Z)",
+  "undo.many": "ustawienia: {count}",
+  "undo.nothing": "Nie ma czego cofnąć",
+
   "unsaved.title": "Niezapisane zmiany",
   "unsaved.text": "Masz niezapisane zmiany: {count}. Zapisać je najpierw?",
-  "unsaved.discard_confirm": "Odrzucić niezapisane zmiany ({count})?",
 
   "value.true": "Wł.",
   "value.false": "Wył.",

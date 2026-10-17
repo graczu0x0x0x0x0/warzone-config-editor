@@ -9,8 +9,10 @@ Data flow
   language change (~170 cards max, fast enough). Rebuilds triggered from inside a
   card's own signal are deferred with ``QTimer.singleShot(0, ...)`` so the card is
   never deleted while its handler is still running.
-* Every dialog goes through ``_ask`` / ``_prompt_unsaved`` / ``_show_message`` so tests can
-  replace them.
+* Every dialog goes through ``_ask`` / ``_prompt_unsaved`` / ``_show_message`` /
+  ``_exec_dialog`` so tests can replace them.
+* Undo/redo, discard and history restores all go through the session's undo stack;
+  ``_after_changes(ids)`` is the one refresh path for any change to the working copy.
 """
 
 from __future__ import annotations
@@ -21,6 +23,7 @@ from PySide6.QtWidgets import (
     QButtonGroup,
     QCheckBox,
     QComboBox,
+    QDialog,
     QFileDialog,
     QFrame,
     QHBoxLayout,
@@ -40,6 +43,7 @@ from PySide6.QtWidgets import (
 from ..core.backup import BackupManager
 from ..core.discovery import ConfigLocation, FileKind, Scope, discover
 from ..core.errors import GameRunningError, ValidationError, WzceError
+from ..core.history import HistoryEntry
 from ..core.i18n import Translator, language_name
 from ..core.knowledge import SUPPORTED_LANGUAGES, KnowledgeBase, KnowledgeEntry, localized
 from ..core.model import Setting
@@ -48,6 +52,7 @@ from ..core.session import EditorSession
 from ..core.storage import SettingsFileSet
 from .app_settings import AppSettings
 from .changes_panel import ChangesPanel
+from .history_dialog import HistoryDialog
 from .setting_card import SettingCard
 from .theme import repolish
 
@@ -114,6 +119,7 @@ class MainWindow(QMainWindow):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
         root.addWidget(self._build_header())
+        root.addWidget(self._build_notice())
 
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
         self.splitter.setChildrenCollapsible(False)
@@ -158,6 +164,9 @@ class MainWindow(QMainWindow):
 
         QShortcut(QKeySequence.StandardKey.Save, self, activated=self.save)
         QShortcut(QKeySequence.StandardKey.Find, self, activated=self.search.setFocus)
+        QShortcut(QKeySequence.StandardKey.Undo, self, activated=self.undo)
+        QShortcut(QKeySequence.StandardKey.Redo, self, activated=self.redo)
+        QShortcut(QKeySequence("Ctrl+Shift+Z"), self, activated=self.redo)
 
     def _build_header(self) -> QWidget:
         header = QFrame()
@@ -219,6 +228,16 @@ class MainWindow(QMainWindow):
         self.preset_combo.activated.connect(self._on_preset_changed)
         row2.addWidget(self.preset_combo)
         row2.addStretch()
+        # Plain text labels: the arrow glyphs are missing from many Windows UI fonts.
+        self.undo_button = QPushButton()
+        self.undo_button.clicked.connect(self.undo)
+        self.redo_button = QPushButton()
+        self.redo_button.clicked.connect(self.redo)
+        row2.addWidget(self.undo_button)
+        row2.addWidget(self.redo_button)
+        self.history_button = QPushButton()
+        self.history_button.clicked.connect(lambda: self.open_history())
+        row2.addWidget(self.history_button)
         self.reload_button = QPushButton()
         self.reload_button.clicked.connect(self._reload)
         row2.addWidget(self.reload_button)
@@ -245,6 +264,12 @@ class MainWindow(QMainWindow):
         self.preset_label.setText(tr("toolbar.recommend_for"))
         self.reload_button.setText(tr("toolbar.reload"))
         self.discard_button.setText(tr("toolbar.discard"))
+        self.history_button.setText(tr("toolbar.history"))
+        self.undo_button.setText(tr("toolbar.undo"))
+        self.redo_button.setText(tr("toolbar.redo"))
+        self.notice_show.setText(tr("notice.show"))
+        self.notice_undo.setText(tr("notice.undo_game"))
+        self.notice_dismiss.setToolTip(tr("notice.dismiss"))
 
         self.preset_combo.clear()
         self.preset_combo.addItem(tr("toolbar.preset_none"), "")
@@ -492,6 +517,7 @@ class MainWindow(QMainWindow):
         )
 
     def _render_all(self) -> None:
+        self._update_notice()
         self._refresh_nav()
         self._render_page()
         self.changes_panel.refresh(self.session)
@@ -600,10 +626,15 @@ class MainWindow(QMainWindow):
         self._after_change(setting_id)
 
     def _after_change(self, setting_id: str) -> None:
+        self._after_changes([setting_id])
+
+    def _after_changes(self, setting_ids: list[str]) -> None:
+        """Refresh everything that depends on the working copy after values changed."""
         assert self.session is not None
-        card = self.cards.get(setting_id)
-        if card is not None:
-            card.refresh()
+        for setting_id in setting_ids:
+            card = self.cards.get(setting_id)
+            if card is not None:
+                card.refresh()
         self._refresh_nav()
         self.changes_panel.refresh(self.session)
         self._update_dirty_state()
@@ -613,15 +644,138 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(0, self, self._render_page)
 
     def _discard_all(self) -> None:
+        # No confirmation needed any more: discarding is a single undoable step.
         if self.session is None or not self.session.is_dirty:
             return
-        count = len(self.session.pending_changes())
-        if not self._ask(
-            self.tr("toolbar.discard"), self.tr("unsaved.discard_confirm", count=count)
-        ):
+        touched = self.session.discard_all()
+        self._after_changes(touched)
+        self.statusBar().showMessage(self.tr("status.discarded"), STATUS_TIMEOUT_MS)
+
+    # ========================================================== undo/redo
+    def undo(self) -> None:
+        if self.session is not None:
+            self._show_undo_result(self.session.undo())
+
+    def redo(self) -> None:
+        if self.session is not None:
+            self._show_undo_result(self.session.redo())
+
+    def _show_undo_result(self, setting_ids: list[str]) -> None:
+        if not setting_ids:
             return
-        self.session.discard_all()
-        QTimer.singleShot(0, self, self._render_all)
+        self._after_changes(setting_ids)
+        if len(setting_ids) == 1 and setting_ids[0] not in self.cards:
+            # Undoing something on another page: take the user there.
+            self.navigate_to(setting_ids[0])
+
+    def _command_text(self, setting_ids: list[str]) -> str:
+        assert self.session is not None
+        if len(setting_ids) == 1 and setting_ids[0] in self.session.document:
+            setting = self.session.document.get(setting_ids[0])
+            return localized(self.knowledge.entry_for(setting).label, self.tr.language)
+        return self.tr("undo.many", count=len(setting_ids))
+
+    # ============================================================ history
+    def _user_values(self, values: dict[str, str]) -> dict[str, str]:
+        """Drop settings the game manages itself before restoring old values.
+
+        Putting back an old driver version, window position or detected-hardware
+        value would only confuse the game, so history restores skip them.
+        """
+        assert self.session is not None
+        document = self.session.document
+        result = {}
+        for setting_id, raw in values.items():
+            if setting_id not in document:
+                continue
+            setting = document.get(setting_id)
+            if setting.read_only or "game_managed" in self.knowledge.entry_for(setting).flags:
+                continue
+            result[setting_id] = raw
+        return result
+
+    def _apply_restored_values(self, values: dict[str, str]) -> None:
+        assert self.session is not None
+        touched = self.session.apply_raw_values(self._user_values(values))
+        if touched:
+            self._after_changes(touched)
+            message = self.tr("history.applied", count=len(touched))
+        else:
+            message = self.tr("history.nothing_to_apply")
+        self.statusBar().showMessage(message, STATUS_TIMEOUT_MS)
+
+    def open_history(self, entry_id: str | None = None) -> None:
+        if self.session is None:
+            return
+        dialog = HistoryDialog(
+            self.session, self.knowledge, self.tr, select_entry_id=entry_id, parent=self
+        )
+        if self._exec_dialog(dialog) and dialog.result_values:
+            self._apply_restored_values(dialog.result_values)
+
+    # ===================================================== game-change notice
+    def _build_notice(self) -> QWidget:
+        self.notice = QFrame()
+        self.notice.setObjectName("notice")
+        layout = QHBoxLayout(self.notice)
+        layout.setContentsMargins(16, 8, 12, 8)
+        self.notice_text = QLabel()
+        self.notice_text.setWordWrap(True)
+        layout.addWidget(self.notice_text, 1)
+        self.notice_show = QPushButton()
+        self.notice_show.clicked.connect(self._on_notice_show)
+        layout.addWidget(self.notice_show)
+        self.notice_undo = QPushButton()
+        self.notice_undo.clicked.connect(self._on_notice_undo)
+        layout.addWidget(self.notice_undo)
+        self.notice_dismiss = QPushButton("✕")
+        self.notice_dismiss.setProperty("variant", "ghost")
+        self.notice_dismiss.clicked.connect(self._dismiss_notice)
+        layout.addWidget(self.notice_dismiss)
+        self.notice.hide()
+        return self.notice
+
+    def _notice_entry(self) -> HistoryEntry | None:
+        return self.session.external_change if self.session is not None else None
+
+    def _update_notice(self) -> None:
+        """Show the banner when the game changed settings the user cares about."""
+        entry = self._notice_entry()
+        if entry is None:
+            self.notice.hide()
+            return
+        meaningful = self._user_values(entry.old_values())
+        if not meaningful:
+            # Only game-managed values changed (driver version, window...): stay quiet;
+            # the entry is still in the history.
+            self.session.acknowledge_external_change()
+            self.notice.hide()
+            return
+        names = [self._command_text([sid]) for sid in list(meaningful)[:3]]
+        if len(meaningful) > 3:
+            names.append("…")
+        self.notice_text.setText(
+            self.tr("notice.game_changed", count=len(meaningful), names=", ".join(names))
+        )
+        self.notice.show()
+
+    def _on_notice_show(self) -> None:
+        entry = self._notice_entry()
+        if entry is not None:
+            self.open_history(entry.id)
+
+    def _on_notice_undo(self) -> None:
+        entry = self._notice_entry()
+        if entry is None:
+            return
+        self._apply_restored_values(entry.old_values())
+        self._dismiss_notice()
+        self.statusBar().showMessage(self.tr("notice.undone"), STATUS_TIMEOUT_MS)
+
+    def _dismiss_notice(self) -> None:
+        if self.session is not None:
+            self.session.acknowledge_external_change()
+        self.notice.hide()
 
     def _reload(self) -> None:
         if self.session is None or not self._confirm_leave():
@@ -691,6 +845,12 @@ class MainWindow(QMainWindow):
             self._show_message(
                 "warning", tr("save.game_running_title"), tr("save.game_running_text")
             )
+            return False
+        # Asked even when ``confirm`` is False: overwriting the game's own changes
+        # is a different decision than "save my edits".
+        if session.disk_changed() and not self._ask(
+            tr("save.confirm_title"), tr("save.disk_changed")
+        ):
             return False
         if confirm and not self._ask(
             tr("save.confirm_title"), tr("save.confirm_text", count=count)
@@ -771,6 +931,22 @@ class MainWindow(QMainWindow):
         self.save_button.setToolTip(tr("save.game_running_text") if self._game_running else "")
         self.discard_button.setEnabled(count > 0)
         self.reload_button.setEnabled(session is not None)
+        self.history_button.setEnabled(session is not None)
+        stack = session.undo_stack if session else None
+        undo_cmd = stack.peek_undo() if stack else None
+        redo_cmd = stack.peek_redo() if stack else None
+        self.undo_button.setEnabled(undo_cmd is not None)
+        self.redo_button.setEnabled(redo_cmd is not None)
+        self.undo_button.setToolTip(
+            tr("undo.tooltip", what=self._command_text(undo_cmd.setting_ids))
+            if undo_cmd
+            else tr("undo.nothing")
+        )
+        self.redo_button.setToolTip(
+            tr("redo.tooltip", what=self._command_text(redo_cmd.setting_ids))
+            if redo_cmd
+            else tr("redo.nothing")
+        )
         self.title_label.setProperty("dirty", count > 0)
         repolish(self.title_label)
         name = session.fileset.stem if session else ""
@@ -798,6 +974,10 @@ class MainWindow(QMainWindow):
         box.exec()
         clicked = box.clickedButton()
         return "save" if clicked is save else "discard" if clicked is discard else "cancel"
+
+    def _exec_dialog(self, dialog: QDialog) -> bool:
+        """Run a modal dialog; True when accepted. Replaced in tests."""
+        return dialog.exec() == QDialog.DialogCode.Accepted
 
     def _show_message(self, level: str, title: str, text: str) -> None:
         icon = {

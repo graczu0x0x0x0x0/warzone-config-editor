@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–3 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–4 ukończone** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -18,7 +18,8 @@ src/wzce/
     discovery.py   # finds s.1.0.codNN and account g.codNN files                [done]
     process.py     # cod.exe detection                                           [done]
     paths.py       # %APPDATA%/WarzoneConfigEditor, game players folders         [done]
-    history.py     # trwała historia zapisów (snapshoty + diff)
+    undo.py        # undo stack with merging of quick edits                    [done]
+    history.py     # persistent history: saves + game changes, snapshots     [done]
     templates.py   # szablony: zapis/odczyt/nakładanie częściowe, import/export
     knowledge.py   # knowledge base loader + unknown-key fallback                [done]
     i18n.py        # UI translations with EN fallback, language listeners        [done]
@@ -30,7 +31,8 @@ src/wzce/
   ui/              # PySide6
     app.py, app_settings.py, theme.py                                         [done]
     main_window.py, setting_card.py, editors.py, changes_panel.py             [done]
-    history_dialog.py, templates_dialog.py, optimizer_wizard.py               (stages 4-6)
+    history_dialog.py                                                          [done]
+    templates_dialog.py, optimizer_wizard.py                                   (stages 5-6)
 tests/             # pytest, fixtures z examples/
 ```
 
@@ -77,9 +79,18 @@ tests/             # pytest, fixtures z examples/
 - [ ] Opisy w bazie wiedzy dla 6 ustawień tylko z BO6 (cod24) — dziś pokazują się jako „Nowe”
 
 ### Etap 4 — Historia i cofanie
-- [ ] Cofnij/Ponów w sesji (`QUndoStack`, Ctrl+Z / Ctrl+Y)
-- [ ] Trwała historia zapisów z opisem, datą i diffem; przywracanie dowolnej wersji
-- [ ] Wykrywanie zmian dokonanych przez grę od ostatniego otwarcia („gra zmieniła 4 ustawienia”)
+- [x] Cofnij/Ponów (Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z) — własny stos w rdzeniu zamiast `QUndoStack`
+      (testowalny bez Qt); szybkie zmiany tego samego ustawienia łączą się w jeden krok;
+      cofnąć można też „Odrzuć wszystkie” i przywrócenia z historii; stos przeżywa zapis
+- [x] Trwała historia (`%APPDATA%\WarzoneConfigEditor\history`): wpisy „Zapis w edytorze” i
+      „Zmienione przez grę”, data, diff przed → po, pełny stan po każdym wpisie (do 200 wpisów)
+- [x] Okno Historii: „Cofnij te zmiany” (tylko wymienione ustawienia) i „Przywróć cały ten stan”;
+      oba trafiają do edytora jako zmiany do zapisania; pomijają wartości zarządzane przez grę
+- [x] Wykrywanie zmian gry: przy otwarciu (porównanie z ostatnio widzianym stanem) i w trakcie pracy;
+      baner z nazwami zmienionych ustawień, „Pokaż szczegóły” i „Cofnij zmiany gry”;
+      zmiany samych pól technicznych (sterownik, okno) trafiają do historii bez banera
+- [x] Zapis nadpisujący świeże zmiany gry pyta o zgodę, a nadpisywany stan najpierw trafia do historii
+- [x] Testy: 17 rdzenia (stos, historia, zmiany gry) + 11 GUI
 
 ### Etap 5 — Szablony i presety
 - [ ] Zapis szablonu: całość lub wybrane kategorie; pomijanie danych sprzętowych
