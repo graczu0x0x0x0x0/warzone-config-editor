@@ -48,9 +48,9 @@ def smoke_test() -> int:
     """Build the full UI without showing it, then exit. Used to check a frozen build.
 
     Exit codes: 0 OK, 2 Qt image plugins missing (SVG/ICO icons would not render),
-    3 the main window could not be built. Our own data goes to a temporary folder so
-    the check never touches the user's settings, history or backups (game files are
-    only read).
+    3 the main window could not be built, 4 the hardware probe (PowerShell/WMI) failed.
+    Our own data goes to a temporary folder so the check never touches the user's
+    settings, history or backups (game files are only read).
     """
     os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
     os.environ["WZCE_DATA_DIR"] = tempfile.mkdtemp(prefix="wzce-smoke-")
@@ -68,4 +68,10 @@ def smoke_test() -> int:
         window.close()
     except Exception:  # any failure means the build is broken
         return 3
+    # The system probe runs PowerShell from the frozen exe - verify it really works.
+    from ..core.system_info import collect_system_info
+
+    info = collect_system_info()
+    if any(error.startswith("cim") for error in info.errors) or not info.cpu_name:
+        return 4
     return 0

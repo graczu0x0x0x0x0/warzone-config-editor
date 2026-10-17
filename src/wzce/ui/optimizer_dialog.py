@@ -42,6 +42,7 @@ class OptimizerDialog(QDialog):
         hardware: HardwareInfo,
         *,
         goal: Goal = Goal.COMPETITIVE,
+        hints: list[str] | None = None,
         parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
@@ -63,6 +64,13 @@ class OptimizerDialog(QDialog):
         title.setObjectName("pageTitle")
         root.addWidget(title)
         root.addWidget(self._hardware_box())
+        # System problems that limit performance more than any game setting
+        # (e.g. RAM without EXPO/XMP, single-channel RAM, 60 Hz monitor).
+        self.hint_label = QLabel(tr("optimizer.system_hint", items=", ".join(hints or [])))
+        self.hint_label.setObjectName("slotWarning")
+        self.hint_label.setWordWrap(True)
+        self.hint_label.setVisible(bool(hints))
+        root.addWidget(self.hint_label)
 
         # --- goal -----------------------------------------------------------
         root.addWidget(self._section_label(tr("optimizer.goal")))

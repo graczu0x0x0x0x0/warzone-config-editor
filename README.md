@@ -40,16 +40,22 @@ pilnuje poprawności wartości i bezpiecznie je zapisuje — z kopią zapasową 
 - **Bezpieczny zapis**: blokada, gdy gra działa; kopia zapasowa przed każdym zapisem; oba pliki
   (`txt0` i `txt1`) zapisywane identycznie i atomowo; zachowany atrybut „tylko do odczytu”.
 - **Narzędzia**: blokada plików przed nadpisaniem, „przywróć ustawienia zalecane przez grę”.
+- **Twój sprzęt i kontrola systemu** — pasek ze specyfikacją komputera (CPU, RAM z prędkością
+  i stanem EXPO/XMP, karta, monitor, dysk z grą) oraz 15 sprawdzeń z instrukcją naprawy:
+  wyłączone EXPO/XMP, pamięć jednokanałowa, gra na HDD, monitor na niższym odświeżaniu, stary
+  sterownik, złe złącze PCIe, wyłączony Resizable BAR, plan zasilania i inne.
+  „Kopiuj specyfikację” przygotowuje tekst na Discord lub forum.
 - Ciemny motyw, przełączanie **PL / EN** w locie.
 
 | | |
 |---|---|
 | ![Optymalizator](docs/img/optimizer.png) | ![Szablony](docs/img/templates.png) |
 | ![Zmiany gry](docs/img/game-change.png) | ![Plik konta](docs/img/account.png) |
+| ![Twój sprzęt](docs/img/hardware-bar.png) | ![Kontrola systemu](docs/img/system-check.png) |
 
 ### Pobranie i uruchomienie
 
-1. Pobierz `WarzoneConfigEditor-1.0.0.exe` (jeden plik, bez instalacji).
+1. Pobierz `WarzoneConfigEditor-1.1.0.exe` (jeden plik, bez instalacji).
 2. Uruchom. Przy pierwszym uruchomieniu Windows SmartScreen może pokazać ostrzeżenie
    („Nieznany wydawca”) — plik nie jest podpisany certyfikatem. Wybierz *Więcej informacji →
    Uruchom mimo to*. Sumę kontrolną SHA-256 znajdziesz w pliku `.sha256` obok.
@@ -104,7 +110,7 @@ zrobionych w jej własnym menu.
 
 ```
 uv sync
-uv run pytest                       # ~280 testów (rdzeń + GUI offscreen)
+uv run pytest                       # ~320 testów (rdzeń + GUI offscreen)
 uv run ruff check . && uv run ruff format .
 uv run wzce --report                # raport z wykrytych plików (tylko odczyt)
 uv run python scripts/build_exe.py  # budowa .exe + samotest (--onedir: wersja folderowa)
@@ -141,11 +147,15 @@ validates every value and saves safely — with backups and a change history.
 - **Safe saving**: blocked while the game runs, backup before every save, both slots (`txt0`/`txt1`)
   written identically and atomically, read-only attribute preserved.
 - **Tools**: lock files against being overwritten, "let the game reset to its recommendations".
+- **Your hardware & system check** — a bar with your PC's spec (CPU, RAM speed and EXPO/XMP
+  state, GPU, monitor, game drive) and 15 checks with fixes: EXPO/XMP off, single-channel RAM,
+  game on HDD, monitor below its refresh rate, outdated driver, wrong PCIe slot, Resizable BAR off,
+  power plan and more. "Copy specification" prepares text for Discord or forums.
 - Dark theme, live **EN / PL** language switch.
 
 ### Download & run
 
-Download `WarzoneConfigEditor-1.0.0.exe` (single file, no installation) and run it. Windows
+Download `WarzoneConfigEditor-1.1.0.exe` (single file, no installation) and run it. Windows
 SmartScreen may warn about an unknown publisher because the file is not code-signed — choose
 *More info → Run anyway*. The SHA-256 checksum is in the `.sha256` file next to it.
 

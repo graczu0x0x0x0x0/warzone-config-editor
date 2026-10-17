@@ -10,6 +10,7 @@ Layers, later ones override earlier ones:
 3. GPU vendor: anti-aliasing / upscaler that fits the card
 4. bottleneck answer (CPU- vs GPU-bound, read from in-game telemetry):
    Reflex boost and GPU Upload Heaps, per the community rule of thumb
+5. system facts: Resizable BAR off -> GPU Upload Heaps off (it needs ReBAR)
 
 Each value carries a ``Reason`` (i18n key + parameters) that the wizard shows
 next to the change, so the user sees *why* it is recommended. The result is a
@@ -139,5 +140,9 @@ def recommend(
         if vendor in (None, "nvidia"):
             result.set("NvidiaReflex@0", "Enabled", reason)
         result.set("GPUUploadHeaps@0", True, reason)
+
+    # 5. GPU Upload Heaps only does something with Resizable BAR enabled.
+    if hardware.rebar is False and "GPUUploadHeaps@0" in document:
+        result.set("GPUUploadHeaps@0", False, Reason("optimizer.reason_rebar_off"))
 
     return result

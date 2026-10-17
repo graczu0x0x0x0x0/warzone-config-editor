@@ -4,6 +4,38 @@ Format oparty na [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/), wersj
 [Semantic Versioning](https://semver.org/lang/pl/). Wersja programu jest zdefiniowana w jednym
 miejscu: `src/wzce/__init__.py`.
 
+## [1.1.0] — 2026-10-17
+
+### Dodano
+
+- **Pasek „Twój sprzęt”** pod nagłówkiem: procesor (rdzenie/wątki), RAM (pojemność, typ, prędkość,
+  ostrzeżenie o wyłączonym EXPO/XMP), karta i VRAM, monitor z odświeżaniem, dysk z grą.
+  Dane wczytują się w tle (2–4 s), pasek można zwinąć.
+- **Okno „Sprzęt i system”** z pełną specyfikacją: pamięć podręczna i 3D V-Cache, każda kość RAM
+  (producent, numer części, napięcie, prędkość i CL znamionowe z numeru części), kanały i sloty,
+  złącze PCIe, Resizable BAR, limit mocy i temperatura karty (NVIDIA), monitor z EDID, folder i dysk
+  gry z wolnym miejscem, Windows, płyta główna, BIOS, plan zasilania, HAGS, tryb gry, nagrywanie
+  w tle, integralność pamięci. Przycisk **„Kopiuj specyfikację”** (tekst na Discord/forum).
+- **Kontrola systemu** — 15 sprawdzeń ze statusem, ważnością, wyjaśnieniem i instrukcją: EXPO/XMP,
+  pamięć jednokanałowa, ilość RAM, dysk z grą (HDD / SATA przy dostępnym NVMe), wolne miejsce,
+  odświeżanie monitora, sterownik starszy niż zalecany przez grę, linie PCIe, Resizable BAR
+  (także w połączeniu z GPU Upload Heaps), plan zasilania, HAGS, tryb gry, nagrywanie w tle,
+  HVCI, grafika zintegrowana. Przyciski otwierają odpowiednie ustawienia Windows lub ustawienie
+  w edytorze. Kontrola niczego nie zmienia.
+- **Optymalizator** pokazuje najważniejsze problemy systemowe i wyłącza GPU Upload Heaps, gdy
+  Resizable BAR jest wyłączony.
+- Tytuł `cod26` rozpoznawany jako *Modern Warfare 4 (beta)* (na podstawie zainstalowanej bety).
+
+### Ustalenia techniczne
+
+- Dane zbierane bez uprawnień administratora: jedno wywołanie PowerShell (CIM/WMI, wynik JSON),
+  rejestr, `powercfg`, `nvidia-smi`, manifesty Steam / wpisy deinstalacji. Każda sonda może się
+  nie udać bez wpływu na pozostałe.
+- EXPO/XMP nie ma flagi w Windows — stan wynika z prędkości i napięcia JEDEC w porównaniu
+  z prędkością znamionową odczytaną z numeru części kości.
+- Dokładnych timingów RAM, temperatury CPU i stanu G-Sync nie da się odczytać bez sterownika
+  jądra — program celowo tego nie robi.
+
 ## [1.0.0] — 2026-10-17
 
 Pierwsze wydanie. · First release.

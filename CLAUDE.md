@@ -45,6 +45,10 @@ Environment quirk: this machine intercepts TLS, so uv needs system certs - alrea
   `MainWindow.hardware` detects lazily once (`hardware_provider` is injectable for tests).
 - Optimizer (`core/optimizer.py`): `recommend(kb, doc, hw, Goal, Bottleneck)` -> values + `Reason`
   (i18n key + params); always feed the values through `plan_template` before applying.
+- System (`core/system_info.py`, `core/system_checks.py`): `collect_system_info()` (slow, 2-4 s,
+  never raises) -> `SystemInfo`; `evaluate_checks(info, hardware, machine_doc)` -> `CheckResult`s
+  (texts: i18n `checks.<id>.title/problem[_variant]/fix/ok`). UI runs the probe in `SystemProbe`
+  (daemon thread); tests pass `system_info_provider=None` or a fixture (`tests/fixtures/system_cim.json`).
 - `HistoryStore` (`core/history.py`): SAVE / GAME_CHANGE entries with diff + snapshot after;
   `last_seen.snapshot` drives `check_external_change`; `session.external_change` holds the latest
   GAME_CHANGE until the UI calls `acknowledge_external_change()`.

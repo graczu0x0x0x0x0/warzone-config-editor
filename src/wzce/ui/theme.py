@@ -240,6 +240,28 @@ def stylesheet() -> str:
     #notice {{ background: #2a2216; border-bottom: 1px solid #4a3b22; }}
     #notice QLabel {{ color: {c["accent_hover"]}; }}
 
+    /* ---------- hardware bar & system dialog ---------- */
+    #hwBar {{ background: {c["surface"]}; border-bottom: 1px solid {c["border"]}; }}
+    #hwTitle {{ color: {c["text_muted"]}; font-weight: 600; }}
+    #hwSummary {{ color: {c["text"]}; }}
+    #hwChecks {{ border-radius: 10px; padding: 3px 12px; font-weight: 600; }}
+    #hwChecks[warn="true"] {{ background: #3a2a12; color: {c["accent"]}; border: 1px solid #5a4220; }}
+    #hwChecks[warn="false"] {{ background: #173326; color: {c["success"]}; border: 1px solid #1f4a37; }}
+    #checkRow {{ background: {c["surface"]}; border: 1px solid {c["border"]}; border-left: 3px solid {c["border"]}; border-radius: 8px; }}
+    #checkRow[status="warn"][severity="high"] {{ border-left-color: {c["danger"]}; }}
+    #checkRow[status="warn"] {{ border-left-color: {c["accent"]}; }}
+    #checkRow[status="ok"] {{ border-left-color: {c["success"]}; }}
+    #checkRow[status="info"] {{ border-left-color: {c["info"]}; }}
+    #checkIcon {{ font-size: 15pt; min-width: 26px; }}
+    #checkIcon[status="warn"] {{ color: {c["accent"]}; }}
+    #checkIcon[status="ok"] {{ color: {c["success"]}; }}
+    #checkIcon[status="info"] {{ color: {c["info"]}; }}
+    #checkIcon[status="unknown"] {{ color: {c["text_faint"]}; }}
+    #checkFix {{ color: {c["info"]}; }}
+    QTabWidget::pane {{ border: 1px solid {c["border"]}; border-radius: 6px; top: -1px; }}
+    QTabBar::tab {{ background: {c["surface"]}; color: {c["text_muted"]}; padding: 7px 16px; border: 1px solid {c["border"]}; border-bottom: none; border-top-left-radius: 6px; border-top-right-radius: 6px; margin-right: 2px; }}
+    QTabBar::tab:selected {{ background: {c["surface_alt"]}; color: {c["text"]}; border-top: 2px solid {c["accent"]}; }}
+
     /* ---------- tables (history) ---------- */
     QTableWidget {{
         background: {c["surface"]}; border: 1px solid {c["border"]}; border-radius: 6px;

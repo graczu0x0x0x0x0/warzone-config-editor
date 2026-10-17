@@ -61,6 +61,14 @@ class AppSettings:
     def preset(self, value: str) -> None:
         self._s.setValue("ui/preset", value)
 
+    @property
+    def hardware_bar_collapsed(self) -> bool:
+        return self._get_bool("ui/hardware_bar_collapsed", False)
+
+    @hardware_bar_collapsed.setter
+    def hardware_bar_collapsed(self, value: bool) -> None:
+        self._s.setValue("ui/hardware_bar_collapsed", value)
+
     # --- files and window -----------------------------------------------------
     @property
     def last_file(self) -> str:

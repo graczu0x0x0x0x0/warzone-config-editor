@@ -94,6 +94,7 @@ class HardwareInfo:
     vram_mb: int | None = None
     refresh_hz: int | None = None  # current refresh rate of the primary display
     max_refresh_hz: int | None = None  # highest rate available at the current resolution
+    rebar: bool | None = None  # Resizable BAR (from SystemInfo/nvidia-smi when known)
 
     @property
     def is_hybrid(self) -> bool:

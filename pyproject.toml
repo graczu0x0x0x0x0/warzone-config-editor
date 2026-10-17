@@ -49,3 +49,5 @@ native-tls = true
 [tool.ruff.lint.per-file-ignores]
 # The Qt stylesheet is CSS inside an f-string; wrapping its rules hurts readability.
 "src/wzce/ui/theme.py" = ["E501"]
+# Embedded PowerShell script (CIM queries) is kept as one readable block.
+"src/wzce/core/system_info.py" = ["E501"]

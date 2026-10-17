@@ -33,7 +33,7 @@ def test_discover_finds_machine_and_account_files(players_dir: Path) -> None:
         ("cod25", Scope.ACCOUNT, FileKind.PROFILE_PM, "76561190000000000"),
     ]
     assert found[3].title_name == "Black Ops 7 / Warzone"
-    assert found[0].title_name == "cod26"  # unknown titles still listed
+    assert found[0].title_name == "Modern Warfare 4 (beta)"
     assert found[3].fileset.is_ab and not found[0].fileset.is_ab
 
 
@@ -106,3 +106,10 @@ def test_same_value(a: str, b: str, same: bool) -> None:
 
 def test_diff_ignores_float_round_off() -> None:
     assert diff_values({"Fov@1": "119.900000"}, {"Fov@1": "119.900002"}) == []
+
+
+def test_unknown_title_code_is_listed_by_code() -> None:
+    from wzce.core.discovery import ConfigLocation
+
+    loc = ConfigLocation(None, Scope.MACHINE, FileKind.SETTINGS, "cod27")  # type: ignore[arg-type]
+    assert loc.title_name == "cod27"

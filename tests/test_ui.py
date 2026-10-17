@@ -46,6 +46,7 @@ def window(qtbot, players_dir: Path, tmp_path: Path, knowledge, game) -> MainWin
         settings,
         locations=discover([players_dir]),
         game_running=game,
+        system_info_provider=None,  # no real WMI/PowerShell probe in tests
         poll=False,
     )
     win.messages = []  # type: ignore[attr-defined]
@@ -716,3 +717,161 @@ def test_fov_changes_by_whole_degrees(window: MainWindow) -> None:
     editor.slider.setValue(editor.slider.value() - 7)  # keyboard-like move snaps to degrees
     value = float(window.session.document.get("Fov@1").raw_value)
     assert value == int(value)
+
+
+# ------------------------------------------- stage 9: hardware bar & checks
+
+
+def _system_fixture():
+    from test_system import _info
+
+    return _info()
+
+
+def _with_system(window: MainWindow, refresh=(240, 240)):
+    from wzce.core.hardware import HardwareInfo
+
+    window._hardware = HardwareInfo(
+        gpu_name="NVIDIA GeForce RTX 5090",
+        gpu_vendor="nvidia",
+        vram_mb=32607,
+        refresh_hz=refresh[0],
+        max_refresh_hz=refresh[1],
+        physical_cores=8,
+        logical_cores=16,
+    )
+    window._on_system_info(_system_fixture())
+    return window
+
+
+def test_hardware_bar_loading_then_data(window: MainWindow) -> None:
+    assert window.hw_bar.summary.text() == "Detecting hardware…"
+    assert window.hw_bar.checks_button.isHidden()
+    _with_system(window)
+    text = window.hw_bar.summary.text()
+    assert "Ryzen 7 9800X3D · 8C/16T" in text
+    assert "64 GB DDR5 · 4800 MT/s ⚠" in text  # EXPO off is flagged
+    assert "RTX 5090 · 32 GB" in text
+    assert "Game: G: SATA SSD" in text
+    assert window.hw_bar.checks_button.text() == "System check: 2 ⚠"
+    assert window.hardware.rebar is True  # merged from nvidia-smi data
+
+
+def test_hardware_bar_collapse_is_remembered(window: MainWindow) -> None:
+    _with_system(window)
+    window.hw_bar.toggle.click()
+    assert window.hw_bar.summary.isHidden()
+    assert window.settings.hardware_bar_collapsed is True
+    window.hw_bar.toggle.click()
+    assert not window.hw_bar.summary.isHidden()
+
+
+def test_system_dialog_spec_and_copy(window: MainWindow, qtbot) -> None:
+    from PySide6.QtGui import QGuiApplication
+
+    from wzce.ui.system_panel import SystemDialog, spec_text
+
+    _with_system(window)
+    dialog = SystemDialog(window.system_info, window.hardware, window.system_checks, window.tr)
+    qtbot.addWidget(dialog)
+    dialog.copy_spec()
+    copied = QGuiApplication.clipboard().text()
+    assert copied == spec_text(window.system_info, window.hardware, window.tr)
+    for expected in (
+        "[Processor]",
+        "Cores / threads: 8 / 16",
+        "L3 96 MB · 3D V-Cache",
+        "EXPO / XMP: off - running at the default JEDEC speed",
+        "P0 CHANNEL A / DIMM 1: PATRIOT · 6400 Series · 32 GB · 1.10 V · rated 6400 MT/s",
+        "PCIe link: PCIe 5.0 x16 (max 5.0 x16)",
+        "Resizable BAR: on",
+        "Monitor: MAG 321U X24 (2024)",
+        "Disk: G: WDC WDS100T2G0A-00JH30 · SATA SSD",
+        "Power plan: High performance",
+    ):
+        assert expected in copied, expected
+    assert dialog.copied_label.text() == "Copied to clipboard."
+    assert dialog.check_rows["expo"].property("status") == "warn"
+
+
+def test_system_dialog_in_polish(window: MainWindow) -> None:
+    from wzce.ui.system_panel import spec_text
+
+    window.set_language("pl")
+    _with_system(window)
+    text = spec_text(window.system_info, window.hardware, window.tr)
+    assert "[Pamięć RAM]" in text and "wyłączony — prędkość domyślna JEDEC" in text
+    assert window.hw_bar.checks_button.text() == "Kontrola systemu: 2 ⚠"
+
+
+def test_check_action_navigates_to_setting(window: MainWindow) -> None:
+    import dataclasses
+
+    info = _system_fixture()
+    info.nvidia = dataclasses.replace(info.nvidia, bar1_mb=256)  # ReBAR off
+    window._on_system_info(info)
+    rebar = next(c for c in window.system_checks if c.id == "rebar")
+    assert rebar.variant == "heaps"
+
+    def run(dialog) -> bool:
+        dialog.action_requested.emit("setting:GPUUploadHeaps@0")
+        return True
+
+    window._exec_dialog = run
+    window.open_system_dialog(show_checks=True)
+    assert "GPUUploadHeaps@0" in window.cards
+
+
+def test_check_action_opens_windows_settings(window: MainWindow) -> None:
+    opened = []
+    window._open_external = opened.append
+    _with_system(window, refresh=(60, 240))
+    refresh = next(c for c in window.system_checks if c.id == "refresh")
+    assert refresh.action == "ms-settings:display-advanced"
+
+    def run(dialog) -> bool:
+        dialog.action_requested.emit(refresh.action)
+        return False
+
+    window._exec_dialog = run
+    window.open_system_dialog()
+    assert opened == ["ms-settings:display-advanced"]
+
+
+def test_optimizer_gets_system_hints_and_rebar(window: MainWindow) -> None:
+    import dataclasses
+
+    info = _system_fixture()
+    info.nvidia = dataclasses.replace(info.nvidia, bar1_mb=256)  # ReBAR off
+    window._on_system_info(info)
+    captured = {}
+
+    def run(dialog) -> bool:
+        captured["hint"] = dialog.hint_label.text()
+        captured["visible"] = not dialog.hint_label.isHidden()
+        row = _row_for(dialog, "GPUUploadHeaps@0")
+        captured["reason"] = dialog.plan_table.table.item(row, 3).text()
+        return False
+
+    window._exec_dialog = run
+    window.open_optimizer()
+    assert captured["visible"] and "Memory profile (EXPO/XMP)" in captured["hint"]
+    assert captured["reason"] == "Resizable BAR is off"
+
+
+def test_account_file_checks_use_machine_file(window: MainWindow) -> None:
+    _open_by_stem(window, "g.cod25.1.0.l")
+    _with_system(window)
+    driver = next(c for c in window.system_checks if c.id == "driver")
+    assert driver.status.value == "ok"  # recommended driver read from the machine file
+
+
+def test_probe_signal_after_close_is_harmless(qtbot) -> None:
+    from wzce.ui.system_panel import SystemProbe
+
+    probe = SystemProbe()
+    received = []
+    probe.ready.connect(received.append)
+    with qtbot.waitSignal(probe.ready, timeout=5000):
+        probe.start(_system_fixture)
+    assert received and received[0].cpu_cores == 8

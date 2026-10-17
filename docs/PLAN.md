@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **wszystkie etapy 0–8 ukończone — wersja 1.0.0** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–9 ukończone — wersja 1.1.0** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -150,6 +150,20 @@ tests/             # pytest, fixtures z examples/
 - [x] README PL/EN ze zrzutami (`docs/img/`), CHANGELOG
 - [ ] Pomysły na później: podpis cyfrowy .exe (mniej ostrzeżeń SmartScreen), lista urządzeń audio
       Windows zamiast identyfikatorów, licencja projektu
+
+### Etap 9 — Twój sprzęt i kontrola systemu (wersja 1.1.0)
+Propozycja i analiza: [`RAPORT_SPRZET.md`](RAPORT_SPRZET.md).
+- [x] 9a Zbieranie danych bez administratora: `core/system_info.py` (PowerShell→JSON, rejestr,
+      powercfg, nvidia-smi, instalacja gry); parsery jako czyste funkcje z testami na fixturach
+- [x] Analiza RAM: kanały z etykiet slotów, prędkość/CL znamionowe z numeru części
+      (G.Skill, Kingston FURY, Corsair, TeamGroup, ogólne), heurystyka EXPO/XMP
+- [x] 9b Pasek „Twój sprzęt” (w tle, zwijany, zapamiętywany) + okno „Sprzęt i system”
+      ze specyfikacją i „Kopiuj specyfikację”
+- [x] 9c Kontrola systemu: 15 sprawdzeń (`core/system_checks.py`) z ważnością, wyjaśnieniem,
+      instrukcją i akcją (ustawienia Windows / strona sterownika / ustawienie w edytorze)
+- [x] 9d Optymalizator: ostrzeżenia systemowe w kreatorze, ReBAR wyłączony → GPU Upload Heaps off
+- [x] Testy: 29 rdzenia (parsowanie, EXPO, sprawdzenia „mój PC” i „PC z problemami”) + 9 GUI
+- [ ] Później: HDR Windows (DisplayConfig), szczegóły PCIe/ReBAR dla AMD/Intel, więcej marek RAM
 
 ## Otwarte pytania / ryzyka
 - Czy gra czyta slot z `.m`, czy zawsze oba? (zapis obu identycznie omija problem)

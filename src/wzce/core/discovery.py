@@ -26,6 +26,9 @@ from .storage import AB_SUFFIXES, SINGLE_SUFFIX, SettingsFileSet
 TITLE_NAMES: dict[str, str] = {
     "cod24": "Black Ops 6",
     "cod25": "Black Ops 7 / Warzone",
+    # Inferred 2026-10-17: the cod26 files appeared together with the installed
+    # "Call of Duty: Modern Warfare 4 - Beta" (Steam app 4783780).
+    "cod26": "Modern Warfare 4 (beta)",
 }
 
 # Folders inside an account folder that we must not treat as accounts or touch.

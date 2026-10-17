@@ -1,0 +1,22 @@
+{
+  "cpu": {"Name": "AMD Ryzen 7 9800X3D 8-Core Processor           ", "NumberOfCores": 8, "NumberOfLogicalProcessors": 16, "MaxClockSpeed": 4700, "L2CacheSize": 8192, "L3CacheSize": 98304, "SocketDesignation": "AM5"},
+  "memory": [
+    {"BankLabel": "P0 CHANNEL A", "DeviceLocator": "DIMM 1", "Manufacturer": "PATRIOT", "PartNumber": "6400 Series         ", "Capacity": 34359738368, "Speed": 4800, "ConfiguredClockSpeed": 4800, "ConfiguredVoltage": 1100, "SMBIOSMemoryType": 34},
+    {"BankLabel": "P0 CHANNEL B", "DeviceLocator": "DIMM 1", "Manufacturer": "PATRIOT", "PartNumber": "6400 Series         ", "Capacity": 34359738368, "Speed": 4800, "ConfiguredClockSpeed": 4800, "ConfiguredVoltage": 1100, "SMBIOSMemoryType": 34}
+  ],
+  "memory_slots": 4,
+  "gpus": [
+    {"Name": "NVIDIA GeForce RTX 5090", "DriverVersion": "32.0.16.1742", "DriverDate": "2026-09-30", "CurrentHorizontalResolution": 3840, "CurrentVerticalResolution": 2160, "CurrentRefreshRate": 240, "MaxRefreshRate": 240},
+    {"Name": "AMD Radeon(TM) Graphics", "DriverVersion": "32.0.21030.31", "DriverDate": "2025-09-02", "CurrentHorizontalResolution": null, "CurrentVerticalResolution": null, "CurrentRefreshRate": null, "MaxRefreshRate": null}
+  ],
+  "board": {"Manufacturer": "Gigabyte Technology Co., Ltd.", "Product": "X870E AORUS ELITE WIFI7"},
+  "bios": {"SMBIOSBIOSVersion": "F12", "ReleaseDate": "2026-05-21"},
+  "os": {"Caption": "Microsoft Windows 11 Pro", "BuildNumber": "26200"},
+  "monitors": [{"manufacturer": "CND", "name": "MAG 321U X24", "year": 2024}],
+  "vbs": {"status": 2, "running": [0]},
+  "drives": [
+    {"letter": "C", "disk": "Samsung SSD 980 1TB", "media": "SSD", "bus": "NVMe"},
+    {"letter": "D", "disk": "ST18000NM000J-2TV103", "media": "HDD", "bus": "SATA"},
+    {"letter": "G", "disk": "WDC WDS100T2G0A-00JH30", "media": "SSD", "bus": "SATA"}
+  ]
+}

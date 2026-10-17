@@ -17,6 +17,7 @@ Data flow
 
 from __future__ import annotations
 
+import dataclasses
 from collections.abc import Callable
 
 from PySide6.QtCore import Qt, QTimer, QUrl
@@ -58,6 +59,8 @@ from ..core.paths import app_data_dir
 from ..core.process import GameRunningCheck, is_game_running
 from ..core.session import EditorSession
 from ..core.storage import SettingsFileSet
+from ..core.system_checks import CheckResult, Severity, Status, evaluate_checks, warnings
+from ..core.system_info import SystemInfo, collect_system_info
 from ..core.templates import TemplateStore
 from ..core.undo import CommandKind
 from .app_settings import AppSettings
@@ -65,6 +68,7 @@ from .changes_panel import ChangesPanel
 from .history_dialog import HistoryDialog
 from .optimizer_dialog import OptimizerDialog
 from .setting_card import SettingCard
+from .system_panel import HardwareBar, SystemDialog, SystemProbe, bar_items, check_title
 from .templates_dialog import TemplatesDialog
 from .theme import repolish
 
@@ -87,6 +91,8 @@ class MainWindow(QMainWindow):
         game_running: GameRunningCheck = is_game_running,
         template_store: TemplateStore | None = None,
         hardware_provider: Callable[[ConfigDocument | None], HardwareInfo] = detect_hardware,
+        system_info_provider: Callable[[], SystemInfo] | None = collect_system_info,
+        async_system_info: bool = True,
         poll: bool = True,
     ) -> None:
         super().__init__()
@@ -97,6 +103,11 @@ class MainWindow(QMainWindow):
         self.template_store = template_store if template_store is not None else TemplateStore()
         self._hardware_provider = hardware_provider
         self._hardware: HardwareInfo | None = None  # detected lazily, once
+        # Detailed spec + checks arrive later from a background probe (2-4 s).
+        self.system_info: SystemInfo | None = None
+        self.system_checks: list[CheckResult] = []
+        self._system_probe = SystemProbe(self)
+        self._system_probe.ready.connect(self._on_system_info)
         self._game_running_check = game_running
         self._game_running = False
         self.session: EditorSession | None = None
@@ -124,6 +135,11 @@ class MainWindow(QMainWindow):
         self._poll()
         if poll:
             self._timer.start()
+        if system_info_provider is not None:
+            if async_system_info:
+                self._system_probe.start(system_info_provider)
+            else:
+                self._on_system_info(system_info_provider())
 
     # =================================================================== UI
     def _build_ui(self) -> None:
@@ -132,6 +148,11 @@ class MainWindow(QMainWindow):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
         root.addWidget(self._build_header())
+        self.hw_bar = HardwareBar(self.tr, collapsed=self.settings.hardware_bar_collapsed)
+        self.hw_bar.details_requested.connect(lambda: self.open_system_dialog())
+        self.hw_bar.checks_requested.connect(lambda: self.open_system_dialog(show_checks=True))
+        self.hw_bar.collapsed_changed.connect(self._on_hw_bar_collapsed)
+        root.addWidget(self.hw_bar)
         root.addWidget(self._build_notice())
 
         self.splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -306,6 +327,7 @@ class MainWindow(QMainWindow):
         self.advanced_check.setText(tr("filter.advanced_mode"))
         self.vendor_check.setText(tr("filter.hide_other_vendors"))
         self.preset_label.setText(tr("toolbar.recommend_for"))
+        self.hw_bar.refresh_texts()
         self.tools_button.setText(tr("toolbar.tools"))
         self.optimize_button.setText(tr("toolbar.optimize"))
         self.reload_action.setText(tr("toolbar.reload"))
@@ -587,6 +609,7 @@ class MainWindow(QMainWindow):
 
     def _render_all(self) -> None:
         self._update_notice()
+        self._refresh_system_checks()
         self._refresh_nav()
         self._render_page()
         self.changes_panel.refresh(self.session)
@@ -797,7 +820,13 @@ class MainWindow(QMainWindow):
             return
         preset = self.preset_combo.currentData() or Goal.COMPETITIVE.value
         dialog = OptimizerDialog(
-            self.session, self.knowledge, self.tr, self.hardware, goal=Goal(preset), parent=self
+            self.session,
+            self.knowledge,
+            self.tr,
+            self.hardware,
+            goal=Goal(preset),
+            hints=self.system_hints(),
+            parent=self,
         )
         if not self._exec_dialog(dialog) or not dialog.result_values:
             return
@@ -807,6 +836,80 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(
             self.tr("optimizer.applied", count=len(touched)), STATUS_TIMEOUT_MS
         )
+
+    # ===================================================== system / checks
+    def _on_system_info(self, info: SystemInfo) -> None:
+        self.system_info = info
+        if info.nvidia is not None and info.nvidia.rebar_enabled is not None:
+            self._hardware = dataclasses.replace(self.hardware, rebar=info.nvidia.rebar_enabled)
+        self._refresh_system_checks()
+
+    def _machine_document(self) -> ConfigDocument | None:
+        """Machine settings of the current title (checks need driver / GPU / ReBAR values)."""
+        session = self.session
+        if session is None:
+            return None
+        if not self.is_account_file():
+            return session.original
+        info = classify_stem(session.fileset.stem)
+        title = info[2] if info else None
+        for loc in self._locations:
+            if loc.scope is Scope.MACHINE and loc.title_code == title:
+                try:
+                    return loc.fileset.load().document
+                except (WzceError, OSError):
+                    return None
+        return None
+
+    def _refresh_system_checks(self) -> None:
+        if self.system_info is None:
+            return
+        self.system_checks = evaluate_checks(
+            self.system_info, self.hardware, self._machine_document()
+        )
+        self.hw_bar.set_data(
+            bar_items(self.system_info, self.hardware, self.tr), len(warnings(self.system_checks))
+        )
+
+    def _on_hw_bar_collapsed(self, collapsed: bool) -> None:
+        self.settings.hardware_bar_collapsed = collapsed
+
+    def system_hints(self) -> list[str]:
+        """Titles of serious system problems, shown in the optimizer."""
+        return [
+            check_title(check, self.tr).split("  ·  ")[0]
+            for check in self.system_checks
+            if check.status is Status.WARN and check.severity is Severity.HIGH
+        ]
+
+    def open_system_dialog(self, show_checks: bool = False) -> None:
+        if self.system_info is None:
+            return
+        dialog = SystemDialog(
+            self.system_info,
+            self.hardware,
+            self.system_checks,
+            self.tr,
+            show_checks=show_checks,
+            parent=self,
+        )
+        chosen: list[str] = []
+
+        def on_action(action: str) -> None:
+            if action.startswith("setting:"):
+                chosen.append(action.removeprefix("setting:"))
+                dialog.accept()
+            else:
+                self._open_external(action)
+
+        dialog.action_requested.connect(on_action)
+        self._exec_dialog(dialog)
+        if chosen:
+            self.navigate_to(chosen[0])
+
+    def _open_external(self, target: str) -> None:
+        """Open a Windows settings page (ms-settings:...) or a web page."""
+        QDesktopServices.openUrl(QUrl(target))
 
     # ============================================================== tools
     def request_game_reset(self) -> None:
