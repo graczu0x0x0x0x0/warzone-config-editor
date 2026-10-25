@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–9 i 10a–10c ukończone, wersja 1.3.0** (2026-10-17). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–9 i 10a–10d ukończone, wersja 1.4.0** (2026-10-25). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 
@@ -175,7 +175,7 @@ Propozycja i analiza: [`RAPORT_SPRZET.md`](RAPORT_SPRZET.md).
 - [x] Testy: 29 rdzenia (parsowanie, EXPO, sprawdzenia „mój PC” i „PC z problemami”) + 9 GUI
 - [ ] Później: HDR Windows (DisplayConfig), szczegóły PCIe/ReBAR dla AMD/Intel, więcej marek RAM
 
-### Etap 10 — Optymalizacja Windows 11 (10a–10c = wersja 1.3.0)
+### Etap 10 — Optymalizacja Windows 11 (10a–10c = wersja 1.3.0, 10d = 1.4.0)
 Research, stan PC autora i propozycja: [`RAPORT_WINDOWS.md`](RAPORT_WINDOWS.md).
 - [x] 10a Odczyt bez administratora: `core/windows_info.py` (`SystemInfo.windows`) — UEFI,
       Secure Boot, GPT, TPM (wersja, producent, firmware), certyfikaty Secure Boot 2023, UAC,

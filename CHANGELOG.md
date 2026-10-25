@@ -6,6 +6,8 @@ miejscu: `src/wzce/__init__.py`.
 
 ## [Nieopublikowane]
 
+## [1.4.0] — 2026-10-25
+
 ### Dodano
 
 - **„Napraw” w zakładce Optymalizacja Windows** — program może sam zmienić 8 ustawień Twojego
