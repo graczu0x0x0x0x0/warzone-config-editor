@@ -5,7 +5,7 @@
   "about.text": "Warzone Config Editor {version}\n\nYour backups, history and templates are stored in:\n{data_dir}",
 
   "app.title": "Warzone Config Editor",
-  "app.subtitle": "Settings editor for Call of Duty: Black Ops 7 / Warzone",
+  "app.subtitle": "Settings editor for Call of Duty: Warzone, Modern Warfare 4 and Black Ops 7",
 
   "backup.title": "Backups",
   "backup.empty": "No backups yet.",

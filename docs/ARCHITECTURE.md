@@ -31,7 +31,7 @@ the game-file logic reviewable on its own.
 |---|---|
 | `errors.py` | `WzceError` hierarchy (parse, validation, unknown setting, game running, write verification, backup); `KnowledgeError` lives in `knowledge.py` |
 | `model.py` | `Setting`, `Constraint`, `ValueType`; value validation and canonical formatting |
-| `document.py` | text ⇄ `ConfigDocument`, byte-exact round-trip, `set_value`, `apply_values` |
+| `document.py` | text ⇄ `ConfigDocument`, byte-exact round-trip, `set_value`, `apply_values`; lines without a constraint borrow it from another variant of the key (`Setting.constraint_from`) |
 | `diff.py` | setting-level diff of documents/snapshots; `same_value()` float32 tolerance |
 | `storage.py` | `SettingsFileSet`: A/B slots (`txt0/txt1` or single `.txt`), atomic save of both slots, read-only attribute, rollback |
 | `backup.py` | `BackupManager`: timestamped copies of `txt0/txt1/.m` + sha256 manifest, restore, prune |

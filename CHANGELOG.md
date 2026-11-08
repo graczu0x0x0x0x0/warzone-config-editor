@@ -6,6 +6,20 @@ miejscu: `src/wzce/__init__.py`.
 
 ## [Nieopublikowane]
 
+### Zmieniono
+
+- Obsługa nowego Warzone na silniku **Modern Warfare 4** (`cod26`, premiera 2026-11-08). Pliki
+  `cod26` są teraz podpisane jako *Modern Warfare 4 / Warzone*, a `cod25` jako *Black Ops 7*.
+
+### Naprawiono
+
+- W wersji premierowej gra przestała zapisywać listę dozwolonych wartości przy dwóch
+  ustawieniach: *AMD FidelityFX* (`AMDFidelityFX@0`) i *Tryb DLSS* (`DLSSModeMP@0`). Edytor
+  traktował je wtedy jak zwykły tekst i przyjmował dowolną wartość, a szablony mogły wpisać
+  DLAA, którego MW4 nie oferuje. Teraz lista jest brana z drugiego wariantu tego samego
+  ustawienia (`@1`), więc znów jest wybór z listy, a błędne wartości są odrzucane. Sam plik
+  gry zapisuje się bez zmian w tych liniach.
+
 ## [1.4.0] — 2026-10-25
 
 ### Dodano

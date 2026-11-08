@@ -667,8 +667,8 @@ def _open_by_stem(window: MainWindow, stem: str) -> None:
 
 def test_account_files_are_listed_with_labels(window: MainWindow) -> None:
     labels = [window.file_combo.itemText(i) for i in range(window.file_combo.count())]
-    assert "Black Ops 7 / Warzone · Account profile …0000" in labels
-    assert "Black Ops 7 / Warzone · Account FOV …0000" in labels
+    assert "Black Ops 7 · Account profile …0000" in labels
+    assert "Black Ops 7 · Account FOV …0000" in labels
 
 
 def test_edit_and_save_account_sensitivity_and_fov(window: MainWindow, players_dir: Path) -> None:
@@ -950,7 +950,7 @@ def test_share_dialog_markdown_and_json(window: MainWindow, tmp_path: Path) -> N
     checked = [gid for gid, c in dialog.group_checks.items() if c.isChecked()]
     assert checked == ["display", "performance", "upscaling", "quality"]
     text = dialog.preview.toPlainText()
-    assert text.startswith("# Call of Duty settings — Black Ops 7 / Warzone")
+    assert text.startswith("# Call of Duty settings — Black Ops 7")
     assert "## Display" in text and "`VSync@0`" in text
     assert "AmdAntilag2@0" not in text  # sample file reports an NVIDIA GPU
 

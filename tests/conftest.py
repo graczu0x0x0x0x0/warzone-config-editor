@@ -19,6 +19,8 @@ COD25_TXT0 = EXAMPLES / "s.1.0.cod25.txt0"
 COD25_TXT1 = EXAMPLES / "s.1.0.cod25.txt1"
 COD25_MARKER = SNAPSHOT / "s.1.0.cod25.m"
 COD26_SINGLE = SNAPSHOT / "s.1.0.cod26.txt"
+# MW4 / Warzone release: some lines lost their "// one of ..." comment (FILE_FORMAT.md §6).
+COD26_RELEASE = EXAMPLES / "live_snapshot_2026-11-08" / "s.1.0.cod26.txt"
 PROFILE_TXT0 = SNAPSHOT / "profile" / "g.cod25.1.0.l.txt0"
 
 ALL_SAMPLE_FILES = sorted(p for p in EXAMPLES.rglob("*") if p.suffix in {".txt0", ".txt1", ".txt"})

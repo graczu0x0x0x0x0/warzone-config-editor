@@ -214,6 +214,10 @@ Research, stan PC autora i propozycja: [`RAPORT_WINDOWS.md`](RAPORT_WINDOWS.md).
 - [x] 1.1.2 — oryginalna nazwa z pliku (np. `DLSSModeMP@0`) w nawiasie przy nazwie ustawienia
 - [x] 1.2.0 — „Udostępnij ustawienia” (Markdown / JSON): `core/share_export.py` + `ui/share_dialog.py`;
       formatowanie wartości przeniesione do `core/display.py` (wspólne dla UI i eksportu)
+- [x] Premiera MW4 / Warzone (`cod26`, 2026-11-08): próbka `examples/live_snapshot_2026-11-08`;
+      ustawienia bez `// one of ...` (`AMDFidelityFX@0`, `DLSSModeMP@0`) przejmują listę
+      wartości z drugiego wariantu klucza; nazwy tytułów „Modern Warfare 4 / Warzone” i „Black Ops 7”
+- [ ] Czy gra akceptuje DLAA w `DLSSModeMP@0` w cod26 (plik dopuszcza tylko DLSS) — test w grze
 
 ## Otwarte pytania / ryzyka
 - ~~Czy gra czyta slot z `.m`, czy zawsze oba?~~ — nieistotne: zapisujemy oba sloty identycznie,

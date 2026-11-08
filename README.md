@@ -3,8 +3,8 @@
 <h1 align="center">Warzone Config Editor</h1>
 
 <p align="center">
-Graficzny edytor plików ustawień <b>Call of Duty: Black Ops 7 / Warzone</b> (PC)<br>
-Graphical editor for <b>Call of Duty: Black Ops 7 / Warzone</b> PC settings files
+Graficzny edytor plików ustawień <b>Call of Duty: Warzone, Modern Warfare 4 i Black Ops 7</b> (PC)<br>
+Graphical editor for <b>Call of Duty: Warzone, Modern Warfare 4 and Black Ops 7</b> PC settings files
 </p>
 
 <p align="center"><a href="#polski">Polski</a> · <a href="#english">English</a></p>
@@ -86,7 +86,7 @@ uv run wzce
 1. **Zamknij grę** (wskaźnik w nagłówku pokazuje „Gra zamknięta”). Gra przy wyjściu nadpisuje
    pliki ustawień, więc edytor nie pozwoli zapisać, gdy działa.
 2. Wybierz plik: **Ustawienia komputera** (grafika, wydajność) albo **Profil konta**
-   (czułość, FOV, dźwięk). Edytor sam znajduje pliki BO7 (`cod25`), BO6 (`cod24`) i nowszych tytułów.
+   (czułość, FOV, dźwięk). Edytor sam znajduje pliki MW4 / Warzone (`cod26`), BO7 (`cod25`), BO6 (`cod24`) i nowszych tytułów.
 3. Zmieniaj ustawienia w kategoriach lub skorzystaj z **Optymalizuj** / **Szablony**.
    Panel po prawej pokazuje wszystkie zmiany „przed → po”.
 4. **Zapisz** (Ctrl+S). Uruchom grę.
@@ -198,7 +198,7 @@ From source (requires [uv](https://docs.astral.sh/uv/)): `uv sync` then `uv run 
 
 1. **Close the game** — it rewrites its settings on exit, so the editor refuses to save while it runs.
 2. Pick a file: **Machine settings** (graphics, performance) or **Account profile**
-   (sensitivity, FOV, audio). BO7 (`cod25`), BO6 (`cod24`) and newer titles are found automatically.
+   (sensitivity, FOV, audio). MW4 / Warzone (`cod26`), BO7 (`cod25`), BO6 (`cod24`) and newer titles are found automatically.
 3. Edit settings by category or use **Optimize** / **Templates**; the right panel lists every
    pending change "before → after".
 4. **Save** (Ctrl+S) and start the game.

@@ -124,6 +124,9 @@ class Setting:
     line_index: int  # 0-based index into ConfigDocument.lines
     description: str = ""
     section: str | None = None  # None for settings outside any "// Section" block
+    # Id of the other variant whose constraint was borrowed because this line has
+    # none of its own (see ConfigDocument._inherit_missing_constraints).
+    constraint_from: str | None = None
     value_type: ValueType = field(init=False)
 
     def __post_init__(self) -> None:
@@ -180,6 +183,19 @@ def infer_value_type(raw_value: str, constraint: Constraint | None) -> ValueType
     if raw_value in ("true", "false"):
         return ValueType.BOOL
     return ValueType.STRING
+
+
+def is_canonical_in(raw_value: str, constraint: Constraint) -> bool:
+    """True when ``raw_value`` is valid for ``constraint`` exactly as written.
+
+    "Exactly" matters: ``"1"`` under a float range would be re-formatted to
+    ``"1.000000"`` and ``"very low"`` to ``"Very_Low"`` - such values do not fit.
+    """
+    value_type = infer_value_type(raw_value, constraint)
+    try:
+        return format_value(raw_value, value_type, constraint) == raw_value
+    except ValidationError:
+        return False
 
 
 def parse_raw_value(raw: str, value_type: ValueType) -> bool | int | float | str:

@@ -22,7 +22,7 @@ from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 
 from .errors import ParseError, UnknownSettingError, ValidationError
-from .model import Constraint, Setting
+from .model import Constraint, Setting, infer_value_type, is_canonical_in
 
 # Key may contain spaces ("Handheld Fov") but never '@'. The three numbers are
 # copied verbatim on write - see FILE_FORMAT.md section "Meaning of the two numbers".
@@ -156,6 +156,36 @@ class ConfigDocument:
                 )
             else:
                 self._by_id[setting.id] = setting
+
+        self._inherit_missing_constraints()
+
+    def _inherit_missing_constraints(self) -> None:
+        """Borrow the value domain of a line that lost it from another variant of the key.
+
+        The cod26 release writes some lines without the trailing comment
+        (``AMDFidelityFX@0 = Off``, ``DLSSModeMP@0 = DLSS``) while the other variant
+        of the same key keeps it (``... // one of Off, CAS, FSR 1, FSR 3``). Without
+        a domain the value would be free text and any typo or a value the title does
+        not offer (DLAA in cod26) would pass validation. Only the in-memory
+        constraint changes - the line keeps its empty suffix, so the round-trip
+        stays byte-exact. A domain is borrowed only if the current value already
+        fits it exactly; otherwise the setting stays free text as before.
+        """
+        by_key: dict[str, list[Setting]] = {}
+        for setting in self.settings:
+            by_key.setdefault(setting.key, []).append(setting)
+        for setting in self.settings:
+            if setting.constraint is not None or setting.suffix:
+                continue  # has a domain, or an unrecognized comment we must not override
+            for sibling in by_key[setting.key]:
+                constraint = sibling.constraint
+                if constraint is None or sibling.constraint_from is not None:
+                    continue  # borrow only domains the game itself wrote
+                if is_canonical_in(setting.raw_value, constraint):
+                    setting.constraint = constraint
+                    setting.constraint_from = sibling.id
+                    setting.value_type = infer_value_type(setting.raw_value, constraint)
+                    break
 
     @staticmethod
     def _parse_setting_line(line: str, index: int) -> Setting | None:

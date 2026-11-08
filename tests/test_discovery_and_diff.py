@@ -32,8 +32,8 @@ def test_discover_finds_machine_and_account_files(players_dir: Path) -> None:
         ("cod25", Scope.ACCOUNT, FileKind.PROFILE, "76561190000000000"),
         ("cod25", Scope.ACCOUNT, FileKind.PROFILE_PM, "76561190000000000"),
     ]
-    assert found[3].title_name == "Black Ops 7 / Warzone"
-    assert found[0].title_name == "Modern Warfare 4 (beta)"
+    assert found[3].title_name == "Black Ops 7"
+    assert found[0].title_name == "Modern Warfare 4 / Warzone"
     assert found[3].fileset.is_ab and not found[0].fileset.is_ab
 
 

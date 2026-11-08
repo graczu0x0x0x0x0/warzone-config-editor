@@ -1,7 +1,7 @@
 # CLAUDE.md — Warzone Config Editor
 
-GUI editor for Call of Duty: Black Ops 7 / Warzone PC settings files
-(`%LOCALAPPDATA%\Activision\Call of Duty\players\s.1.0.cod25.txt0` / `.txt1`).
+GUI editor for Call of Duty: Warzone / Modern Warfare 4 (`cod26`) and Black Ops 7 (`cod25`) PC settings files
+(`%LOCALAPPDATA%\Activision\Call of Duty\players\s.1.0.cod25.txt0` / `.txt1`, single `s.1.0.cod26.txt`).
 
 ## Status
 Released and working: **v1.4.0**, stages 0–10d of `docs/PLAN.md` done, ~430 tests green.

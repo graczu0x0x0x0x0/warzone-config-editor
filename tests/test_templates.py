@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import COD26_SINGLE, not_running
+from conftest import COD26_RELEASE, COD26_SINGLE, not_running
 from wzce.core import ConfigDocument, KnowledgeBase, SettingsFileSet
 from wzce.core.session import EditorSession
 from wzce.core.templates import (
@@ -157,10 +157,17 @@ def test_builtin_templates(doc, kb) -> None:
     assert not (set(competitive.values) & HARDWARE_IDS)
 
 
-def test_builtin_quality_skips_dlaa_on_cod26(kb) -> None:
-    cod26 = ConfigDocument.from_bytes(COD26_SINGLE.read_bytes())
+@pytest.mark.parametrize("path", [COD26_SINGLE, COD26_RELEASE], ids=["beta", "release"])
+def test_builtin_quality_skips_dlaa_on_cod26(kb, path: Path) -> None:
+    # The release file has no "// one of DLSS" on this line; the domain comes from @1.
+    cod26 = ConfigDocument.from_bytes(path.read_bytes())
     quality = next(t for t in builtin_templates(kb, cod26, "en") if t.builtin_id == "quality")
     assert "DLSSModeMP@0" not in quality.values  # DLAA does not exist in cod26
+    plan = plan_template(cod26, kb, {"DLSSModeMP@0": "DLAA", "AMDFidelityFX@0": "FSR 9"})
+    assert plan.skipped == {
+        "DLSSModeMP@0": SkipReason.INVALID,
+        "AMDFidelityFX@0": SkipReason.INVALID,
+    }
 
 
 # ---------------------------------------------------------------- storage

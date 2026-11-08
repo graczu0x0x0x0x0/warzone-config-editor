@@ -25,10 +25,10 @@ from .storage import AB_SUFFIXES, SINGLE_SUFFIX, SettingsFileSet
 # Known title codes. Unknown codes are still listed, just without a friendly name.
 TITLE_NAMES: dict[str, str] = {
     "cod24": "Black Ops 6",
-    "cod25": "Black Ops 7 / Warzone",
-    # Inferred 2026-10-17: the cod26 files appeared together with the installed
-    # "Call of Duty: Modern Warfare 4 - Beta" (Steam app 4783780).
-    "cod26": "Modern Warfare 4 (beta)",
+    "cod25": "Black Ops 7",
+    # cod26 first appeared with the "Modern Warfare 4 - Beta" (2026-10-17); since the
+    # 2026-11-08 release Warzone runs on it too and the cod25 files are no longer written.
+    "cod26": "Modern Warfare 4 / Warzone",
 }
 
 # Folders inside an account folder that we must not treat as accounts or touch.

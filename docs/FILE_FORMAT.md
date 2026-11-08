@@ -18,7 +18,9 @@ Root: `%LOCALAPPDATA%\Activision\Call of Duty\players\`
 | `<platformId>\keybinds.cod25.kb` | binary (`codk` magic) | account | Key bindings — **do not touch** |
 | `<platformId>\settingspresets.cod25.2.cdb`, `favoritesettings.cod25.2.cdb` | binary | account | In-game presets/favourites |
 | `<platformId>\SteamCloud\...` | mixed | account | Steam Cloud mirror |
-| `s.1.0.cod26.txt` (single file, no A/B) | text | machine | Next title (`cod26`), same grammar, 163 settings |
+| `s.1.0.cod26.txt` (single file, no A/B) | text | machine | Modern Warfare 4 / Warzone (`cod26`), same grammar, 163 settings |
+| `<platformId>\g.cod26.1.0.l.b`, `g.cod26.pm.1.0.l.b` | binary (40 / 25 B) | account | Single-file companions of the cod26 `.l.txt` files — **do not touch** |
+| `<platformId>\SteamCloud\g.cod26.1.0.txt` | text | account (cloud) | Same grammar; on 2026-11-08 held only the Accessibility setting `TextChat background opacity@0` (in cod25 it lived in the local account file). SteamCloud is never edited |
 
 ### Account files and their `.l.b` companions (analysed 2026-10-17)
 
@@ -113,6 +115,12 @@ Parsing rules / pitfalls:
 - Some float ranges are absurd (`-3.4e38 to 3.4e38`, `0 to 2147483647`) → use a spin box, not a slider.
 - The same key can appear with different variants: `DepthOfField@0` (bool) and `DepthOfField@1`
   (enum). The **identity of a setting is `Key@Variant`**, not `Key`.
+- The constraint comment can be **missing on one variant** while the other keeps it
+  (cod26 release, 2026-11-08: `AMDFidelityFX@0 = Off` vs
+  `AMDFidelityFX@1 = Off // one of Off, CAS, FSR 1, FSR 3`; same for `DLSSModeMP@0/@1`
+  with `one of DLSS`). The beta file had the comment on both. The parser borrows the
+  sibling's domain when the current value fits it exactly (`Setting.constraint_from`);
+  the line itself is written back without a comment, as the game wrote it.
 - Description comments may be duplicated or shared between variants.
 - One trailing block (`LicensedMusicVolume`, `MouseUsesRawInput`, `VRSValidationMask`) sits
   **after** the System section without its own section header → treat as "Other".
@@ -179,3 +187,12 @@ Removed: `DepthOfField@0/1`, `LicensedMusicVolume@0`, `MouseUsesRawInput@0`, `VR
 
 → The editor must render **unknown keys automatically** from the inline constraint, using the
 knowledge base only for labels/descriptions/recommendations.
+
+### cod26 beta → release (2026-11-08)
+
+Since the release Warzone runs on `cod26` (Modern Warfare 4); the cod25 files were last
+written on 2026-10-25. Compared with the beta snapshot (`examples/live_snapshot_2026-10-17`)
+the release files (`examples/live_snapshot_2026-11-08`) have the **same ids** in all three
+files (163 / 71 / 3): nothing added, nothing removed. The only format change is the
+constraint comment dropped from `AMDFidelityFX@0` and `DLSSModeMP@0` (see §3). The other
+differences are values (the author's in-game choices and a newer driver).

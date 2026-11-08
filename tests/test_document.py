@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import ALL_SAMPLE_FILES, COD26_SINGLE, PROFILE_TXT0
+from conftest import ALL_SAMPLE_FILES, COD26_RELEASE, COD26_SINGLE, PROFILE_TXT0
 from wzce.core import ConfigDocument, ParseError, UnknownSettingError, ValidationError, ValueType
 
 # ----------------------------------------------------------------- round-trip
@@ -70,6 +70,37 @@ def test_cod26_and_profile_files_parse() -> None:
     # Keys with spaces are legal in account files.
     assert profile.get("Handheld Fov@0").value == 80.0
     assert profile.get("TextChat background opacity@0").value == pytest.approx(0.2)
+
+
+def test_missing_constraint_is_borrowed_from_other_variant() -> None:
+    data = COD26_RELEASE.read_bytes()
+    doc = ConfigDocument.from_bytes(data)
+    amd = doc.get("AMDFidelityFX@0")
+    assert amd.suffix == "" and amd.constraint_from == "AMDFidelityFX@1"
+    assert amd.value_type is ValueType.ENUM
+    assert amd.constraint.options == ("Off", "CAS", "FSR 1", "FSR 3")
+    assert doc.get("DLSSModeMP@0").constraint.options == ("DLSS",)
+    with pytest.raises(ValidationError):
+        doc.set_value("DLSSModeMP@0", "DLAA")  # cod26 offers only DLSS
+    doc.set_value("AMDFidelityFX@0", "fsr 3")  # canonical spelling, line keeps no comment
+    assert doc.lines[doc.get("AMDFidelityFX@0").line_index] == "AMDFidelityFX@0;56444;48403 = FSR 3"
+    assert ConfigDocument.from_bytes(data).to_bytes() == data
+    assert sum(1 for s in doc if s.constraint_from) == 2
+
+
+@pytest.mark.parametrize(
+    ("line", "sibling"),
+    [
+        ("A@0;1;2 = Bogus", "A@1;1;2 = Low // one of Low, High"),  # outside the domain
+        ("A@0;1;2 = low", "A@1;1;2 = Low // one of Low, High"),  # not the exact spelling
+        ("A@0;1;2 = 1", "A@1;1;2 = 0.5 // 0.000000 to 1.000000"),  # "1" is not "1.000000"
+        ("A@0;1;2 = Low // custom note", "A@1;1;2 = Low // one of Low, High"),  # own comment
+    ],
+)
+def test_constraint_is_not_borrowed_when_value_does_not_fit(line: str, sibling: str) -> None:
+    doc = ConfigDocument.parse(f"1\n{line}\n{sibling}\n")
+    assert doc.get("A@0").constraint is None
+    assert doc.get("A@0").value_type is ValueType.STRING
 
 
 def test_variants_are_distinct_settings(cod25_doc: ConfigDocument) -> None:
