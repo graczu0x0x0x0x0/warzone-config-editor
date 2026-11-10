@@ -6,6 +6,8 @@ miejscu: `src/wzce/__init__.py`.
 
 ## [Nieopublikowane]
 
+## [1.4.1] — 2026-11-10
+
 ### Zmieniono
 
 - Obsługa nowego Warzone na silniku **Modern Warfare 4** (`cod26`, premiera 2026-11-08). Pliki

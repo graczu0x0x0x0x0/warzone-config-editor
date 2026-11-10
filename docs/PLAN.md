@@ -1,6 +1,6 @@
 # Plan realizacji — Warzone Config Editor
 
-> Status: stos zaakceptowany; **etapy 0–9 i 10a–10d ukończone, wersja 1.4.0** (2026-10-25). Odhaczaj `[x]` w miarę postępu.
+> Status: stos zaakceptowany; **etapy 0–9 i 10a–10d ukończone, wersja 1.4.1** (2026-11-10). Odhaczaj `[x]` w miarę postępu.
 > Stos: Python 3.12 + PySide6-Essentials, pytest, ruff, uv, PyInstaller.
 > Szczegóły i uzasadnienie: [`RAPORT.md`](RAPORT.md). Format pliku: [`FILE_FORMAT.md`](FILE_FORMAT.md).
 

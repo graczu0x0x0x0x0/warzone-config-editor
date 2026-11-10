@@ -4,7 +4,7 @@ GUI editor for Call of Duty: Warzone / Modern Warfare 4 (`cod26`) and Black Ops 
 (`%LOCALAPPDATA%\Activision\Call of Duty\players\s.1.0.cod25.txt0` / `.txt1`, single `s.1.0.cod26.txt`).
 
 ## Status
-Released and working: **v1.4.0**, stages 0–10d of `docs/PLAN.md` done, ~430 tests green.
+Released and working: **v1.4.1**, stages 0–10d of `docs/PLAN.md` done, ~475 tests green.
 Current version: `src/wzce/__init__.py`; what changed recently: `CHANGELOG.md` + `git log`.
 Remaining ideas are the unchecked `[ ]` items in `docs/PLAN.md` - nothing is in progress unless
 the user says so.
